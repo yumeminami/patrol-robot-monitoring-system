@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+sqlalchemy
+flake8
+coverage

@@ -29,7 +29,7 @@ def get_robots(db: Session = Depends(get_db)):
                 "message": "No robots found"},
             status_code=404)
     robots = jsonable_encoder(robots)
-    return JSONResponse(content=robots, status_code=200)
+    return robots
 
 
 @router.get("/{robot_id}", response_model=Robot)
@@ -41,12 +41,13 @@ def get_robot(robot_id: int, db: Session = Depends(get_db)):
                 "message": "No robot found"},
             status_code=404)
     robot = jsonable_encoder(robot)
-    return JSONResponse(content=robot, status_code=200)
+    return robot
 
 
 @router.post("/", response_model=Robot)
 def create_robot(robot: RobotCreate, db: Session = Depends(get_db)):
-    return crud_robot.create(db=db, obj_in=robot)
+    robot = crud_robot.create(db=db, obj_in=robot)
+    return robot
 
 
 @router.post("/{robot_id}", response_model=Robot)
@@ -60,7 +61,8 @@ def update_robot(
             content={
                 "message": "No robot found"},
             status_code=404)
-    return crud_robot.update(db=db, db_obj=robot, obj_in=robot_update)
+    robot = crud_robot.update(db=db, db_obj=robot, obj_in=robot_update)
+    return robot
 
 
 @router.delete("/{robot_id}", response_model=Robot)
@@ -71,4 +73,5 @@ def delete_robot(robot_id: int, db: Session = Depends(get_db)):
             content={
                 "message": "No robot found"},
             status_code=404)
-    return crud_robot.remove(db=db, id=robot_id)
+    robot = crud_robot.remove(db=db, id=robot_id)
+    return robot

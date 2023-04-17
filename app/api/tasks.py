@@ -23,22 +23,42 @@ def get_db():
 @router.get("/{id}", response_model=list[Task])
 def get_task(id: int, db: Session = Depends(get_db)):
     tasks = crud_task.task.get(db, id=id)
-    tasks = jsonable_encoder(tasks)
-    return JSONResponse(content=tasks, status_code=200)
+    if not tasks:
+        return JSONResponse(
+            content={
+                "message": "No tasks found"},
+            status_code=404)
+    return tasks
 
 
 @router.post("/", response_model=Task)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
-    return crud_task.task.create(db=db, obj_in=task)
+    task = crud_task.task.create(db=db, obj_in=task)
+    return task
 
 
 @router.post("/{id}", response_model=Task)
-def update_task(id: int, task: TaskUpdate, db: Session = Depends(get_db)):
-    return crud_task.task.update(
-        db=db, db_obj=crud_task.task.get(
-            db=db, id=id), obj_in=task)
+def update_task(
+        id: int,
+        task_update: TaskUpdate,
+        db: Session = Depends(get_db)):
+    task = crud_task.task.get(db=db, id=id)
+    if not task:
+        return JSONResponse(
+            content={
+                "message": "No task found"},
+            status_code=404)
+    task = crud_task.task.update(db=db, db_obj=task, obj_in=task_update)
+    return task
 
 
 @router.delete("/{id}", response_model=Task)
 def delete_task(id: int, db: Session = Depends(get_db)):
-    return crud_task.task.remove(db=db, id=id)
+    task = crud_task.task.get(db=db, id=id)
+    if not task:
+        return JSONResponse(
+            content={
+                "message": "No task found"},
+            status_code=404)
+    task = crud_task.task.remove(db=db, id=id)
+    return task

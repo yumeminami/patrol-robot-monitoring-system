@@ -6,6 +6,7 @@ from app.crud.base import CRUDBase
 from app.models.tasks import Task
 from app.schemas.tasks import TaskCreate, TaskUpdate
 
+
 class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
     def get_multi_by_name(
         self, db: Session, *, name: str, skip: int = 0, limit: int = 100
@@ -17,5 +18,6 @@ class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
             .limit(limit)
             .all()
         )
+
 
 task = CRUDTask(Task)

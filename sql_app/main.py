@@ -19,6 +19,8 @@ async def db_session_middleware(request: Request, call_next):
     return response
 
 # Dependency
+
+
 def get_db(request: Request):
     return request.state.db
 

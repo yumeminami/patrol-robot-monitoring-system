@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 
 from ..db.database import Base
 
+
 class Robot(Base):
     __tablename__ = "robots"
 

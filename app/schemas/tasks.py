@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 
+
 class Task(BaseModel):
     id: int
     name: str
+
     class Config:
         orm_mode = True
 
@@ -10,6 +12,7 @@ class Task(BaseModel):
 class TaskCreate(BaseModel):
     name: str
 
+
 class TaskUpdate(BaseModel):
-    id : int
+    id: int
     name: str

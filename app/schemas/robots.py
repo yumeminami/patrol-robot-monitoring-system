@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 
+
 class Robot(BaseModel):
     id: int
     name: str
+
     class Config:
         orm_mode = True
 
@@ -10,6 +12,7 @@ class Robot(BaseModel):
 class RobotCreate(BaseModel):
     name: str
 
+
 class RobotUpdate(BaseModel):
-    id : int
+    id: int
     name: str

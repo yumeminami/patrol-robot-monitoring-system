@@ -20,7 +20,7 @@ def get_db():
         db.close()
 
 
-@router.get("/{id}", response_model=list[Task])
+@router.get("/{id}", response_model=Task)
 def get_task(id: int, db: Session = Depends(get_db)):
     tasks = crud_task.task.get(db, id=id)
     if not tasks:
@@ -30,6 +30,16 @@ def get_task(id: int, db: Session = Depends(get_db)):
             status_code=404)
     return tasks
 
+@router.get("/", response_model=list[Task])
+def get_tasks(db: Session = Depends(get_db)):
+    tasks = crud_task.task.get_multi(db=db)
+    if not tasks:
+        return JSONResponse(
+            content={
+                "message": "No tasks found"},
+            status_code=404)
+    tasks = jsonable_encoder(tasks)
+    return tasks
 
 @router.post("/", response_model=Task)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):

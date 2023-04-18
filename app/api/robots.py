@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from ..db.database import SessionLocal, engine
+from app.db.database import SessionLocal, engine
 from app.crud.robots import robot as crud_robot
-from ..schemas.robots import RobotCreate, RobotUpdate, Robot
+from app.schemas.robots import RobotCreate, RobotUpdate, Robot
 from sqlalchemy.orm import Session
-from ..models import robots
+from app.models import robots
 from fastapi.encoders import jsonable_encoder
 
 robots.Base.metadata.create_all(bind=engine)

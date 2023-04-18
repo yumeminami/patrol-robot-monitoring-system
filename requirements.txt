@@ -3,3 +3,4 @@ uvicorn
 sqlalchemy
 flake8
 coverage
+pymongo

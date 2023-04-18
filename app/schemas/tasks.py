@@ -22,6 +22,7 @@ class PyObjectId(ObjectId):
     def __modify_schema__(cls, field_schema):
         field_schema.update(type="string")
 
+
 class Task(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     type: int = Field(...)

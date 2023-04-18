@@ -35,7 +35,7 @@ task = tasks.Task(
         name="2",
         sensitivity=2,
     )],
-    status = 1,
+    status=1,
     start_time="2021-01-01 00:00:00",
     is_everyday=True
 )

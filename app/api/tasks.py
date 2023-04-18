@@ -9,7 +9,7 @@ from fastapi.encoders import jsonable_encoder
 import pymongo
 import pydantic
 from bson import ObjectId
-pydantic.json.ENCODERS_BY_TYPE[ObjectId]=str
+pydantic.json.ENCODERS_BY_TYPE[ObjectId] = str
 
 # tasks.Base.metadata.create_all(bind=engine)
 
@@ -17,9 +17,10 @@ router = APIRouter()
 
 collection = mongo_db["tasks"]
 
+
 @router.get("/", response_model=list[Task])
 async def get_tasks():
-    tasks =  collection.find()
+    tasks = collection.find()
     response_body = []
     for task in tasks:
         print(task)
@@ -27,20 +28,25 @@ async def get_tasks():
         response_body.append(task)
     return response_body
 
+
 @router.post("/", response_model=Task)
 def create_task(task: Task):
     result = collection.insert_one(task.dict())
     return task
+
 
 @router.get("/{id}", response_model=Task)
 def get_task(id: str):
     task = collection.find_one({"_id": ObjectId(id)})
     return task
 
+
 @router.post("/{id}", response_model=Task)
 def update_task(id: str, task: Task):
-    result = collection.update_one({"_id": ObjectId(id)}, {"$set": task.dict()})
+    result = collection.update_one(
+        {"_id": ObjectId(id)}, {"$set": task.dict()})
     return task
+
 
 @router.delete("/{id}", response_model=Task)
 def delete_task(id: str):

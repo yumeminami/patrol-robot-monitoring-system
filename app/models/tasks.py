@@ -9,3 +9,6 @@ class Task(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(50), index=True)
+    robot = Column(String(50))
+    status = Column(Integer)
+    start_time = Column(String(50))

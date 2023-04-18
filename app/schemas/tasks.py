@@ -48,13 +48,28 @@ class Task(BaseModel):
                     {
                         "id": 1,
                         "position": '1',
-                        "speed": 1
-
+                        "speed": 1,
+                        "gimbalpoints": [
+                            {
+                                "id": 1,
+                                "takepicture": '1',
+                                "takevideo": '1',
+                                "recordvoice": '1'
+                            },
+                        ]
                     },
                     {
                         "id": 2,
                         "position": '2',
-                        "speed": 2
+                        "speed": 2,
+                        "gimbalpoints": [
+                            {
+                                "id": 2,
+                                "takepicture": '2',
+                                "takevideo": '2',
+                                "recordvoice": '2'
+                            },
+                        ]
                     }
                 ],
                 "start_poisition": "",

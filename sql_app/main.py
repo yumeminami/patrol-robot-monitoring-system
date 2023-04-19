@@ -58,3 +58,28 @@ def create_item_for_user(
 def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = crud.get_items(db, skip=skip, limit=limit)
     return items
+
+
+@app.get("/robots/", response_model=list[schemas.Robot])
+def read_robots(
+        skip: int = 0,
+        limit: int = 100,
+        db: Session = Depends(get_db)):
+    robots = crud.get_robots(db, skip=skip, limit=limit)
+    return robots
+
+
+@app.post("/robots/", response_model=schemas.Robot)
+def create_robots(robot: schemas.RobotCreate, db: Session = Depends(get_db)):
+    return crud.create_robot(db=db, robot=robot)
+
+
+@app.get("/tasks/", response_model=list[schemas.Task])
+def read_tasks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    tasks = crud.get_tasks(db, skip=skip, limit=limit)
+    return tasks
+
+
+@app.post("/tasks/", response_model=schemas.Task)
+def create_tasks(task: schemas.TaskCreate, db: Session = Depends(get_db)):
+    return crud.create_task(db=db, task=task)

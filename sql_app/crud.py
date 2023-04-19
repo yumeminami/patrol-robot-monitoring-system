@@ -31,8 +31,32 @@ def get_items(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_user_item(db: Session, item: schemas.ItemCreate, user_id: int):
-    db_item = models.Item(**item.dict(), owner_id=user_id)
+    db_item = models.Item(**item.dict())
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
     return db_item
+
+
+def get_robots(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Robot).offset(skip).limit(limit).all()
+
+
+def create_robot(db: Session, robot: schemas.RobotCreate):
+    db_robot = models.Robot(**robot.dict())
+    db.add(db_robot)
+    db.commit()
+    db.refresh(db_robot)
+    return db_robot
+
+
+def get_tasks(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Task).offset(skip).limit(limit).all()
+
+
+def create_task(db: Session, task: schemas.TaskCreate):
+    db_task = models.Task(**task.dict())
+    db.add(db_task)
+    db.commit()
+    db.refresh(db_task)
+    return db_task

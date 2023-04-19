@@ -131,3 +131,5 @@ dmypy.json
 *.db
 
 sql_app.db
+
+.vscode/

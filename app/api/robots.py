@@ -1,12 +1,9 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from app.db.database import SessionLocal, engine
-from app.models.models import Base
-from app.schemas.schemas import RobotCreate, RobotUpdate, Robot
-# from app.crud import robots as crud
+from app.db.database import SessionLocal
+from app.schemas.robots import RobotCreate, RobotUpdate, Robot
 from app.crud.robots import robot as crud
 
-Base.metadata.create_all(bind=engine)
 router = APIRouter()
 
 

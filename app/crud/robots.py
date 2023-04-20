@@ -3,7 +3,7 @@ from typing import List
 
 from app.crud.base import CRUDBase
 from app.models.models import Robot
-from app.schemas.schemas import RobotCreate, RobotUpdate
+from app.schemas.robots import RobotCreate, RobotUpdate
 
 
 class CRUDRobot(CRUDBase[Robot, RobotCreate, RobotUpdate]):

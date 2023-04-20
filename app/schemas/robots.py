@@ -6,8 +6,11 @@ from typing import List, Optional, Union
 class Robot(BaseModel):
     id: int
     name: str
-    battery: int
-    task: List[Task] = []
+    battery: int = 100
+    status: int = 0
+    speed: int = 0
+    position: int = 0
+    tasks: List[Task] = []
 
     class Config:
         orm_mode = True
@@ -15,9 +18,10 @@ class Robot(BaseModel):
 
 class RobotCreate(BaseModel):
     name: str
-    battery: int = 100
 
 
 class RobotUpdate(BaseModel):
     name: str
-    battery: int
+    status: int
+    speed: int
+    position: int

@@ -1,12 +1,10 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from app.db.database import SessionLocal, engine
-from app.models.models import Base
-from app.schemas.schemas import TaskCreate, TaskUpdate, Task
+from app.db.database import SessionLocal
+from app.schemas.tasks import TaskCreate, TaskUpdate, Task
 # from app.crud import tasks as crud
 from app.crud.tasks import task as crud
 
-Base.metadata.create_all(bind=engine)
 router = APIRouter()
 
 

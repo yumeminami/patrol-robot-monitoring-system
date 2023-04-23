@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from .tasks import Task
 from typing import List, Optional, Union
+from .sensors import Sensor
 
 
 class Robot(BaseModel):
@@ -10,7 +10,9 @@ class Robot(BaseModel):
     status: int = 0
     speed: int = 0
     position: int = 0
-    tasks: List[Task] = []
+    task_id: int = 0
+    task_status: int = 0
+    sensors: List[Sensor] = []
 
     class Config:
         orm_mode = True

@@ -1,11 +1,13 @@
 from pydantic import BaseModel, validator, ValidationError
 from typing import List, Optional, Union
+from .checkpoints import CheckPoint
 
 
 class TaskBase(BaseModel):
     type: int
     status: int
     robot_id: int
+    checkpoint_ids: List[int] = []
 
     @validator('type')
     def type_must_be_in_range(cls, v):

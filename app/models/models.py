@@ -1,5 +1,6 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table, JSON
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table, JSON, TIMESTAMP, TIME, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from app.db.database import engine
 
 from app.db.database import Base
@@ -46,6 +47,19 @@ class Sensor(Base):
     value = Column(String(50), default=None)
     robot_id = Column(Integer, ForeignKey("robots.id"))
     robot = relationship("Robot", back_populates="sensors")
+
+
+class AlarmLog(Base):
+    __tablename__ = 'alarm_logs'
+
+    id = Column(Integer, primary_key=True, index=True)
+    level = Column(Integer, default=0)
+    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
+    type = Column(Integer, default=0)
+    time = Column(DateTime, default=func.now())
+    status = Column(Integer, default=0)
+    img_url = Column(String(100), default="")
+    video_url = Column(String(100), default="")
 
 
 Base.metadata.create_all(bind=engine)

@@ -14,4 +14,7 @@ router.include_router(
     prefix="/checkpoints",
     tags=["checkpoints"])
 router.include_router(sensors_router, prefix="/sensors", tags=["sensors"])
-router.include_router(alarm_logs_router, prefix="/alarm_logs", tags=["alarm_logs"])
+router.include_router(
+    alarm_logs_router,
+    prefix="/alarm_logs",
+    tags=["alarm_logs"])

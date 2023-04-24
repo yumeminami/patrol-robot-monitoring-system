@@ -58,6 +58,7 @@ class AlarmLog(Base):
     type = Column(Integer, default=0)
     time = Column(DateTime, default=func.now())
     status = Column(Integer, default=0)
+    location = Column(Integer, default=0)
     img_url = Column(String(100), default="")
     video_url = Column(String(100), default="")
 

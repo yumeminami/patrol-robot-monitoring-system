@@ -8,6 +8,7 @@ class AlarmLogBase(BaseModel):
     task_id: int
     type: int
     status: int
+    location: int
     img_url: Optional[str] = None
     video_url: Optional[str] = None
 

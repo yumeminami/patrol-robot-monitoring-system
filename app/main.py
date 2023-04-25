@@ -1,12 +1,12 @@
+import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
 import sys
-import os 
+import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from app.api.router import router as api_router
-import uvicorn
 
 app = FastAPI()
 

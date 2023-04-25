@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.crud.base import CRUDBase
 from app.db.database import SessionLocal
 
-from typing import Callable, Optional
+from typing import Callable, Optional, Dict
 
 
 def get_db():
@@ -20,16 +20,19 @@ def create_generic_router(
     create_schema,
     update_schema,
     db_model,
-    custom_read: Optional[Callable] = None,
-        custom_read_multi: Optional[Callable] = None,
+    hooks: Optional[Dict[str, Callable]] = None,
 ):
     router = APIRouter()
+
+    if hooks is None:
+        hooks = {}
 
     @router.get("/", response_model=list[db_model])
     async def read_items(db: Session = Depends(get_db)):
         items = await crud.get_multi(db=db)
-        if custom_read_multi:
-            return [custom_read_multi(item) for item in items]
+        custom_read = hooks.get("custom_read")
+        if custom_read:
+            return [custom_read(item) for item in items]
         return items
 
     @router.get("/{item_id}", response_model=db_model)
@@ -37,26 +40,44 @@ def create_generic_router(
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
+        custom_read = hooks.get("custom_read")
         if custom_read:
             return custom_read(db_item)
         return db_items
 
     @router.post("/", response_model=db_model)
     async def create_item(item: create_schema, db: Session = Depends(get_db)):
-        return await crud.create(db=db, obj_in=item)
+        created_item = await crud.create(db=db, obj_in=item)
+
+        on_create = hooks.get("on_create")
+        if on_create:
+            await on_create(created_item)
+
+        return created_item
 
     @router.put("/{item_id}", response_model=db_model)
     async def update_item(item_id: int, item: update_schema, db: Session = Depends(get_db)):
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
-        return await crud.update(db=db, db_obj=db_item, obj_in=item)
+
+        updated_item = await crud.update(db=db, db_obj=db_item, obj_in=item)
+
+        on_update = hooks.get("on_update")
+        if on_update:
+            await on_update(item_id, updated_item)
+        return updated_item
 
     @router.delete("/{item_id}", response_model=db_model)
     async def delete_item(item_id: int, db: Session = Depends(get_db)):
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
-        return await crud.remove(db=db, id=item_id)
+        removed_item = await crud.remove(db=db, id=item_id)
+
+        on_delete = hooks.get("on_delete")
+        if on_delete:
+            await on_delete(item_id, removed_item)
+        return removed_item
 
     return router

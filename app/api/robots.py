@@ -27,13 +27,17 @@ def customize_robot_response(robot):
     return robot_data
 
 
+robot_hooks = {
+    "custom_read": customize_robot_response,
+    # "on_update": update_robot_on_ros,
+}
+
 router = create_generic_router(
     crud,
     RobotCreate,
     RobotUpdate,
     Robot,
-    custom_read=customize_robot_response,
-    custom_read_multi=customize_robot_response)
+    hooks=robot_hooks)
 
 
 # take photo

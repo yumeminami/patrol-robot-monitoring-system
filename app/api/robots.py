@@ -13,5 +13,31 @@ def customize_robot_response(robot):
         robot_data['task_status'] = task.status
     return robot_data
 
-router = create_generic_router(crud,RobotCreate,RobotUpdate,Robot,custom_read=customize_robot_response,custom_read_multi=customize_robot_response)
 
+router = create_generic_router(
+    crud,
+    RobotCreate,
+    RobotUpdate,
+    Robot,
+    custom_read=customize_robot_response,
+    custom_read_multi=customize_robot_response)
+
+
+# take photo
+@router.get("/{id}/photo")
+def take_photo(id: int, db: Session = Depends(get_db)):
+    robot = crud.read(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+    # TODO: Take photo
+    return {"message": "Photo taken"}
+
+
+# start or stop video stream
+@router.post("/{id}/video")
+def start_stop_video(id: int, db: Session = Depends(get_db)):
+    robot = crud.read(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+    # TODO: Start or stop video stream
+    return {"message": "Video stream started or stopped"}

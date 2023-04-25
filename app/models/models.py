@@ -66,4 +66,27 @@ class AlarmLog(BaseModel):
     video_url = Column(String(100), default="")
 
 
+class RobotLog(BaseModel):
+    __tablename__ = 'robot_logs'
+
+    robot_id = Column(Integer, ForeignKey("robots.id"), nullable=False)
+    total_task_executed = Column(Integer, default=0)
+    total_distance = Column(Integer, default=0)
+    total_alarm_raised = Column(Integer, default=0)
+
+
+class TaskLog(BaseModel):
+    __tablename__ = 'task_logs'
+
+    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
+    robot_id = Column(Integer, ForeignKey("robots.id"), nullable=False)
+    type = Column(Integer, default=0)
+
+
+class VisionAlgorithm(BaseModel):
+    __tablename__ = 'vision_algorithms'
+
+    name = Column(String(50), index=True)
+
+
 Base.metadata.create_all(bind=engine)

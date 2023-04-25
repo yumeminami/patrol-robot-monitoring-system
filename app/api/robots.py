@@ -39,7 +39,7 @@ router = create_generic_router(
 # take photo
 @router.get("/{id}/photo")
 def take_photo(id: int, db: Session = Depends(get_db)):
-    robot = crud.read(db, id)
+    robot = crud.get(db, id)
     if robot is None:
         raise HTTPException(status_code=404, detail="Robot not found")
     # TODO: Take photo
@@ -49,7 +49,7 @@ def take_photo(id: int, db: Session = Depends(get_db)):
 # start or stop video stream
 @router.post("/{id}/video")
 def start_stop_video(id: int, db: Session = Depends(get_db)):
-    robot = crud.read(db, id)
+    robot = crud.get(db, id)
     if robot is None:
         raise HTTPException(status_code=404, detail="Robot not found")
     # TODO: Start or stop video stream

@@ -1,6 +1,4 @@
-from typing import List
 
-from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app.models.models import AlarmLog

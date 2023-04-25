@@ -1,6 +1,5 @@
-from pydantic import BaseModel, validator, ValidationError
-from typing import List, Optional, Union
-from .checkpoints import CheckPoint
+from pydantic import BaseModel, validator
+from typing import List
 
 
 class TaskBase(BaseModel):

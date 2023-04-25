@@ -36,7 +36,3 @@ router.include_router(
     vision_algorithms_router,
     prefix="/vision_algorithms",
     tags=["vision_algorithms"])
-
-
-
-

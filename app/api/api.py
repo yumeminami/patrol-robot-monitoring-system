@@ -14,6 +14,7 @@ def get_db():
     finally:
         db.close()
 
+
 def create_generic_router(
     crud: CRUDBase,
     create_schema,

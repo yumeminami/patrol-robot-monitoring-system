@@ -2,6 +2,19 @@ from app.schemas.robots import RobotCreate, RobotUpdate, Robot
 from app.crud.robots import robot as crud
 from app.api.api import create_generic_router
 
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
+from app.db.database import SessionLocal
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 def customize_robot_response(robot):
     robot_data = robot.__dict__

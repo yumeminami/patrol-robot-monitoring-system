@@ -33,6 +33,20 @@ jobs:
     - name: Lint with flake8
       continue-on-error: false
       run: flake8 app/ --select E303,W293,W291,W292,E305
+    
+    - name: Run pytest with coverage
+      run: |
+        pip install pytest-cov
+        pytest --cov=app -p no:warnings
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
 
     # - name: Run unittest tests with coverage
     #   run: |

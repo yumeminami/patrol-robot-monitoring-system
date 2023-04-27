@@ -6,3 +6,7 @@ coverage
 pymongo
 pymysql
 cryptography
+httpx
+pytest
+pytest-cov
+configparser

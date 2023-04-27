@@ -38,15 +38,7 @@ jobs:
       run: |
         pip install pytest-cov
         pytest --cov=app -p no:warnings
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
+      continue-on-error: false
 
     # - name: Run unittest tests with coverage
     #   run: |

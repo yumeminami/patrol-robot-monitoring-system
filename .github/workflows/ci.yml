@@ -30,21 +30,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Lint with flake8
-      continue-on-error: false
-      run: flake8 app/ --select E303,W293,W291,W292,E305
+    - name: Linting
+      run: |
+        autoflake8 --in-place --remove-unused-variables --recursive . 
+        black . --line-length=79
     
     - name: Run pytest with coverage
       run: |
         pip install pytest-cov
         pytest --cov=app -p no:warnings
       continue-on-error: false
-
-    # - name: Run unittest tests with coverage
-    #   run: |
-    #     coverage run --source=scripts -m unittest discover tests
-
-    # - name: Generate coverage report
-    #   run: |
-    #     coverage report
-    #     coverage xml

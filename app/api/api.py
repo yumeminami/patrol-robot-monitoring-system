@@ -43,7 +43,7 @@ def create_generic_router(
         custom_read = hooks.get("custom_read")
         if custom_read:
             return custom_read(db_item)
-        return db_items
+        return db_item
 
     @router.post("/", response_model=db_model)
     async def create_item(item: create_schema, db: Session = Depends(get_db)):

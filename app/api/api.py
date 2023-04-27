@@ -56,7 +56,9 @@ def create_generic_router(
         return created_item
 
     @router.put("/{item_id}", response_model=db_model)
-    async def update_item(item_id: int, item: update_schema, db: Session = Depends(get_db)):
+    async def update_item(
+        item_id: int, item: update_schema, db: Session = Depends(get_db)
+    ):
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")

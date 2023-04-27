@@ -1,4 +1,3 @@
-
 from app.crud.base import CRUDBase
 from app.models.models import RobotLog
 from app.schemas.robot_logs import RobotLogCreate, RobotLogUpdate

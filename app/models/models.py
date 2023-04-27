@@ -23,7 +23,7 @@ class Robot(BaseModel):
     speed = Column(Integer, default=0)
     position = Column(Integer, default=0)
     tasks = relationship("Task", back_populates="robot", lazy="dynamic")
-    sensors = relationship("Sensor", back_populates="robot", lazy='joined')
+    sensors = relationship("Sensor", back_populates="robot", lazy="joined")
 
 
 class Task(BaseModel):
@@ -45,7 +45,7 @@ class CheckPoint(BaseModel):
 
 
 class Sensor(BaseModel):
-    __tablename__ = 'sensors'
+    __tablename__ = "sensors"
 
     name = Column(String(50), index=True)
     value = Column(String(50), default=None)
@@ -54,7 +54,7 @@ class Sensor(BaseModel):
 
 
 class AlarmLog(BaseModel):
-    __tablename__ = 'alarm_logs'
+    __tablename__ = "alarm_logs"
 
     level = Column(Integer, default=0)
     task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
@@ -67,7 +67,7 @@ class AlarmLog(BaseModel):
 
 
 class RobotLog(BaseModel):
-    __tablename__ = 'robot_logs'
+    __tablename__ = "robot_logs"
 
     robot_id = Column(Integer, ForeignKey("robots.id"), nullable=False)
     total_task_executed = Column(Integer, default=0)
@@ -76,7 +76,7 @@ class RobotLog(BaseModel):
 
 
 class TaskLog(BaseModel):
-    __tablename__ = 'task_logs'
+    __tablename__ = "task_logs"
 
     task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
     robot_id = Column(Integer, ForeignKey("robots.id"), nullable=False)
@@ -84,7 +84,7 @@ class TaskLog(BaseModel):
 
 
 class VisionAlgorithm(BaseModel):
-    __tablename__ = 'vision_algorithms'
+    __tablename__ = "vision_algorithms"
 
     name = Column(String(50), index=True)
 

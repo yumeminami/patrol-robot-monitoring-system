@@ -9,5 +9,5 @@ router = APIRouter()
 async def control_gimbal(gimbal_id: int):
     # TODO: implement gimbal control
     return JSONResponse(
-        status_code=200,
-        content="Gimbal control not implemented yet")
+        status_code=200, content="Gimbal control not implemented yet"
+    )

@@ -22,8 +22,8 @@ def customize_robot_response(robot):
     if tasks:
         # TODO Make sure that the last task is the current task
         task = tasks[-1]
-        robot_data['task_id'] = task.id
-        robot_data['task_status'] = task.status
+        robot_data["task_id"] = task.id
+        robot_data["task_status"] = task.status
     return robot_data
 
 
@@ -33,11 +33,8 @@ robot_hooks = {
 }
 
 router = create_generic_router(
-    crud,
-    RobotCreate,
-    RobotUpdate,
-    Robot,
-    hooks=robot_hooks)
+    crud, RobotCreate, RobotUpdate, Robot, hooks=robot_hooks
+)
 
 
 # take photo

@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from sqlalchemy.orm import Session
 from . import crud, models, schemas
 from .database import SessionLocal, engine
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -16,6 +17,7 @@ async def db_session_middleware(request: Request, call_next):
     finally:
         request.state.db.close()
     return response
+
 
 # Dependency
 
@@ -61,9 +63,8 @@ def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 @app.get("/robots/", response_model=list[schemas.Robot])
 def read_robots(
-        skip: int = 0,
-        limit: int = 100,
-        db: Session = Depends(get_db)):
+    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+):
     robots = crud.get_robots(db, skip=skip, limit=limit)
     return robots
 

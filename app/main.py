@@ -9,8 +9,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.api.router import router as api_router
 
 ENVIRONMENT = os.environ.get("ENV", "default")
+
+
 def create_app():
-    
     app = FastAPI()
     # Set up middleware, routes, etc.
     app.add_middleware(

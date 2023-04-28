@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
@@ -30,9 +31,9 @@ def create_generic_router(
     @router.get("/", response_model=list[db_model])
     async def read_items(db: Session = Depends(get_db)):
         items = await crud.get_multi(db=db)
-        custom_read = hooks.get("custom_read")
-        if custom_read:
-            return [custom_read(item) for item in items]
+        on_read = hooks.get("on_read")
+        if on_read:
+            return [on_read(item) for item in items]
         return items
 
     @router.get("/{item_id}", response_model=db_model)
@@ -40,9 +41,9 @@ def create_generic_router(
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
-        custom_read = hooks.get("custom_read")
-        if custom_read:
-            return custom_read(db_item)
+        on_read = hooks.get("on_read")
+        if on_read:
+            return on_read(db_item)
         return db_item
 
     @router.post("/", response_model=db_model)

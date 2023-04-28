@@ -28,7 +28,7 @@ def customize_robot_response(robot):
 
 
 robot_hooks = {
-    "custom_read": customize_robot_response,
+    "on_read": customize_robot_response,
     # "on_update": update_robot_on_ros,
 }
 

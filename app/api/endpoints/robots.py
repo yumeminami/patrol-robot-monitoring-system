@@ -28,8 +28,7 @@ def customize_robot_response(robot):
 
 
 robot_hooks = {
-    "on_read": customize_robot_response,
-    # "on_update": update_robot_on_ros,
+    "after_read": customize_robot_response,
 }
 
 router = create_generic_router(

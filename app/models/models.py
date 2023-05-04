@@ -1,4 +1,12 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, JSON, String
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    JSON,
+    String,
+    Boolean,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.database import engine
@@ -33,6 +41,14 @@ class Task(BaseModel):
     status = Column(Integer, default=0)
     robot_id = Column(Integer, ForeignKey("robots.id"))
     checkpoint_ids = Column(JSON, default=[])
+    start_position = Column(String(50), default="")
+    end_position = Column(String(50), default="")
+    speed = Column(Integer,default=0)
+    sensors = Column(JSON, default=[])
+    vision_algorithms = Column(JSON, default=[])
+    execution_time = Column(DateTime)
+    interval = Column(Integer, default=0)
+    is_everyday = Column(Boolean, default=False)
     robot = relationship("Robot", back_populates="tasks")
 
 

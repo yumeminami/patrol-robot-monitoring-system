@@ -12,3 +12,6 @@ pytest-cov
 configparser
 autoflake8
 black
+pandas
+python-multipart
+python-jose

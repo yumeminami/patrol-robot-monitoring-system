@@ -4,6 +4,7 @@ services:
   app:
     build: .
     image: app:latest
+    restart: always
     container_name: app
     ports:
       - "8000:8000"

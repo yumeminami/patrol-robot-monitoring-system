@@ -6,9 +6,10 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from app.api.deps import router as deps_router
 from app.api.router import router as api_router
 
-ENVIRONMENT = os.environ.get("ENV", "default")
+# ENVIRONMENT = os.environ.get("ENV", "test")
 
 
 def create_app():
@@ -22,6 +23,7 @@ def create_app():
         allow_headers=["*"],
     )
 
+    app.include_router(deps_router)
     app.include_router(api_router, prefix="/api")
 
     return app

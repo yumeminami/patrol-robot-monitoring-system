@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
-from .robots import router as robots_router
-from .tasks import router as tasks_router
-from .checkpoints import router as checkpoints_router
-from .sensors import router as sensors_router
-from .alarm_logs import router as alarm_logs_router
-from .robot_logs import router as robot_logs_router
-from .task_logs import router as task_logs_router
-from .vision_algorithms import router as vision_algorithms_router
+from .endpoints.robots import router as robots_router
+from .endpoints.tasks import router as tasks_router
+from .endpoints.checkpoints import router as checkpoints_router
+from .endpoints.sensors import router as sensors_router
+from .endpoints.alarm_logs import router as alarm_logs_router
+from .endpoints.robot_logs import router as robot_logs_router
+from .endpoints.task_logs import router as task_logs_router
+from .endpoints.vision_algorithms import router as vision_algorithms_router
 
 router = APIRouter()
 

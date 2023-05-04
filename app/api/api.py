@@ -7,6 +7,8 @@ from app.db.database import SessionLocal
 
 from typing import Callable, Optional, Dict
 
+from .deps import oauth2_scheme
+
 
 def get_db():
     db = SessionLocal()
@@ -29,7 +31,9 @@ def create_generic_router(
         hooks = {}
 
     @router.get("/", response_model=list[db_model])
-    async def read_items(db: Session = Depends(get_db)):
+    async def read_items(
+        db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+    ):
         items = await crud.get_multi(db=db)
         on_read = hooks.get("on_read")
         if on_read:
@@ -37,7 +41,11 @@ def create_generic_router(
         return items
 
     @router.get("/{item_id}", response_model=db_model)
-    async def read_item(item_id: int, db: Session = Depends(get_db)):
+    async def read_item(
+        item_id: int,
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme),
+    ):
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
@@ -47,7 +55,11 @@ def create_generic_router(
         return db_item
 
     @router.post("/", response_model=db_model)
-    async def create_item(item: create_schema, db: Session = Depends(get_db)):
+    async def create_item(
+        item: create_schema,
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme),
+    ):
         created_item = await crud.create(db=db, obj_in=item)
 
         on_create = hooks.get("on_create")
@@ -58,7 +70,10 @@ def create_generic_router(
 
     @router.put("/{item_id}", response_model=db_model)
     async def update_item(
-        item_id: int, item: update_schema, db: Session = Depends(get_db)
+        item_id: int,
+        item: update_schema,
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme),
     ):
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
@@ -72,7 +87,11 @@ def create_generic_router(
         return updated_item
 
     @router.delete("/{item_id}", response_model=db_model)
-    async def delete_item(item_id: int, db: Session = Depends(get_db)):
+    async def delete_item(
+        item_id: int,
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme),
+    ):
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")

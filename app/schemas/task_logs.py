@@ -1,10 +1,11 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 
 class TaskLogBase(BaseModel):
-    task_id: int
-    robot_id: int
+    task_id: Optional[int] = None
+    robot_id: Optional[int] = None
     type: int
 
 

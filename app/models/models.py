@@ -30,8 +30,18 @@ class Robot(BaseModel):
     status = Column(Integer, default=0)
     speed = Column(Integer, default=0)
     position = Column(Integer, default=0)
-    tasks = relationship("Task", back_populates="robot", lazy="dynamic")
-    sensors = relationship("Sensor", back_populates="robot", lazy="joined")
+    tasks = relationship(
+        "Task",
+        back_populates="robot",
+        lazy="dynamic",
+        cascade="all, delete-orphan",
+    )
+    sensors = relationship(
+        "Sensor",
+        back_populates="robot",
+        lazy="joined",
+        cascade="all, delete-orphan",
+    )
 
 
 class Task(BaseModel):
@@ -39,7 +49,7 @@ class Task(BaseModel):
 
     type = Column(Integer, default=0)
     status = Column(Integer, default=0)
-    robot_id = Column(Integer, ForeignKey("robots.id", ondelete="CASCADE"))
+    robot_id = Column(Integer, ForeignKey("robots.id"))
     checkpoint_ids = Column(JSON, default=[])
     start_position = Column(String(50), default="")
     end_position = Column(String(50), default="")
@@ -64,7 +74,7 @@ class Sensor(BaseModel):
 
     name = Column(String(50), index=True)
     value = Column(String(50), default=None)
-    robot_id = Column(Integer, ForeignKey("robots.id", ondelete="CASCADE"))
+    robot_id = Column(Integer, ForeignKey("robots.id"))
     robot = relationship("Robot", back_populates="sensors")
 
 

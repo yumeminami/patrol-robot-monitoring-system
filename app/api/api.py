@@ -77,8 +77,10 @@ def create_generic_router(
         if before_created:
             before_created(item)
 
-        created_item = await crud.create(db=db, obj_in=item)
-
+        try:
+            created_item = await crud.create(db=db, obj_in=item)
+        except Exception as e:
+            return JSONResponse(status_code=400, content=e.__str__())
         after_created = hooks.get("after_created")
         if after_created:
             await after_created(created_item)
@@ -100,7 +102,12 @@ def create_generic_router(
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
 
-        updated_item = await crud.update(db=db, db_obj=db_item, obj_in=item)
+        try:
+            updated_item = await crud.update(
+                db=db, db_obj=db_item, obj_in=item
+            )
+        except Exception as e:
+            return JSONResponse(status_code=400, content=e.__str__())
 
         after_update = hooks.get("after_update")
         if after_update:
@@ -120,7 +127,11 @@ def create_generic_router(
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
+
+        try:
             removed_item = await crud.remove(db=db, id=item_id)
+        except Exception as e:
+            return JSONResponse(status_code=400, content=e.__str__())
 
         after_delete = hooks.get("after_delete")
         if after_delete:

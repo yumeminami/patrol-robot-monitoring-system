@@ -10,11 +10,10 @@ class TaskBase(BaseModel):
     checkpoint_ids: List[int] = []
     start_position: str = ""
     end_position: str = ""
-    speed : int = 0
-    sensors : List[int] = []
-    vision_algorithms : List[int] = []
-    execution_time: Union[str,datetime]
-    interval: int = 0
+    speed: int = 0
+    sensors: List[int] = []
+    vision_algorithms: List[int] = []
+    execution_time: Union[str, datetime]
     is_everyday: bool = False
 
     @validator("type")

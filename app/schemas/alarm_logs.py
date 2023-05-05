@@ -5,7 +5,7 @@ from datetime import datetime
 
 class AlarmLogBase(BaseModel):
     level: int
-    task_id: int
+    task_id: Optional[int] = None
     type: int
     status: int
     location: int

@@ -32,13 +32,18 @@ def create_generic_router(
 
     @router.get("/", response_model=list[db_model])
     async def read_items(
-        db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+        skip: int = 0,
+        limit: int = 100,
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2_scheme),
     ):
         before_read = hooks.get("before_read")
         if before_read:
             return [before_read(item) for item in items]
 
-        items = await crud.get_multi(db=db)
+        items = await crud.get_multi(db=db, skip=skip, limit=limit)
+        if items is None:
+            return JSONResponse(status_code=404, content="Item not found")
         after_read = hooks.get("after_read")
         if after_read:
             return [after_read(item) for item in items]
@@ -71,13 +76,8 @@ def create_generic_router(
         before_created = hooks.get("before_created")
         if before_created:
             before_created(item)
-        
-        try:
-            created_item = await crud.create(db=db, obj_in=item)
-        except Exception as e:
-            print(e)
-            return JSONResponse(status_code=400, content=e.__str__())           
 
+        created_item = await crud.create(db=db, obj_in=item)
 
         after_created = hooks.get("after_created")
         if after_created:
@@ -99,11 +99,8 @@ def create_generic_router(
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
-        
-        try:
-            updated_item = await crud.update(db=db, db_obj=db_item, obj_in=item)
-        except Exception as e:
-            return JSONResponse(status_code=400, content=e.__str__())
+
+        updated_item = await crud.update(db=db, db_obj=db_item, obj_in=item)
 
         after_update = hooks.get("after_update")
         if after_update:
@@ -123,7 +120,7 @@ def create_generic_router(
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
-        removed_item = await crud.remove(db=db, id=item_id)
+            removed_item = await crud.remove(db=db, id=item_id)
 
         after_delete = hooks.get("after_delete")
         if after_delete:

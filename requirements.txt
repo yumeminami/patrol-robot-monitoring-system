@@ -16,3 +16,4 @@ pandas
 python-multipart
 python-jose
 passlib
+alembic

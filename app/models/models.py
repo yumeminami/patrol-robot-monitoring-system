@@ -39,7 +39,7 @@ class Task(BaseModel):
 
     type = Column(Integer, default=0)
     status = Column(Integer, default=0)
-    robot_id = Column(Integer, ForeignKey("robots.id",ondelete='CASCADE'))
+    robot_id = Column(Integer, ForeignKey("robots.id", ondelete="CASCADE"))
     checkpoint_ids = Column(JSON, default=[])
     start_position = Column(String(50), default="")
     end_position = Column(String(50), default="")
@@ -64,7 +64,7 @@ class Sensor(BaseModel):
 
     name = Column(String(50), index=True)
     value = Column(String(50), default=None)
-    robot_id = Column(Integer, ForeignKey("robots.id",ondelete='CASCADE'))
+    robot_id = Column(Integer, ForeignKey("robots.id", ondelete="CASCADE"))
     robot = relationship("Robot", back_populates="sensors")
 
 
@@ -72,7 +72,9 @@ class AlarmLog(BaseModel):
     __tablename__ = "alarm_logs"
 
     level = Column(Integer, default=0)
-    task_id = Column(Integer, ForeignKey("tasks.id",ondelete='CASCADE'), nullable=False)
+    task_id = Column(
+        Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
+    )
     type = Column(Integer, default=0)
     time = Column(DateTime, default=func.now())
     status = Column(Integer, default=0)
@@ -84,7 +86,9 @@ class AlarmLog(BaseModel):
 class RobotLog(BaseModel):
     __tablename__ = "robot_logs"
 
-    robot_id = Column(Integer, ForeignKey("robots.id",ondelete='CASCADE'), nullable=False)
+    robot_id = Column(
+        Integer, ForeignKey("robots.id", ondelete="CASCADE"), nullable=False
+    )
     total_task_executed = Column(Integer, default=0)
     total_distance = Column(Integer, default=0)
     total_alarm_raised = Column(Integer, default=0)
@@ -93,8 +97,12 @@ class RobotLog(BaseModel):
 class TaskLog(BaseModel):
     __tablename__ = "task_logs"
 
-    task_id = Column(Integer, ForeignKey("tasks.id",ondelete='CASCADE'), nullable=False)
-    robot_id = Column(Integer, ForeignKey("robots.id",ondelete='CASCADE'), nullable=False)
+    task_id = Column(
+        Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
+    )
+    robot_id = Column(
+        Integer, ForeignKey("robots.id", ondelete="CASCADE"), nullable=False
+    )
     type = Column(Integer, default=0)
 
 

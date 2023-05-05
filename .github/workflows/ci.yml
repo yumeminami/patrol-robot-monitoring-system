@@ -33,7 +33,7 @@ jobs:
     - name: Linting
       run: |
         autoflake8 --in-place --remove-unused-variables --recursive . 
-        black . --line-length=79
+        black . --line-length=79 --exclude=alembic/
     
     - name: Run pytest with coverage
       run: |

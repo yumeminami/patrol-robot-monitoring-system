@@ -13,7 +13,7 @@ class TaskBase(BaseModel):
     speed: int = 0
     sensors: List[int] = []
     vision_algorithms: List[int] = []
-    execution_time: Union[str, datetime]
+    execution_time: List[datetime]
     is_everyday: bool = False
 
     @validator("type")

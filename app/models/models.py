@@ -99,6 +99,7 @@ class RobotLog(BaseModel):
     robot_id = Column(
         Integer, ForeignKey("robots.id", ondelete="CASCADE"), nullable=False
     )
+    robot_name = Column(String(50), index=True)
     total_task_executed = Column(Integer, default=0)
     total_distance = Column(Integer, default=0)
     total_alarm_raised = Column(Integer, default=0)

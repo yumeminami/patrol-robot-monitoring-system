@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator
 from typing import List
-from datetime import datetime
+from datetime import time
 from .checkpoints import CheckPoint
 from .sensors import Sensor
 from .vision_algorithms import VisionAlgorithm
@@ -16,7 +16,7 @@ class TaskBase(BaseModel):
     speed: int = 0
     sensors: List[Sensor] = []
     vision_algorithms: List[VisionAlgorithm] = []
-    execution_time: List[datetime]
+    execution_time: List[time]
     is_everyday: bool = False
 
     @validator("type")

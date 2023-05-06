@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 class VisionAlgorithmBase(BaseModel):
     name: str
-    sensitivity: float = 0.0
 
 
 class VisionAlgorithmCreate(VisionAlgorithmBase):
@@ -19,3 +18,7 @@ class VisionAlgorithm(VisionAlgorithmBase):
 
     class Config:
         orm_mode = True
+
+
+class VisionAlgorithmForTask(VisionAlgorithm):
+    sensitivity: float = 0.0

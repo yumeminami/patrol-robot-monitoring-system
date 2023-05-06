@@ -1,21 +1,20 @@
 from pydantic import BaseModel, validator
 from typing import List
 from datetime import time
-from .checkpoints import CheckPoint
-from .sensors import Sensor
-from .vision_algorithms import VisionAlgorithm
+from .sensors import SensorForTask
+from .vision_algorithms import VisionAlgorithmForTask
 
 
 class TaskBase(BaseModel):
     type: int
     status: int
     robot_id: int
-    checkpoint_ids: List[CheckPoint] = []
+    checkpoint_ids: List[int] = []
     start_position: str = ""
     end_position: str = ""
     speed: int = 0
-    sensors: List[Sensor] = []
-    vision_algorithms: List[VisionAlgorithm] = []
+    sensors: List[SensorForTask] = []
+    vision_algorithms: List[VisionAlgorithmForTask] = []
     execution_time: List[time]
     is_everyday: bool = False
 

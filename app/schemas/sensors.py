@@ -6,8 +6,6 @@ class SensorBase(BaseModel):
     name: str
     value: float = 0.0
     robot_id: int
-    upper_limit: Optional[float]
-    lower_limit: Optional[float]
 
 
 class SensorCreate(SensorBase):
@@ -23,3 +21,8 @@ class Sensor(SensorBase):
 
     class Config:
         orm_mode = True
+
+
+class SensorForTask(Sensor):
+    upper_limit: Optional[float]
+    lower_limit: Optional[float]

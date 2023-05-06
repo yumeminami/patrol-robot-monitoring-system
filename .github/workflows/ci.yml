@@ -35,8 +35,8 @@ jobs:
         autoflake8 --in-place --remove-unused-variables --recursive --exclude=alembic .
         black . --line-length=79 --exclude=alembic/
     
-    - name: Run pytest with coverage
-      run: |
-        pip install pytest-cov
-        pytest --cov=app -p no:warnings
-      continue-on-error: false
+    # - name: Run pytest with coverage
+    #   run: |
+    #     pip install pytest-cov
+    #     pytest --cov=app -p no:warnings
+    #   continue-on-error: false

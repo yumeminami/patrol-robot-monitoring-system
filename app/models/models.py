@@ -6,6 +6,7 @@ from sqlalchemy import (
     JSON,
     String,
     Boolean,
+    Float
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -67,15 +68,18 @@ class CheckPoint(BaseModel):
     name = Column(String(50), index=True)
     position = Column(Integer, default=0)
     speed = Column(Integer, default=0)
+    gimbal_points = Column(JSON, default=[Integer])
 
 
 class Sensor(BaseModel):
     __tablename__ = "sensors"
 
     name = Column(String(50), index=True)
-    value = Column(String(50), default=None)
+    value = Column(Integer, default=0)
     robot_id = Column(Integer, ForeignKey("robots.id"))
     robot = relationship("Robot", back_populates="sensors")
+    upper_limit = Column(Float, default=0)
+    lower_limit = Column(Float, default=0)
 
 
 class AlarmLog(BaseModel):
@@ -121,6 +125,11 @@ class VisionAlgorithm(BaseModel):
     __tablename__ = "vision_algorithms"
 
     name = Column(String(50), index=True)
+    sensitivity = Column(Float, default=0.0)
 
+class GimbalPoint(BaseModel):
+    __tablename__ = "gimbal_points"
+    preset_point = Column(Integer, nullable=False)
+    
 
 Base.metadata.create_all(bind=engine)

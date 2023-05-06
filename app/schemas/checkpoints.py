@@ -1,10 +1,11 @@
 from pydantic import BaseModel
-
+from typing import List
 
 class CheckPointBase(BaseModel):
     name: str
     position: int = 0
     speed: int = 0
+    gimbal_points: List[int] = []
 
     class Config:
         orm_mode = True

@@ -7,6 +7,7 @@ from sqlalchemy import (
     String,
     Boolean,
     Float,
+    Time,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -57,7 +58,7 @@ class Task(BaseModel):
     speed = Column(Integer, default=0)
     sensors = Column(JSON, default=[])
     vision_algorithms = Column(JSON, default=[])
-    execution_time = Column(JSON, default=[DateTime])
+    execution_time = Column(JSON, default=[Time])
     is_everyday = Column(Boolean, default=False)
     robot = relationship("Robot", back_populates="tasks")
 

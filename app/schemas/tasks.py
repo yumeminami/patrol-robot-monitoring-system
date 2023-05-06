@@ -1,5 +1,5 @@
 from pydantic import BaseModel, validator
-from typing import List, Union
+from typing import List
 from datetime import datetime
 from .checkpoints import CheckPoint
 from .sensors import Sensor

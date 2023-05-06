@@ -18,7 +18,13 @@ def test_create_sensor(test_app):
 
     # Prepare the request headers with the token
     headers = {"Authorization": f"Bearer {token}"}
-    sensor_data = {"name": "Test Sensor", "value": "42", "robot_id": 1}
+    sensor_data = {
+        "name": "Test Sensor",
+        "value": 42,
+        "robot_id": 1,
+        "upper_limit": "100",
+        "lower_limit": "0",
+    }
     response = test_app.post(
         "/api/sensors/", json=sensor_data, headers=headers
     )
@@ -37,7 +43,13 @@ def test_read_sensor(test_app):
 
     # Prepare the request headers with the token
     headers = {"Authorization": f"Bearer {token}"}
-    sensor_data = {"name": "Test Sensor", "value": "42", "robot_id": 1}
+    sensor_data = {
+        "name": "Test Sensor",
+        "value": 42,
+        "robot_id": 1,
+        "upper_limit": "100",
+        "lower_limit": "0",
+    }
     sensor_response = test_app.post(
         "/api/sensors/", json=sensor_data, headers=headers
     )
@@ -62,14 +74,26 @@ def test_update_sensor(test_app):
 
     # Prepare the request headers with the token
     headers = {"Authorization": f"Bearer {token}"}
-    sensor_data = {"name": "Test Sensor", "value": "42", "robot_id": 1}
+    sensor_data = {
+        "name": "Test Sensor",
+        "value": 42,
+        "robot_id": 1,
+        "upper_limit": "100",
+        "lower_limit": "0",
+    }
     sensor_response = test_app.post(
         "/api/sensors/", json=sensor_data, headers=headers
     )
     sensor = Sensor(**json.loads(sensor_response.text))
 
     # Update the sensor
-    update_data = {"name": "Updated Sensor", "value": "84", "robot_id": 1}
+    update_data = {
+        "name": "Updated Sensor",
+        "value": 84,
+        "robot_id": 1,
+        "upper_limit": "100",
+        "lower_limit": "0",
+    }
     update_response = test_app.put(
         f"/api/sensors/{sensor.id}", json=update_data, headers=headers
     )

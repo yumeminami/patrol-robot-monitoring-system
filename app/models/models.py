@@ -6,7 +6,7 @@ from sqlalchemy import (
     JSON,
     String,
     Boolean,
-    Float
+    Float,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -57,7 +57,7 @@ class Task(BaseModel):
     speed = Column(Integer, default=0)
     sensors = Column(JSON, default=[])
     vision_algorithms = Column(JSON, default=[])
-    execution_time = Column(JSON,default=[DateTime])
+    execution_time = Column(JSON, default=[DateTime])
     is_everyday = Column(Boolean, default=False)
     robot = relationship("Robot", back_populates="tasks")
 
@@ -127,9 +127,10 @@ class VisionAlgorithm(BaseModel):
     name = Column(String(50), index=True)
     sensitivity = Column(Float, default=0.0)
 
+
 class GimbalPoint(BaseModel):
     __tablename__ = "gimbal_points"
     preset_point = Column(Integer, nullable=False)
-    
+
 
 Base.metadata.create_all(bind=engine)

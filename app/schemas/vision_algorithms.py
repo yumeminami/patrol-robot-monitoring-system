@@ -5,6 +5,7 @@ class VisionAlgorithmBase(BaseModel):
     name: str
     sensitivity: float = 0.0
 
+
 class VisionAlgorithmCreate(VisionAlgorithmBase):
     pass
 

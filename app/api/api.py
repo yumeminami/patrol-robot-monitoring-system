@@ -30,7 +30,7 @@ def create_generic_router(
     if hooks is None:
         hooks = {}
 
-    @router.get("/", response_model=list[db_model])
+    @router.get("", response_model=list[db_model])
     async def read_items(
         skip: int = 0,
         limit: int = 100,
@@ -67,7 +67,7 @@ def create_generic_router(
             return after_read(db_item)
         return db_item
 
-    @router.post("/", response_model=db_model)
+    @router.post("", response_model=db_model)
     async def create_item(
         item: create_schema,
         db: Session = Depends(get_db),

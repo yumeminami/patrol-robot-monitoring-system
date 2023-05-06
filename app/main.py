@@ -23,7 +23,7 @@ def create_app():
         allow_headers=["*"],
     )
 
-    app.include_router(deps_router)
+    app.include_router(deps_router,tags=["token"])
     app.include_router(api_router, prefix="/api")
 
     return app

@@ -1,6 +1,5 @@
 from pydantic import BaseModel, validator
 from typing import List
-from datetime import time
 from .sensors import SensorForTask
 from .vision_algorithms import VisionAlgorithmForTask
 from enum import Enum
@@ -54,6 +53,21 @@ class TaskBase(BaseModel):
                         "sensor must belong to the robot that the task belongs to"
                     )
         return v
+
+    @validator("execution_time")
+    def execution_time_validator(cls, v):
+        if v:
+            for time in v:
+                try:
+                    time = time.split(":")
+                    time = time[0] + ":" + time[1]
+                    time = time.split(":")
+                    if int(time[0]) not in range(0, 24) or int(
+                        time[1]
+                    ) not in range(0, 60):
+                        raise ValueError("execution_time must be a valid time")
+                except:
+                    raise ValueError("execution_time must be a valid time")
 
 
 class Task(TaskBase):

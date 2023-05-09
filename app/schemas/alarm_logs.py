@@ -43,6 +43,12 @@ class AlarmLogCreate(AlarmLogBase):
 class AlarmLogUpdate(BaseModel):
     status: int
 
+    @validator("status")
+    def status_validator(cls, v):
+        if v not in range(0, 2):
+            raise ValueError("status must be unprocessed(0) or processed(1)")
+        return v
+
 
 class AlarmLog(AlarmLogBase):
     id: int

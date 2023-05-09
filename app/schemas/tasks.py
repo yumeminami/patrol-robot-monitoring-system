@@ -5,15 +5,18 @@ from .sensors import SensorForTask
 from .vision_algorithms import VisionAlgorithmForTask
 from enum import Enum
 
+
 class TaskType(Enum):
     AUTO = 0
     MANUAL = 1
+
 
 class TaskStatus(Enum):
     NOT_STARTED = 0
     IN_PROGRESS = 1
     PENDING = 2
     COMPLETED = 3
+
 
 class TaskBase(BaseModel):
     type: int
@@ -25,7 +28,7 @@ class TaskBase(BaseModel):
     speed: int = 0
     sensors: List[SensorForTask] = []
     vision_algorithms: List[VisionAlgorithmForTask] = []
-    execution_time: List[time]
+    execution_time: List[str]
     is_everyday: bool = False
 
     @validator("type")

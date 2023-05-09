@@ -75,7 +75,7 @@ def create_generic_router(
     ):
         before_created = hooks.get("before_created")
         if before_created:
-            before_created(item)
+            await before_created(item)
 
         try:
             created_item = await crud.create(db=db, obj_in=item)
@@ -96,7 +96,7 @@ def create_generic_router(
     ):
         before_updated = hooks.get("before_update")
         if before_updated:
-            before_updated(item_id, item)
+            await before_updated(item_id, item, db)
 
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
@@ -111,7 +111,7 @@ def create_generic_router(
 
         after_update = hooks.get("after_update")
         if after_update:
-            await after_update(item_id, updated_item)
+            await after_update(item_id, updated_item, db)
         return updated_item
 
     @router.delete("/{item_id}", response_model=db_model)
@@ -122,7 +122,7 @@ def create_generic_router(
     ):
         before_delete = hooks.get("before_delete")
         if before_delete:
-            await before_delete(item_id)
+            await before_delete(item_id, db)
 
         db_item = await crud.get(db=db, id=item_id)
         if db_item is None:
@@ -135,7 +135,7 @@ def create_generic_router(
 
         after_delete = hooks.get("after_delete")
         if after_delete:
-            await after_delete(item_id, removed_item)
+            await after_delete(item_id, removed_item, db)
         return removed_item
 
     return router

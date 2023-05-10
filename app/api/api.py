@@ -75,7 +75,7 @@ def create_generic_router(
     ):
         before_created = hooks.get("before_created")
         if before_created:
-            await before_created(item)
+            await before_created(item, db)
 
         try:
             created_item = await crud.create(db=db, obj_in=item)
@@ -83,7 +83,7 @@ def create_generic_router(
             return JSONResponse(status_code=400, content=e.__str__())
         after_created = hooks.get("after_created")
         if after_created:
-            await after_created(created_item)
+            await after_created(created_item, db)
 
         return created_item
 

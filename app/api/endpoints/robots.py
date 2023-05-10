@@ -16,19 +16,19 @@ def get_db():
         db.close()
 
 
-def customize_robot_response(robot):
-    robot_data = robot.__dict__
+def after_read(robot):
     tasks = robot.tasks.all()
+    robot = Robot.from_orm(robot)
     if tasks:
         # TODO Make sure that the last task is the current task
         task = tasks[-1]
-        robot_data["task_id"] = task.id
-        robot_data["task_status"] = task.status
-    return robot_data
+        robot.task_id = task.id
+        robot.task_status = task.status
+    return robot
 
 
 robot_hooks = {
-    "after_read": customize_robot_response,
+    "after_read": after_read,
 }
 
 router = create_generic_router(

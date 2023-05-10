@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from sqlalchemy.orm import Session
-
+import pandas as pd
 from app.crud.base import CRUDBase
 from app.db.database import SessionLocal
+from starlette.background import BackgroundTasks
+import os
 
 from typing import Callable, Optional, Dict
 
@@ -16,6 +18,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def remove_file(path: str) -> None:
+    os.remove(path)
 
 
 def create_generic_router(
@@ -32,21 +38,45 @@ def create_generic_router(
 
     @router.get("", response_model=list[db_model])
     async def read_items(
+        background_tasks: BackgroundTasks,
         skip: int = 0,
         limit: int = 100,
+        export: bool = False,
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
         before_read = hooks.get("before_read")
         if before_read:
-            return [before_read(item) for item in items]
+            items = [before_read(item) for item in items]
 
         items = await crud.get_multi(db=db, skip=skip, limit=limit)
         if items is None:
             return JSONResponse(status_code=404, content="Item not found")
         after_read = hooks.get("after_read")
         if after_read:
-            return [after_read(item) for item in items]
+            items = [after_read(item) for item in items]
+
+        if export:
+            # check item type is db model 
+            items_data = []
+            for item in items:
+                if isinstance(item, db_model) == False:
+                    item = db_model.from_orm(item)
+                items_data.append(item.__dict__)
+            
+            # convert to pandas dataframe
+            df = pd.DataFrame(items_data)
+
+            file_name = "export.xlsx"
+            df.to_excel(file_name, index=False, engine="openpyxl")
+
+            # remove file after returnning response
+            background_tasks.add_task(remove_file, file_name)
+            return FileResponse(
+                file_name,
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                filename=file_name,
+            )
         return items
 
     @router.get("/{item_id}", response_model=db_model)

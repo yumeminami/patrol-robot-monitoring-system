@@ -1,14 +1,14 @@
+import os
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.background import BackgroundTasks
 from sqlalchemy.orm import Session
-import pandas as pd
-from app.crud.base import CRUDBase
-from app.db.database import SessionLocal
-from starlette.background import BackgroundTasks
-import os
 
 from typing import Callable, Optional, Dict
 
+from app.crud.base import CRUDBase
+from app.db.database import SessionLocal
+from app.utils.excel import write_excel
 from .deps import oauth2_scheme
 
 
@@ -57,18 +57,20 @@ def create_generic_router(
             items = [after_read(item) for item in items]
 
         if export:
-            # check item type is db model 
+            # check item type is db model
             items_data = []
             for item in items:
                 if isinstance(item, db_model) == False:
+                    created_at = item.created_at
+                    updated_at = item.updated_at
                     item = db_model.from_orm(item)
+                    item.__dict__["created_at"] = created_at
+                    item.__dict__["updated_at"] = updated_at
+
                 items_data.append(item.__dict__)
-            
-            # convert to pandas dataframe
-            df = pd.DataFrame(items_data)
 
             file_name = "export.xlsx"
-            df.to_excel(file_name, index=False, engine="openpyxl")
+            write_excel(items_data, file_name)
 
             # remove file after returnning response
             background_tasks.add_task(remove_file, file_name)

@@ -47,7 +47,3 @@ def write_excel(data, filename):
 
     # Save the workbook to an Excel file
     wb.save(filename)
-
-
-# data_single_dict = {"column1": 1, "column2": "A", "column3": 4.5}
-# write_excel(data_single_dict, "output_single_dict.xlsx")

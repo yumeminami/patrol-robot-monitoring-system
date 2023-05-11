@@ -60,14 +60,28 @@ class TaskBase(BaseModel):
             for time in v:
                 try:
                     time = time.split(":")
-                    time = time[0] + ":" + time[1]
-                    time = time.split(":")
-                    if int(time[0]) not in range(0, 24) or int(
-                        time[1]
-                    ) not in range(0, 60):
+                    if len(time) == 2:
+                        if int(time[0]) not in range(0, 24) or int(
+                            time[1]
+                        ) not in range(0, 60):
+                            raise ValueError(
+                                "execution_time must be a valid time"
+                            )
+                    elif len(time) == 3:
+                        if (
+                            int(time[0]) not in range(0, 24)
+                            or int(time[1]) not in range(0, 60)
+                            or int(time[2]) not in range(0, 60)
+                        ):
+                            raise ValueError(
+                                "execution_time must be a valid time"
+                            )
+                        time = time[0] + ":" + time[1] + ":" + time[2]
+                    else:
                         raise ValueError("execution_time must be a valid time")
                 except:
                     raise ValueError("execution_time must be a valid time")
+        return v
 
 
 class Task(TaskBase):

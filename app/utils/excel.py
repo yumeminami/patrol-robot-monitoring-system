@@ -2,18 +2,21 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Font
+from app.schemas.cn_key_map import key_map
 
 
 def flatten_dict(d, parent_key="", sep="_"):
     items = []
     for k, v in d.items():
-        new_key = parent_key + sep + k if parent_key else k
+        new_key = key_map.get(k, k)
+        new_key = parent_key + sep + k if parent_key else new_key
         if isinstance(v, dict):
             items.extend(flatten_dict(v, new_key, sep=sep).items())
         elif isinstance(v, list):
             items.append((new_key, ", ".join(str(i) for i in v)))
         else:
             items.append((new_key, v))
+
     return dict(items)
 
 

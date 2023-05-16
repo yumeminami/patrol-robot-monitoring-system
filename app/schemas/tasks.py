@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator,root_validator
 from typing import List
 from .sensors import SensorForTask
 from .vision_algorithms import VisionAlgorithmForTask
@@ -15,6 +15,7 @@ class TaskStatus(Enum):
     IN_PROGRESS = 1
     PENDING = 2
     COMPLETED = 3
+    STOPPED = 4
 
 
 class TaskBase(BaseModel):
@@ -22,27 +23,52 @@ class TaskBase(BaseModel):
     status: int
     robot_id: int
     checkpoint_ids: List[int] = []
-    start_position: str = ""
-    end_position: str = ""
+    start_position: int = 0
+    end_position: int = 0
     speed: int = 0
     sensors: List[SensorForTask] = []
     vision_algorithms: List[VisionAlgorithmForTask] = []
     execution_time: List[str]
     is_everyday: bool = False
 
-    @validator("type")
-    def type_validator(cls, v):
-        if v not in range(0, 2):
+    @root_validator(pre=True)
+    def type_validator(cls, values):
+        type = values.get("type")
+        start_position = values.get("start_position")
+        end_position = values.get("end_position")
+        speed = values.get("speed")
+        checkpoint_ids = values.get("checkpoint_ids")
+
+        if type not in range(0, 2):
             raise ValueError("type must be auto(0) or maunal(1)")
-        return v
+        
+        if type == TaskType.AUTO.value:
+            if not start_position or not end_position:
+                raise ValueError("start_position and end_position must be provided when type is auto")
+            if start_position < 0 or end_position < 0:
+                raise ValueError("start_position and end_position could not smaller than 0")
+            if start_position >= end_position:
+                raise ValueError("start_position must be smaller than end_position")
+            if speed == 0:
+                raise ValueError("speed must be provided when type is auto")
+            if checkpoint_ids:
+                raise ValueError("auto type task could not contain checkpoints")
+        elif type == TaskType.MANUAL.value:
+            if not checkpoint_ids:
+                raise ValueError("checkpoint_ids must be provided when type is manual")
+            
+        
+        return values
+
 
     @validator("status")
     def status_validator(cls, v):
         if v not in range(0, 4):
             raise ValueError(
-                "status must be not started(0), in progress(1), pending(2) or completed(3)"
+                "status must be not started(0), in progress(1), pending(2), completed(3) or stopped(4)"
             )
         return v
+    
 
     @validator("sensors")
     def sensors_validator(cls, v, values):

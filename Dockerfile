@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Copy app
 COPY . /app
+COPY requirements.txt /app
 
 
 # RUN cat /etc/apt/sources.list 
@@ -23,22 +24,22 @@ RUN apt-get update && apt-get install -y \
     python3.10 \
     python3-pip
 
-# Install python dependencies
+# # Install python dependencies
 RUN pip3 install -r requirements.txt
 
 # Expose port
 EXPOSE 8000
 
 # Set python path
-ENV PYTHONPATH=$PWD
+# ENV PYTHONPATH=$PWD
 
 CMD ["python3", "app/main.py"]
 
 
 # Start from the ROS Foxy ROS1 bridge image
-# FROM osrf/ros:foxy-ros1-bridge
+# FROM ros:foxy-ros1-bridge
 
-# # Set the working directory
+# Set the working directory
 # WORKDIR /home/ros2
 
 # # Run the ROS1 bridge when the container starts

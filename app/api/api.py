@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends,HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.background import BackgroundTasks
 from sqlalchemy.orm import Session
@@ -45,10 +45,6 @@ def create_generic_router(
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
-        before_read = hooks.get("before_read")
-        if before_read:
-            items = [before_read(item) for item in items]
-
         items = await crud.get_multi(db=db, skip=skip, limit=limit)
         if items is None:
             return JSONResponse(status_code=404, content="Item not found")
@@ -58,22 +54,25 @@ def create_generic_router(
 
         if export:
             # check item type is db model
-            items_data = []
-            for item in items:
-                if isinstance(item, db_model) == False:
-                    created_at = item.created_at
-                    updated_at = item.updated_at
-                    item = db_model.from_orm(item)
-                    item.__dict__["created_at"] = created_at
-                    item.__dict__["updated_at"] = updated_at
+            try:
+                items_data = []
+                for item in items:
+                    if isinstance(item, db_model) == False:
+                        created_at = item.created_at
+                        updated_at = item.updated_at
+                        item = db_model.from_orm(item)
+                        item.__dict__["created_at"] = created_at
+                        item.__dict__["updated_at"] = updated_at
 
-                items_data.append(item.__dict__)
+                    items_data.append(item.__dict__)
 
-            file_name = "export.xlsx"
-            write_excel(items_data, file_name)
+                file_name = "export.xlsx"
+                write_excel(items_data, file_name)
 
-            # remove file after returnning response
-            background_tasks.add_task(remove_file, file_name)
+                # remove file after returnning response
+                background_tasks.add_task(remove_file, file_name)
+            except Exception as e:
+                raise HTTPException(status_code=400,detail=e.__str__())
             return FileResponse(
                 file_name,
                 media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -112,7 +111,7 @@ def create_generic_router(
         try:
             created_item = await crud.create(db=db, obj_in=item)
         except Exception as e:
-            return JSONResponse(status_code=400, content=e.__str__())
+            return HTTPException(status_code=400, detail=e.__str__())
         after_created = hooks.get("after_created")
         if after_created:
             await after_created(created_item, db)
@@ -139,7 +138,7 @@ def create_generic_router(
                 db=db, db_obj=db_item, obj_in=item
             )
         except Exception as e:
-            return JSONResponse(status_code=400, content=e.__str__())
+            return HTTPException(status_code=400, detail=e.__str__())
 
         after_update = hooks.get("after_update")
         if after_update:
@@ -163,7 +162,7 @@ def create_generic_router(
         try:
             removed_item = await crud.remove(db=db, id=item_id)
         except Exception as e:
-            return JSONResponse(status_code=400, content=e.__str__())
+            return HTTPException(status_code=400, detail=e.__str__())
 
         after_delete = hooks.get("after_delete")
         if after_delete:

@@ -6,6 +6,20 @@ from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from fastapi import HTTPException
 
+def indent(elem, level=0):
+    i = "\n" + level * "  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
 
 async def create_task_xml(task_create, db):
     # check type
@@ -59,7 +73,7 @@ async def create_task_xml(task_create, db):
                 action_elem.set("index", str(k))
                 action_elem.set("param", f"{action}param{k}")
 
-    ET.indent(root)
+    indent(root)
     # Save the XML to the file with encoding and XML declaration
     tree = ET.ElementTree(root)
     # TODO confirm the file name and path

@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.background import BackgroundTasks
 from sqlalchemy.orm import Session
 
-from typing import Callable, Optional, Dict
+from typing import Callable, Optional, Dict, List
 
 from app.crud.base import CRUDBase
 from app.db.database import SessionLocal
@@ -36,7 +36,7 @@ def create_generic_router(
     if hooks is None:
         hooks = {}
 
-    @router.get("", response_model=list[db_model])
+    @router.get("", response_model=List[db_model])
     async def read_items(
         background_tasks: BackgroundTasks,
         skip: int = 0,

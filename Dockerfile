@@ -33,3 +33,13 @@ EXPOSE 8000
 ENV PYTHONPATH=$PWD
 
 CMD ["python3", "app/main.py"]
+
+
+# Start from the ROS Foxy ROS1 bridge image
+# FROM osrf/ros:foxy-ros1-bridge
+
+# # Set the working directory
+# WORKDIR /home/ros2
+
+# # Run the ROS1 bridge when the container starts
+# CMD ["ros2", "run", "ros1_bridge", "dynamic_bridge"]

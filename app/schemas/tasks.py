@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator,root_validator
+from pydantic import BaseModel, validator, root_validator
 from typing import List
 from .sensors import SensorForTask
 from .vision_algorithms import VisionAlgorithmForTask
@@ -41,25 +41,33 @@ class TaskBase(BaseModel):
 
         if type not in range(0, 2):
             raise ValueError("type must be auto(0) or maunal(1)")
-        
+
         if type == TaskType.AUTO.value:
             if not start_position or not end_position:
-                raise ValueError("start_position and end_position must be provided when type is auto")
+                raise ValueError(
+                    "start_position and end_position must be provided when type is auto"
+                )
             if start_position < 0 or end_position < 0:
-                raise ValueError("start_position and end_position could not smaller than 0")
+                raise ValueError(
+                    "start_position and end_position could not smaller than 0"
+                )
             if start_position >= end_position:
-                raise ValueError("start_position must be smaller than end_position")
+                raise ValueError(
+                    "start_position must be smaller than end_position"
+                )
             if speed == 0:
                 raise ValueError("speed must be provided when type is auto")
             if checkpoint_ids:
-                raise ValueError("auto type task could not contain checkpoints")
+                raise ValueError(
+                    "auto type task could not contain checkpoints"
+                )
         elif type == TaskType.MANUAL.value:
             if not checkpoint_ids:
-                raise ValueError("checkpoint_ids must be provided when type is manual")
-            
-        
-        return values
+                raise ValueError(
+                    "checkpoint_ids must be provided when type is manual"
+                )
 
+        return values
 
     @validator("status")
     def status_validator(cls, v):
@@ -68,16 +76,16 @@ class TaskBase(BaseModel):
                 "status must be not started(0), in progress(1), pending(2), completed(3) or stopped(4)"
             )
         return v
-    
 
     @validator("sensors")
     def sensors_validator(cls, v, values):
         if v:
             for sensor in v:
-                if sensor.robot_id != values["robot_id"]:
-                    raise ValueError(
-                        "sensor must belong to the robot that the task belongs to"
-                    )
+                if values["robot_id"]:
+                    if sensor.robot_id != values["robot_id"]:
+                        raise ValueError(
+                            "sensor must belong to the robot that the task belongs to"
+                        )
         return v
 
     @validator("execution_time")
@@ -107,6 +115,8 @@ class TaskBase(BaseModel):
                         raise ValueError("execution_time must be a valid time")
                 except:
                     raise ValueError("execution_time must be a valid time")
+        else:
+            raise ValueError("execution_time must be provided")
         return v
 
 

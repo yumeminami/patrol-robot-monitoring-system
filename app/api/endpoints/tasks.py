@@ -20,7 +20,8 @@ async def before_update(id, task_update, db):
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     if (
-        task["status"] == TaskStatus.COMPLETED.value or task["status"] == TaskStatus.STOPPED.value
+        task["status"] == TaskStatus.COMPLETED.value
+        or task["status"] == TaskStatus.STOPPED.value
     ):
         raise HTTPException(
             status_code=400,

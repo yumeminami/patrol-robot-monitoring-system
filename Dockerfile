@@ -20,9 +20,7 @@ RUN echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal main restricted universe 
 
 # Install python pip
 
-RUN apt-get update && apt-get install -y \
-    python3.10 \
-    python3-pip
+RUN apt-get update && apt-get install -y python3-pip
 
 # # Install python dependencies
 RUN pip3 install -r requirements.txt
@@ -30,8 +28,6 @@ RUN pip3 install -r requirements.txt
 # Expose port
 EXPOSE 8000
 
-# Set python path
-# ENV PYTHONPATH=$PWD
 
 CMD ["python3", "app/main.py"]
 

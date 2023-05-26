@@ -33,18 +33,18 @@ def write_excel(data, filename):
 
     # Write the DataFrame to the worksheet
     for r in dataframe_to_rows(df, index=False, header=True):
-        ws.append(r)
+        ws.append(r)  # type: ignore
 
     # Set the font to Calibri and font size to 12 for all cells
     font = Font(name="Calibri", size=12)
-    for row in ws.iter_rows():
+    for row in ws.iter_rows():  # type: ignore
         for cell in row:
             cell.font = font
 
     # Set the column width
-    for column_cells in ws.columns:
+    for column_cells in ws.columns:  # type: ignore
         length = max(len(str(cell.value)) for cell in column_cells)
-        ws.column_dimensions[column_cells[0].column_letter].width = max(
+        ws.column_dimensions[column_cells[0].column_letter].width = max(  # type: ignore
             12, length
         )
 

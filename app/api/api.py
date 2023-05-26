@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Depends,HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.background import BackgroundTasks
 from sqlalchemy.orm import Session
@@ -72,7 +72,7 @@ def create_generic_router(
                 # remove file after returnning response
                 background_tasks.add_task(remove_file, file_name)
             except Exception as e:
-                raise HTTPException(status_code=400,detail=e.__str__())
+                raise HTTPException(status_code=400, detail=e.__str__())
             return FileResponse(
                 file_name,
                 media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

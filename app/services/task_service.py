@@ -6,6 +6,7 @@ from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from fastapi import HTTPException
 
+
 def indent(elem, level=0):
     i = "\n" + level * "  "
     if len(elem):
@@ -14,12 +15,13 @@ def indent(elem, level=0):
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
         for elem in elem:
-            indent(elem, level+1)
+            indent(elem, level + 1)
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
     else:
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
+
 
 async def create_task_xml(task_create, db):
     # check type

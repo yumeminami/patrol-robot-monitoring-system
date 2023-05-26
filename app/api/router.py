@@ -9,6 +9,7 @@ from .endpoints.robot_logs import router as robot_logs_router
 from .endpoints.task_logs import router as task_logs_router
 from .endpoints.vision_algorithms import router as vision_algorithms_router
 from .endpoints.gimbalpoints import router as gimbalpoints_router
+from .exporter import router as exporter_router
 
 router = APIRouter()
 
@@ -40,3 +41,7 @@ router.include_router(
     prefix="/gimbalpoints",
     tags=["gimbal_points"],
 )
+
+
+# Exporter router
+router.include_router(exporter_router, prefix="/exporter", tags=["exporter"])

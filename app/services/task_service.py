@@ -85,15 +85,21 @@ async def create_task_xml(task_create, db):
 
 
 def start_task():
-    rospy.init_node("parameter_updater")
+    command = "rosparam set /patrol_state 1"
 
-    new_value = 1
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    output, error = process.communicate()
 
-    rospy.set_param("patrol_state", new_value)
-
-    print("Parameter updated to: ", new_value)
-
-    rospy.signal_shutdown("finished.")
+    if output:
+        print("Command output:")
+        print(output.decode("utf-8"))
+    if error:
+        print("Command error:")
+        print(error.decode("utf-8"))
+    else:
+        print("Task started")
 
 
 def stop_task():
@@ -109,4 +115,6 @@ def stop_task():
         print(output.decode("utf-8"))
     if error:
         print("Command error:")
-    print(error.decode("utf-8"))
+        print(error.decode("utf-8"))
+    else:
+        print("Task stopped")

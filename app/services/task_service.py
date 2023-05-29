@@ -84,7 +84,26 @@ async def create_task_xml(task_create, db):
     tree.write("output.xml", encoding="utf-8", xml_declaration=True)
 
 
-def start_task():
+def run_node():
+    # TODO Now is hard code, need to be changed
+    command = "rosrun zj_robot normal_patrol_state_machine"
+
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+
+    output, error = process.communicate()
+
+    if output:
+        print("Command output:")
+        print(output.decode("utf-8"))
+    if error:
+        print("Command error:")
+        print(error.decode("utf-8"))
+
+
+def update_parameter():
+    # TODO Now is hard code, need to be changed
     command = "rosparam set /patrol_state 1"
 
     process = subprocess.Popen(
@@ -98,11 +117,11 @@ def start_task():
     if error:
         print("Command error:")
         print(error.decode("utf-8"))
-    else:
-        print("Task started")
+    print("Parameter updated")
 
 
-def stop_task():
+def kill_node():
+    # TODO Now is hard code, need to be changed
     command = "rosnode kill /normal_patrol_state_machine"
 
     process = subprocess.Popen(
@@ -116,5 +135,3 @@ def stop_task():
     if error:
         print("Command error:")
         print(error.decode("utf-8"))
-    else:
-        print("Task stopped")

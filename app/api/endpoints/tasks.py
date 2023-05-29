@@ -2,7 +2,11 @@ from app.schemas.tasks import Task, TaskCreate, TaskUpdate, TaskStatus
 from app.crud.tasks import task as crud
 from app.api.api import create_generic_router
 from fastapi import HTTPException
-from app.services.task_service import create_task_xml, start_task
+from app.services.task_service import (
+    create_task_xml,
+    run_node,
+    update_parameter,
+)
 
 
 async def before_created(task_create, db):
@@ -11,7 +15,8 @@ async def before_created(task_create, db):
 
 async def after_created(task, db):
     # TODO push the task to the mq
-    start_task()
+    # run_node()
+    update_parameter()
 
 
 async def before_update(id, task_update, db):

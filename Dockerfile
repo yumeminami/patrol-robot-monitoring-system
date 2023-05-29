@@ -1,4 +1,4 @@
-FROM osrf/ros:foxy-ros1-bridge
+FROM osrf/ros:noetic-desktop-full
 
 # Set work directory
 WORKDIR /app
@@ -10,7 +10,6 @@ COPY requirements.txt /app
 
 # RUN cat /etc/apt/sources.list 
 RUN rm /etc/apt/sources.list.d/ros1-latest.list
-RUN rm /etc/apt/sources.list.d/ros2-latest.list
 
 # Replace the official sources list with a Chinese mirror
 RUN echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal main restricted universe multiverse" > /etc/apt/sources.list \
@@ -33,10 +32,10 @@ CMD ["python3", "app/main.py"]
 
 
 # Start from the ROS Foxy ROS1 bridge image
-# FROM ros:foxy-ros1-bridge
+# FROM osrf/ros:noetic-desktop-full
 
-# Set the working directory
-# WORKDIR /home/ros2
+# # Set the working directory
+# WORKDIR /home/ros
 
 # # Run the ROS1 bridge when the container starts
-# CMD ["ros2", "run", "ros1_bridge", "dynamic_bridge"]
+# CMD ["roscore"]

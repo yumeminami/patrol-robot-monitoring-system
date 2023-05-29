@@ -6,13 +6,15 @@ services:
     image: app:latest
     restart: always
     container_name: app
+    environment:
+      ROS_MASTER_URI: http://ros_core:11311 #TODO replace the real ros master uri
     ports:
       - "8000:8000"
     volumes:
       - ./:/app
     depends_on:
       - db
-      - dynamic_bridge
+      - ros_core
 
   
   db:
@@ -27,12 +29,10 @@ services:
     volumes:
       - "db_data:/var/lib/mysql"
     
-  dynamic_bridge:
-    image: dynamic_bridge:latest
+  ros_core:
+    image: ros_core:latest
     restart: always
-    container_name: dynamic_bridge
-    environment:
-      ROS_MASTER_URI: http://app:11311 #TODO replace the real ros master uri
+    container_name: ros_core
     depends_on: 
       - db
     

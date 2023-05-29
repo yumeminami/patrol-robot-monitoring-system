@@ -5,6 +5,8 @@ from app.schemas.tasks import TaskType
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from fastapi import HTTPException
+import rospy
+import subprocess
 
 
 def indent(elem, level=0):
@@ -80,3 +82,31 @@ async def create_task_xml(task_create, db):
     tree = ET.ElementTree(root)
     # TODO confirm the file name and path
     tree.write("output.xml", encoding="utf-8", xml_declaration=True)
+
+
+def start_task():
+    rospy.init_node("parameter_updater")
+
+    new_value = 1
+
+    rospy.set_param("patrol_state", new_value)
+
+    print("Parameter updated to: ", new_value)
+
+    rospy.signal_shutdown("finished.")
+
+
+def stop_task():
+    command = "rosnode kill /normal_patrol_state_machine"
+
+    process = subprocess.Popen(
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    output, error = process.communicate()
+
+    if output:
+        print("Command output:")
+        print(output.decode("utf-8"))
+    if error:
+        print("Command error:")
+    print(error.decode("utf-8"))

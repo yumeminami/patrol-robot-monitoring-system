@@ -4,23 +4,26 @@ from app.api.api import create_generic_router
 from fastapi import HTTPException
 from app.services.task_service import (
     create_task_xml,
-    run_node,
-    update_parameter,
 )
+from app.utils.parse_execution_time import parse_execution_time
+from app.celery_app.celery import start_task
 
 
-async def before_created(task_create, db):
-    await create_task_xml(task_create, db)
+def before_created(task_create, db):
+    create_task_xml(task_create, db)
 
 
-async def after_created(task, db):
+def after_created(task, db):
     # TODO push the task to the mq
-    # run_node()
-    update_parameter()
+    task = Task.from_orm(task)
+    for execution_time in task.execution_time:
+        eta_time = parse_execution_time(execution_time)
+        start_task.apply_async(args=(task.id,), eta=eta_time)
+        print(eta_time)
 
 
-async def before_update(id, task_update, db):
-    task = await crud.get(db, id)
+def before_update(id, task_update, db):
+    task = crud.get(db, id)
     task = task.__dict__
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -40,3 +43,9 @@ hooks = {
     "before_update": before_update,
 }
 router = create_generic_router(crud, TaskCreate, TaskUpdate, Task, hooks=hooks)
+
+
+# @router.post("/start_task")
+# def start_task():
+#     test.apply_async(countdown=10)
+#     return "success"

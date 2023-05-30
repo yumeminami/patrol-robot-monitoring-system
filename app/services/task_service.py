@@ -5,7 +5,6 @@ from app.schemas.tasks import TaskType
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from fastapi import HTTPException
-import rospy
 import subprocess
 
 
@@ -25,7 +24,7 @@ def indent(elem, level=0):
             elem.tail = i
 
 
-async def create_task_xml(task_create, db):
+def create_task_xml(task_create, db):
     # check type
     if task_create.type == TaskType.AUTO.value:
         return
@@ -35,7 +34,7 @@ async def create_task_xml(task_create, db):
     # get checkpoints from task_create.checkpoint_ids
     checkpoint_list = []
     for id in task_create.checkpoint_ids:
-        checkpoint = await checkpoint_crud.get(db, id)
+        checkpoint = checkpoint_crud.get(db, id)
         if checkpoint is None:
             raise HTTPException(
                 status_code=400,
@@ -55,7 +54,7 @@ async def create_task_xml(task_create, db):
         # get patrol point's corresponding gimbal points
         gimbalpoint_list = []
         for id in checkpoint.gimbal_points:
-            gimbal_point = await gimbal_point_crud.get(db, id)
+            gimbal_point = gimbal_point_crud.get(db, id)
             if gimbal_point is None:
                 raise HTTPException(
                     status_code=400,

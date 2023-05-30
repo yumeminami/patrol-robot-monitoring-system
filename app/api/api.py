@@ -37,7 +37,7 @@ def create_generic_router(
         hooks = {}
 
     @router.get("", response_model=List[db_model])
-    async def read_items(
+    def read_items(
         background_tasks: BackgroundTasks,
         skip: int = 0,
         limit: int = 100,
@@ -45,7 +45,7 @@ def create_generic_router(
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
-        items = await crud.get_multi(db=db, skip=skip, limit=limit)
+        items = crud.get_multi(db=db, skip=skip, limit=limit)
         if items is None:
             return JSONResponse(status_code=404, content="Item not found")
         after_read = hooks.get("after_read")
@@ -81,7 +81,7 @@ def create_generic_router(
         return items
 
     @router.get("/{item_id}", response_model=db_model)
-    async def read_item(
+    def read_item(
         item_id: int,
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
@@ -90,7 +90,7 @@ def create_generic_router(
         if before_read:
             before_read(item_id)
 
-        db_item = await crud.get(db=db, id=item_id)
+        db_item = crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
         after_read = hooks.get("after_read")
@@ -99,27 +99,27 @@ def create_generic_router(
         return db_item
 
     @router.post("", response_model=db_model)
-    async def create_item(
+    def create_item(
         item: create_schema,
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
         before_created = hooks.get("before_created")
         if before_created:
-            await before_created(item, db)
+            before_created(item, db)
 
         try:
-            created_item = await crud.create(db=db, obj_in=item)
+            created_item = crud.create(db=db, obj_in=item)
         except Exception as e:
             return HTTPException(status_code=400, detail=e.__str__())
         after_created = hooks.get("after_created")
         if after_created:
-            await after_created(created_item, db)
+            after_created(created_item, db)
 
         return created_item
 
     @router.put("/{item_id}", response_model=db_model)
-    async def update_item(
+    def update_item(
         item_id: int,
         item: update_schema,
         db: Session = Depends(get_db),
@@ -127,46 +127,44 @@ def create_generic_router(
     ):
         before_updated = hooks.get("before_update")
         if before_updated:
-            await before_updated(item_id, item, db)
+            before_updated(item_id, item, db)
 
-        db_item = await crud.get(db=db, id=item_id)
+        db_item = crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
 
         try:
-            updated_item = await crud.update(
-                db=db, db_obj=db_item, obj_in=item
-            )
+            updated_item = crud.update(db=db, db_obj=db_item, obj_in=item)
         except Exception as e:
             return HTTPException(status_code=400, detail=e.__str__())
 
         after_update = hooks.get("after_update")
         if after_update:
-            await after_update(item_id, updated_item, db)
+            after_update(item_id, updated_item, db)
         return updated_item
 
     @router.delete("/{item_id}", response_model=db_model)
-    async def delete_item(
+    def delete_item(
         item_id: int,
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
         before_delete = hooks.get("before_delete")
         if before_delete:
-            await before_delete(item_id, db)
+            before_delete(item_id, db)
 
-        db_item = await crud.get(db=db, id=item_id)
+        db_item = crud.get(db=db, id=item_id)
         if db_item is None:
             return JSONResponse(status_code=404, content="Item not found")
 
         try:
-            removed_item = await crud.remove(db=db, id=item_id)
+            removed_item = crud.remove(db=db, id=item_id)
         except Exception as e:
             return HTTPException(status_code=400, detail=e.__str__())
 
         after_delete = hooks.get("after_delete")
         if after_delete:
-            await after_delete(item_id, removed_item, db)
+            after_delete(item_id, removed_item, db)
         return removed_item
 
     return router

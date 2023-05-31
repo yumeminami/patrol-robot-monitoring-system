@@ -31,16 +31,15 @@
   <h3 align="center">Patrol-Robot-Monitoring-System</h3>
 
   <p align="center">
-    An awesome README template to jumpstart your projects!
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the project »</strong></a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy"><strong>Explore the project »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy">Quick Start</a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Report Bug</a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy/issues">Report Bug</a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Request Feature</a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy/issues">Request Feature</a>
   </p>
 </div>
 

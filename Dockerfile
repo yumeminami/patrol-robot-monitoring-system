@@ -1,4 +1,4 @@
-FROM osrf/ros:noetic-desktop-full
+FROM ros:noetic
 
 # Set work directory
 WORKDIR /app
@@ -32,7 +32,7 @@ CMD ["python3", "app/main.py"]
 
 
 # Start from the ROS Foxy ROS1 bridge image
-# FROM osrf/ros:noetic-desktop-full
+# FROM ros:noetic
 
 # # Set the working directory
 # WORKDIR /home/ros

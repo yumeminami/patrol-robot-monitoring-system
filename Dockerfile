@@ -1,4 +1,4 @@
-FROM ros:noetic
+FROM ros:noetic as app
 
 # Set work directory
 WORKDIR /app
@@ -32,10 +32,10 @@ CMD ["python3", "app/main.py"]
 
 
 # Start from the ROS Foxy ROS1 bridge image
-# FROM ros:noetic
+FROM ros:noetic as ros_core
 
-# # Set the working directory
-# WORKDIR /home/ros
+# Set the working directory
+WORKDIR /home/ros
 
-# # Run the ROS1 bridge when the container starts
-# CMD ["roscore"]
+# Run the ROS1 bridge when the container starts
+CMD ["roscore"]

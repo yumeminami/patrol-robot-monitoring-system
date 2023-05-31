@@ -32,8 +32,8 @@ jobs:
 
     - name: Linting
       run: |
-        black . --line-length=79 --exclude="alembic"
-        autoflake8 --in-place --remove-unused-variables --exclude "alembic" --recursive .
+        black . --line-length=79 --exclude="alembic|ros"
+        autoflake8 --in-place --remove-unused-variables --exclude "alembic, ros" --recursive .
 
     
     - name: Run pytest with coverage

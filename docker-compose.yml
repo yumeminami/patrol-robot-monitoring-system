@@ -2,7 +2,10 @@ version: '3.9'
 
 services:
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: app
     image: app:latest
     restart: always
     container_name: app
@@ -42,6 +45,10 @@ services:
       - "db_data:/var/lib/mysql"
     
   ros_core:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: ros_core
     image: ros_core:latest
     restart: always
     container_name: ros_core

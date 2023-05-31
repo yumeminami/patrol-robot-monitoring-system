@@ -18,6 +18,7 @@ services:
     depends_on:
       - db
       - ros_core
+    # user: ubuntu
     command: python3 app/main.py
   
   celery-worker:
@@ -28,6 +29,7 @@ services:
     environment:
       REDIS_PASSWORD: sample_password
       ROS_MASTER_URI: http://ros_core:11311 #TODO replace the real ros master uri
+    # user: ubuntu
     depends_on:
       - redis
 
@@ -52,6 +54,7 @@ services:
     image: ros_core:latest
     restart: always
     container_name: ros_core
+    # user: ubuntu
     depends_on: 
       - db
 

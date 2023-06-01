@@ -24,10 +24,7 @@ RUN apt-get update && apt-get install -y python3-pip
 # # Install python dependencies
 RUN pip3 install -r requirements.txt
 
-RUN useradd -ms /bin/bash ubuntu
 
-# Set ubuntu user as the owner of the app directory
-RUN chown -R ubuntu:ubuntu /app
 
 # # Switch to ubuntu user
 # USER ubuntu
@@ -46,7 +43,6 @@ FROM ros:noetic as ros_core
 # Set the working directory
 WORKDIR /home/ros
 
-RUN useradd -ms /bin/bash ubuntu
 
 # Run the ROS1 bridge when the container starts
 CMD ["roscore"]

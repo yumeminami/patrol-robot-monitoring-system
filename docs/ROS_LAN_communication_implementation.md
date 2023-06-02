@@ -23,7 +23,7 @@ ROS LAN communication implementation
     ```
     /rosout
     ```
-The output represents the ROS Master machine is running and the Slave machine can connect to the ROS Master machine.
+This output indicates that the ROS master is running and the slaves can connect to the ROS master, but at the same time, you need to make sure that the firewall settings do not block the communication between the ROS nodes.
 
 ---
 

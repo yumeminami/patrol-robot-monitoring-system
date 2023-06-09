@@ -13,6 +13,8 @@ services:
       ROS_MASTER_URI: http://ros_core:11311 #TODO replace the real ros master uri
     ports:
       - "8000:8000"
+      - "45101:45101"
+      - "45100:45100"
     volumes:
       - ./:/app
     depends_on:
@@ -52,6 +54,7 @@ services:
     image: ros_core:latest
     restart: always
     container_name: ros_core
+    hostname: ros_core
     ports:
       - "11311:11311"
     # user: ubuntu

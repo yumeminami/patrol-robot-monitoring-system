@@ -20,3 +20,5 @@ alembic
 openpyxl
 celery
 redis
+colorlog
+pyfiglet

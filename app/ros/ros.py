@@ -1,9 +1,14 @@
+import logging
+from datetime import datetime
+
 import rospy
 from std_msgs.msg import String
-from app.utils.log import logger,log_queue
-from datetime import datetime
-import logging
 
+from app.utils.log import logger,log_queue
+from app.db.database import SessionLocal
+from app.crud.robots import robot as crud
+from app.schemas.robots import Robot
+from app.schemas.sensors import Sensor
 
 
 class Node:
@@ -16,16 +21,26 @@ class Node:
         self.subscribers = {}
         handler = logging.handlers.QueueHandler(log_queue)
         logger.addHandler(handler)
+        logger.setLevel(level=logging.DEBUG)
 
     def initialize(self):
         logger.info("Initializing node...")
         self.create_subscribers()
 
     def create_subscribers(self):
-        # TODO should query the database for get the robot's topics
-
+        # Create a list of topics to subscribe robots' data
+        db = SessionLocal()
+        robots = crud.get_multi(db)
+        topics = []
+        for robot in robots:
+            robot = Robot.from_orm(robot)
+            sensors = robot.sensors
+            for sensor in sensors:
+                topic = "/{robot}/{sensor}".format(robot=robot.name, sensor=sensor.name)
+                topics.append(topic)
+            logger.info(f"Robot: {robot}")
         # Create multiple subscribers and associate them with topics
-        topics = ["/topic1", "/topic2"]  # List of topics to subscribe to
+        logger.info(f"Subscribing to topics: {topics}")
         for topic in topics:
             self.wait_for_topic(topic)
     
@@ -33,8 +48,7 @@ class Node:
         published_topics = [t[0] for t in rospy.get_published_topics()]
         while topic not in published_topics:
             current_time = datetime.now().strftime("%H:%M:%S")
-            logger.info(f"Published topics: {published_topics}")
-            logger.info(f"Waiting for topic '{topic}' to become available... time: {current_time}")
+            logger.debug(f"Waiting for topic '{topic}' to become available... time: {current_time}")
             rospy.sleep(1)
             published_topics = [t[0] for t in rospy.get_published_topics()]
         

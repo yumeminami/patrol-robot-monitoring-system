@@ -9,6 +9,7 @@ from app.db.database import SessionLocal
 from app.crud.robots import robot as crud
 from app.schemas.robots import Robot
 from app.schemas.sensors import Sensor
+from app.db.redis import redis_client
 
 
 class Node:
@@ -49,13 +50,17 @@ class Node:
         while topic not in published_topics:
             current_time = datetime.now().strftime("%H:%M:%S")
             logger.debug(f"Waiting for topic '{topic}' to become available... time: {current_time}")
-            rospy.sleep(1)
+            rospy.sleep(5)
             published_topics = [t[0] for t in rospy.get_published_topics()]
         
+        topic_type = rospy.get_published_topics()[published_topics.index(topic)][1]
         self.subscribers[topic] = rospy.Subscriber(name=topic, data_class=String, callback=self.callback)
 
     def callback(self, message):
         logger.info(f"Received message from topic: {message}")
+        # get the robot data from the topic and update the cache
+
+
 
 
 def create_robot_daemon(nodename, xmlrpc_port, tcpros_port):

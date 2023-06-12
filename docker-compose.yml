@@ -15,8 +15,6 @@ services:
       ROS_HOSTNAME: 192.168.2.43
     ports:
       - "8000:8000"
-      - "45101:45101"
-      - "45100:45100"
       - "45150-45200:45150-45200"
     volumes:
       - ./:/app
@@ -60,13 +58,11 @@ services:
     hostname: ros_core
     ports:
       - "11311:11311"
-    # user: ubuntu
     depends_on: 
       - db
 
   redis:
     image: redis:latest
-    # restart: always
     container_name: redis
     ports:
       - "6379:6379"

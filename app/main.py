@@ -5,7 +5,6 @@ import sys
 import os
 from pyfiglet import Figlet
 import multiprocessing
-import queue
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -36,7 +35,9 @@ def create_app():
 app = create_app()
 
 
-process = multiprocessing.Process(target=create_robot_daemon, args=("robot", 45159, 45160))
+process = multiprocessing.Process(
+    target=create_robot_daemon, args=("robot", 45159, 45160)
+)
 process.start()
 
 if __name__ == "__main__":

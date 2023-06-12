@@ -20,7 +20,6 @@ def after_read(robot):
     tasks = robot.tasks.all()
     robot = Robot.from_orm(robot)
     if tasks:
-        # TODO Make sure that the last task is the current task
         task = tasks[-1]
         robot.task_id = task.id
         robot.task_status = task.status

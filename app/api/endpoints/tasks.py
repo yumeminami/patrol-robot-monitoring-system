@@ -7,6 +7,7 @@ from app.services.task_service import (
 )
 from app.utils.parse_execution_time import parse_execution_time
 from app.celery_app.celery import start_task
+from app.utils.log import logger
 
 
 def before_created(task_create, db):
@@ -14,12 +15,11 @@ def before_created(task_create, db):
 
 
 def after_created(task, db):
-    # TODO push the task to the mq
     task = Task.from_orm(task)
     for execution_time in task.execution_time:
         eta_time = parse_execution_time(execution_time)
         start_task.apply_async(args=(task.id,), eta=eta_time)
-        print(eta_time)
+        logger.info(f"Task {task.id} will start at {execution_time}")
 
 
 def before_update(id, task_update, db):
@@ -43,9 +43,3 @@ hooks = {
     "before_update": before_update,
 }
 router = create_generic_router(crud, TaskCreate, TaskUpdate, Task, hooks=hooks)
-
-
-# @router.post("/start_task")
-# def start_task():
-#     test.apply_async(countdown=10)
-#     return "success"

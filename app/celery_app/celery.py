@@ -20,11 +20,9 @@ def start_task(task_id):
     db = SessionLocal()
 
     task = crud.get(db, task_id)
-    # print(task)
     crud.update(
         db, db_obj=task, obj_in={"status": TaskStatus.IN_PROGRESS.value}
     )
-    # run_node()
     update_parameter()
 
     return "success"

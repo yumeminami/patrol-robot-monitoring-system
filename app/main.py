@@ -4,12 +4,16 @@ from fastapi import FastAPI
 import sys
 import os
 from pyfiglet import Figlet
+import multiprocessing
+import queue
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.api.deps import router as deps_router
 from app.api.router import router as api_router
 from app.utils.log import logger
+
+from app.ros.ros import create_robot_daemon
 
 
 def create_app():
@@ -32,9 +36,13 @@ def create_app():
 app = create_app()
 
 
+process = multiprocessing.Process(target=create_robot_daemon, args=("robot", 45159, 45160))
+process.start()
+
 if __name__ == "__main__":
     f = Figlet(font="speed")
     logger.info(f.renderText("\nPatrol Robot System"))
     logger.info("Server Start...")
     uvicorn.run(app, host="0.0.0.0", port=8000)  # type: ignore
     logger.info(f.renderText("\nBye!"))
+    process.terminate()

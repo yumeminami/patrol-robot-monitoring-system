@@ -1,0 +1,21 @@
+@startuml
+actor User
+participant Node
+participant Subscriber
+participant Publisher
+participant CallbackFunction
+participant Cache
+
+User -> Node: Initialize the node
+Node -> Subscriber: Create subscriber
+Subscriber -> Publisher: Search for corresponding publisher
+alt Publisher found
+    Subscriber -> Subscriber: Receive message
+    Subscriber -> CallbackFunction: Invoke callback function with received message
+    CallbackFunction -> Cache: Update parsed data
+else Publisher not found
+    Subscriber -> Subscriber: Wait in a loop
+    loop Wait for publisher
+    end
+end
+@enduml

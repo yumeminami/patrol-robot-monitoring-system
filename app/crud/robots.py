@@ -18,5 +18,8 @@ class CRUDRobot(CRUDBase[Robot, RobotCreate, RobotUpdate]):
             .all()
         )
 
+    def get_by_name(self, db: Session, *, name: str):
+        return db.query(self.model).filter(Robot.name == name).first()
+
 
 robot = CRUDRobot(Robot)

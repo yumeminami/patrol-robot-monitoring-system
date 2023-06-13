@@ -31,6 +31,23 @@ def create_generic_router(
     db_model,
     hooks: Optional[Dict[str, Callable]] = None,
 ):
+    """
+    Create generic router for CRUD operations
+    The router will have the following endpoints:
+    - GET /: return all items
+    - GET /{id}: return item with id
+    - POST /: create item
+    - PUT /{id}: update item with id
+    - DELETE /{id}: delete item with id
+
+    :param crud: CRUD object
+    :param create_schema: Pydantic model for create
+    :param update_schema: Pydantic model for update
+    :param db_model: SQLAlchemy model
+    :param hooks: dict of hooks to be called before/after CRUD operations
+
+    :return: FastAPI router
+    """
     router = APIRouter()
 
     if hooks is None:
@@ -45,6 +62,21 @@ def create_generic_router(
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
+        """
+        Read items
+
+        :param background_tasks: BackgroundTasks
+        :param skip: skip
+        :param limit: limit
+        :param export: a flag to export data to excel, default is False. If True, the response will be a file
+        and the file will be removed after returning response.
+        :param db: database session
+        :param token: token
+
+        :return: list of items
+
+
+        """
         items = crud.get_multi(db=db, skip=skip, limit=limit)
         if items is None:
             return JSONResponse(status_code=404, content="Item not found")
@@ -86,6 +118,15 @@ def create_generic_router(
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
+        """
+        Read item by id
+
+        :param item_id: item id
+        :param db: database session
+        :param token: token
+
+        :return: item
+        """
         before_read = hooks.get("before_read")
         if before_read:
             before_read(item_id)
@@ -104,6 +145,15 @@ def create_generic_router(
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
+        """
+        Create item
+
+        :param item: item
+        :param db: database session
+        :param token: token
+
+        :return: created item
+        """
         before_created = hooks.get("before_created")
         if before_created:
             before_created(item, db)
@@ -125,6 +175,16 @@ def create_generic_router(
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
+        """
+        Update item
+
+        :param item_id: item id
+        :param item: item
+        :param db: database session
+        :param token: token
+
+        :return: updated item
+        """
         before_updated = hooks.get("before_update")
         if before_updated:
             before_updated(item_id, item, db)
@@ -149,6 +209,15 @@ def create_generic_router(
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
     ):
+        """
+        Delete item
+
+        :param item_id: item id
+        :param db: database session
+        :param token: token
+
+        :return: deleted item
+        """
         before_delete = hooks.get("before_delete")
         if before_delete:
             before_delete(item_id, db)

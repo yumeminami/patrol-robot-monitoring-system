@@ -15,6 +15,9 @@ def before_created(task_create, db):
 
 
 def after_created(task, db):
+    """
+    After task created, push it to celery
+    """
     task = Task.from_orm(task)
     for execution_time in task.execution_time:
         eta_time = parse_execution_time(execution_time)
@@ -23,6 +26,10 @@ def after_created(task, db):
 
 
 def before_update(id, task_update, db):
+    """
+    Before task updated, check if the task is completed or stopped
+    If it is, raise an exception to tell the user that the task cannot be updated
+    """
     task = crud.get(db, id)
     task = task.__dict__
     if task is None:

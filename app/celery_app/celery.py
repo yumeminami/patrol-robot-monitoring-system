@@ -17,6 +17,12 @@ app.autodiscover_tasks(["celery.tasks"], force=True)
 
 @app.task
 def start_task(task_id):
+    """Update the task status to IN_PROGRESS and update the ROS parameter
+
+    :param task_id: get the task from database by task_id
+
+    :return: success
+    """
     db = SessionLocal()
 
     task = crud.get(db, task_id)

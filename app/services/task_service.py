@@ -9,6 +9,12 @@ import subprocess
 
 
 def indent(elem, level=0):
+    """Indent the xml file
+
+    Due to the python version compatibility, we cannot use the latest version of xml.dom.minidom in
+    python3.8. So we use this function to indent the xml file.
+
+    """
     i = "\n" + level * "  "
     if len(elem):
         if not elem.text or not elem.text.strip():
@@ -84,6 +90,13 @@ def create_task_xml(task_create, db):
 
 
 def run_node():
+    """Run the robot ros node.(Deprecated)
+
+    At the first design, this step was belong to this system. But now, after the
+    discussion with the team, we decide to run the ros node in the robot.
+
+    """
+
     # TODO Now is hard code, need to be changed
     command = "rosrun zj_robot normal_patrol_state_machine"
 

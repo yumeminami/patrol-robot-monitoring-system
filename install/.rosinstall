@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/ubuntu/patrol-robot-monitoring-system/ros/install/setup.sh

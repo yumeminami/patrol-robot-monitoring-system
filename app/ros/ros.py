@@ -14,6 +14,8 @@ from app.schemas.robots import Robot
 from app.schemas.sensors import Sensor
 from app.db.redis import redis_client
 
+from ros_interfaces.msg import SensorData
+
 ros_port_queue = Queue()
 for i in range(45159, 45200):
     ros_port_queue.put(i)
@@ -60,7 +62,9 @@ class Node:
         """
         # Create a list of topics to subscribe robot's data
         db = SessionLocal()
-        robot = crud.get_by_name(db, name=rospy.get_name().strip("/"))
+        # node name = /robot_subscriber 
+        robotname = rospy.get_name().strip("/").replace("_subscriber", "")
+        robot = crud.get_by_name(db, name=robotname)
         robot = Robot.from_orm(robot)
         sensors = robot.sensors
         for sensor in sensors:
@@ -89,7 +93,7 @@ class Node:
             published_topics.index(topic)
         ][1]
         self.subscribers[topic] = rospy.Subscriber(
-            name=topic, data_class=String, callback=self.callback
+            name=topic, data_class=SensorData, callback=self.callback
         )
 
     def callback(self, message):
@@ -114,9 +118,8 @@ def initialize_all_robots_corresponding_nodes():
     process_list = []
     for robot in robots:
         robot = Robot.from_orm(robot)
-        nodename = robot.name
         process = multiprocessing.Process(
-            target=run_node, args=(nodename, ros_port_queue)
+            target=run_node, args=(robot.name, ros_port_queue)
         )
         process_list.append(process)
         process.start()
@@ -124,7 +127,7 @@ def initialize_all_robots_corresponding_nodes():
     return process_list
 
 
-def run_node(nodename, ros_port_queue):
+def run_node(robotname, ros_port_queue):
     """Run the ROS node
 
     In this function, we will create a ROS node and initialize it. The node will subscribe
@@ -140,6 +143,7 @@ def run_node(nodename, ros_port_queue):
         return
     xmlrpc_port = ros_port_queue.get()
     tcpros_port = ros_port_queue.get()
+    nodename = robotname + "_subscriber"
     logger.debug(f"Creating node: {nodename}")
     logger.debug(f"xmlrpc_port: {xmlrpc_port}")
     logger.debug(f"tcpros_port: {tcpros_port}")

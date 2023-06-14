@@ -79,9 +79,9 @@ class Node:
         published_topics = [t[0] for t in rospy.get_published_topics()]
         while topic not in published_topics:
             current_time = datetime.now().strftime("%H:%M:%S")
-            logger.debug(
-                f"Waiting for topic '{topic}' to become available... time: {current_time}"
-            )
+            # logger.debug(
+            #     f"Waiting for topic '{topic}' to become available... time: {current_time}"
+            # )
             rospy.sleep(5)
             published_topics = [t[0] for t in rospy.get_published_topics()]
 

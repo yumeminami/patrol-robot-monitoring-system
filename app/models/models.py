@@ -76,6 +76,7 @@ class Sensor(BaseModel):
 
     name = Column(String(50), index=True)
     value = Column(Integer, default=0)
+    unit = Column(String(50), nullable=False)
     robot_id = Column(Integer, ForeignKey("robots.id"))
     robot = relationship("Robot", back_populates="sensors")
 

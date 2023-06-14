@@ -1,6 +1,9 @@
-from celery import Celery
 import os
-from app.services.task_service import update_parameter
+import threading
+
+from celery import Celery
+
+from app.services.task_service import update_parameter, monitor_sensor_data
 from app.crud.tasks import task as crud
 from app.schemas.tasks import TaskStatus
 from app.db.database import SessionLocal
@@ -30,5 +33,8 @@ def start_task(task_id):
         db, db_obj=task, obj_in={"status": TaskStatus.IN_PROGRESS.value}
     )
     update_parameter()
+
+    thread = threading.Thread(target=monitor_sensor_data, args=(task,))
+    thread.start()
 
     return "success"

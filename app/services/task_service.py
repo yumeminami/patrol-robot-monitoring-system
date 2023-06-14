@@ -1,9 +1,10 @@
 import xml.etree.ElementTree as ET
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
-from app.schemas.tasks import TaskType
+from app.schemas.tasks import Task, TaskType
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
+from app.utils.log import logger
 from fastapi import HTTPException
 import subprocess
 
@@ -147,3 +148,30 @@ def kill_node():
     if error:
         print("Command error:")
         print(error.decode("utf-8"))
+
+
+def monitor_sensor_data(task):
+    """When the task is running, monitor the sensor data.
+
+    1. Get the latest sensor data from the cache.
+
+    2. Check the sensor data is over the threshold or not.
+
+    3. If the sensor data is over the threshold, create the alarm.
+
+    4. while the robot status or task status is finished, stop the monitor.
+    """
+    logger.info("Start to monitor sensor data...")
+    task = Task.from_orm(task)
+    logger.debug(task)
+
+    # while True:
+    # get the latest sensor data from the cache
+
+    # if the task is finished, stop the monitor
+    # if task.status == TaskStatus.COMPLETED.value:
+    #     break
+
+    # check the sensor data is over the threshold or not
+
+    # if the sensor data is over the threshold, create the alarm

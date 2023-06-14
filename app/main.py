@@ -36,7 +36,10 @@ app = create_app()
 f = Figlet(font="speed")
 logger.info(f.renderText("\nPatrol Robot System"))
 logger.info("Server Start...")
-initialize_all_robots_corresponding_nodes()
+process_list = initialize_all_robots_corresponding_nodes()
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)  # type: ignore
+    for process in process_list:
+        process.terminate()
+    logger.info(f.renderText("\nBye!"))

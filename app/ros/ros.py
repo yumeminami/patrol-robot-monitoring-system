@@ -93,8 +93,13 @@ class Node:
         )
 
     def callback(self, message):
+        """Callback function for the subscriber
+
+        :param message: the message received from the topic
+
+        We will parse the message and update the data in the cache.
+        """
         logger.info(f"Received message from topic: {message}")
-        # get the robot data from the topic and update the cache
 
 
 def initialize_all_robots_corresponding_nodes():
@@ -116,8 +121,7 @@ def initialize_all_robots_corresponding_nodes():
         process_list.append(process)
         process.start()
 
-    for process in process_list:
-        process.join()
+    return process_list
 
 
 def run_node(nodename, ros_port_queue):

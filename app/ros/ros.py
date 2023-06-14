@@ -62,7 +62,6 @@ class Node:
         """
         # Create a list of topics to subscribe robot's data
         db = SessionLocal()
-        # node name = /robot_subscriber 
         robotname = rospy.get_name().strip("/").replace("_subscriber", "")
         robot = crud.get_by_name(db, name=robotname)
         robot = Robot.from_orm(robot)

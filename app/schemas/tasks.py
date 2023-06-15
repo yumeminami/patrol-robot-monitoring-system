@@ -23,9 +23,9 @@ class TaskBase(BaseModel):
     status: int
     robot_id: int
     checkpoint_ids: List[int] = []
-    start_position: int = 0
-    end_position: int = 0
-    speed: int = 0
+    start_position: float = 0
+    end_position: float = 0
+    velocity: float = 0
     sensors: List[SensorForTask] = []
     vision_algorithms: List[VisionAlgorithmForTask] = []
     execution_time: List[str]

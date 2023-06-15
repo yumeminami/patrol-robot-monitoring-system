@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
-from app.schemas.tasks import Task, TaskType
+from app.schemas.tasks import TaskType
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.utils.log import logger
@@ -162,8 +162,7 @@ def monitor_sensor_data(task):
     4. while the robot status or task status is finished, stop the monitor.
     """
     logger.info("Start to monitor sensor data...")
-    task = Task.from_orm(task)
-    logger.debug(task)
+    # logger.info(task)
 
     # while True:
     # get the latest sensor data from the cache

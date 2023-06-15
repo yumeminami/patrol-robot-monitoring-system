@@ -21,7 +21,7 @@ def after_created(task, db):
     task = Task.from_orm(task)
     for execution_time in task.execution_time:
         eta_time = parse_execution_time(execution_time)
-        start_task.apply_async(args=(task.id,), eta=eta_time)
+        start_task.apply_async(args=(task.id, eta_time), eta=eta_time)
         logger.info(f"Task {task.id} will start at {execution_time}")
 
 

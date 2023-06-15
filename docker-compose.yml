@@ -19,6 +19,8 @@ services:
       - "45150-45200:45150-45200"
     volumes:
       - ./:/app
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     depends_on:
       - db
       - ros_core
@@ -30,6 +32,8 @@ services:
     command: celery -A app.celery_app.celery worker --loglevel=info
     volumes:
       - ./:/app
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     environment:
       REDIS_PASSWORD: sample_password
       ROS_MASTER_URI: http://ros_core:11311 #TODO replace the real ros master uri

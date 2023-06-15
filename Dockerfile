@@ -25,14 +25,10 @@ RUN apt-get update && apt-get install -y python3-pip
 RUN pip3 install -r requirements.txt
 
 
-
-# # Switch to ubuntu user
-# USER ubuntu
-
-
 # Expose port
 EXPOSE 8000
 
+RUN bash -c "source install/setup.bash"
 
 CMD ["python3", "app/main.py"]
 

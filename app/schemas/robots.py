@@ -1,15 +1,22 @@
 from pydantic import BaseModel
 from typing import List
 from .sensors import Sensor
+from enum import Enum
+
+
+class RobotBatteryStatus(Enum):
+    NOCHARGE = 0
+    CHARGING = 1
 
 
 class Robot(BaseModel):
     id: int
     name: str
     battery: int = 100
+    battery_status = RobotBatteryStatus.NOCHARGE
     status: int = 0
-    speed: int = 0
-    position: int = 0
+    velocity: float = 0.0
+    position: float = 0.0
     task_id: int = 0
     task_status: int = 0
     sensors: List[Sensor] = []
@@ -27,3 +34,5 @@ class RobotUpdate(BaseModel):
     status: int
     speed: int
     position: int
+    battery: int
+    battery_status: int

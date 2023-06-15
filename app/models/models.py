@@ -7,6 +7,7 @@ from sqlalchemy import (
     String,
     Boolean,
     Time,
+    Float,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -28,9 +29,10 @@ class Robot(BaseModel):
 
     name = Column(String(50), index=True)
     battery = Column(Integer, default=100)
+    battery_status = Column(Integer, default=0)
     status = Column(Integer, default=0)
-    speed = Column(Integer, default=0)
-    position = Column(Integer, default=0)
+    velocity = Column(Float, default=0.0)
+    position = Column(Float, default=0.0)
     tasks = relationship(
         "Task",
         back_populates="robot",

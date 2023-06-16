@@ -2,7 +2,6 @@ from ros_interfaces.msg import SensorData
 
 import rospy
 
-from std_msgs.msg import String
 
 rospy.init_node("robot", xmlrpc_port=45161, tcpros_port=45162)
 

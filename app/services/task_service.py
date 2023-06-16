@@ -162,15 +162,3 @@ def monitor_sensor_data(task):
     4. while the robot status or task status is finished, stop the monitor.
     """
     logger.info("Start to monitor sensor data...")
-    # logger.info(task)
-
-    # while True:
-    # get the latest sensor data from the cache
-
-    # if the task is finished, stop the monitor
-    # if task.status == TaskStatus.COMPLETED.value:
-    #     break
-
-    # check the sensor data is over the threshold or not
-
-    # if the sensor data is over the threshold, create the alarm

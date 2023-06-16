@@ -23,6 +23,7 @@ app.autodiscover_tasks(["celery.tasks"], force=True)
 @app.task
 def start_task(task_id, eta_time):
     """Update the task status to IN_PROGRESS and update the ROS parameter
+    If the task is everyday task, update the eta_time to tomorrow and push the task to celery again.
 
     :param task_id: get the task from database by task_id
 

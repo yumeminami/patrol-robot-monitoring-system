@@ -1,24 +1,25 @@
-import queue
 import logging
 import multiprocessing
 from multiprocessing import Queue
 from datetime import datetime
 
 import rospy
-from std_msgs.msg import String
 
 from app.utils.log import logger, log_queue
 from app.db.database import SessionLocal
 from app.crud.robots import robot as crud
 from app.schemas.robots import Robot
-from app.schemas.sensors import Sensor
-from app.db.redis import redis_client
 
-from ros_interfaces.msg import SensorData
+from common.msg import robot_real_time_info
+from common.msg import sensor_data
+from common.msg import *
 
 ros_port_queue = Queue()
 for i in range(45159, 45200):
     ros_port_queue.put(i)
+
+
+topic_list = ["robot_real_time_info", "sensor_data"]
 
 
 class Node:
@@ -52,66 +53,98 @@ class Node:
         self.create_subscribers()
 
     def create_subscribers(self):
-        """Create subscribers for the node
+        """Establishes ROS topic subscriptions for the node.
 
-        The node will subscribe to the topics that the robot publishes. The topics are these
-        aspects of the robot:
-            - robot real-time data(position, velocity, etc.)
-            - sensor data (temperature, humidity, etc.)
+        This node subscribes to the topics published by a specific robot. These topics encompass:
+            - Real-time robot data (position, velocity, etc.)
+            - Sensor readings (temperature, humidity, etc.)
 
+        Each topic subscription is preceded by a waiting period until the topic becomes available.
+        The robot name is inferred from the node name.
         """
-        # Create a list of topics to subscribe robot's data
+
         db = SessionLocal()
         robotname = rospy.get_name().strip("/").replace("_subscriber", "")
-        robot = crud.get_by_name(db, name=robotname)
-        robot = Robot.from_orm(robot)
-        sensors = robot.sensors
-        for sensor in sensors:
-            topic = "/{robot}/{sensor}".format(
-                robot=robot.name, sensor=sensor.name
+
+        for topic in topic_list:
+            topic = "/{robotname}/{topic}".format(
+                robotname=robotname, topic=topic
             )
-            logger.info(f"Subscribing to topic: {topic}")
-            self.wait_for_topic(topic)
+            self.wait_for_topic(robotname, topic)
 
-    def wait_for_topic(self, topic):
-        """Wait for the topic to become available
+    def wait_for_topic(self, robotname, topic):
+        """Ensures a topic is available before creating a subscription.
 
-        :param topic: the topic to subscribe
+        This function periodically checks if a given topic is being published. Once the topic
+        is available, it creates a subscriber that listens to the topic. The callback function
+        for each subscriber is determined by the topic type.
 
+        :param robotname: The name of the robot that publishes the topic
+        :param topic: The topic to subscribe to
         """
-        published_topics = [t[0] for t in rospy.get_published_topics()]
+
+        published_topics = [
+            toptics_types[0] for toptics_types in rospy.get_published_topics()
+        ]
         while topic not in published_topics:
             current_time = datetime.now().strftime("%H:%M:%S")
-            # logger.debug(
-            #     f"Waiting for topic '{topic}' to become available... time: {current_time}"
-            # )
+            logger.debug(
+                f"Waiting for topic '{topic}' to become available... time: {current_time}"
+            )
             rospy.sleep(5)
-            published_topics = [t[0] for t in rospy.get_published_topics()]
+            published_topics = [
+                toptics_types[0]
+                for toptics_types in rospy.get_published_topics()
+            ]
 
         topic_type = rospy.get_published_topics()[
             published_topics.index(topic)
-        ][1]
-        self.subscribers[topic] = rospy.Subscriber(
-            name=topic, data_class=SensorData, callback=self.callback
-        )
+        ][1].split("/")[-1]
 
-    def callback(self, message):
+        try:
+            msg_class = globals()[topic_type]
+
+            callback_method = getattr(self, f"{topic_type}_callback")
+
+            self.subscribers[topic] = rospy.Subscriber(
+                name=topic, data_class=msg_class, callback=callback_method
+            )
+        except KeyError:
+            logger.error(f"Topic type '{topic_type}' is not defined")
+        except AttributeError:
+            logger.error(
+                f"Callback function for topic type '{topic_type}' is not defined"
+            )
+
+    def robot_real_time_info_callback(self, message):
         """Callback function for the subscriber
 
         :param message: the message received from the topic
 
         We will parse the message and update the data in the cache.
         """
-        logger.info(f"Received message from topic: {message}")
+        logger.info(f"Received message from topic: \n{message}")
+
+    def sensor_data_callback(self, message):
+        """Callback function for the subscriber
+
+        :param message: the message received from the topic
+
+        We will parse the message and update the data in the cache.
+        """
+        logger.info(f"Received message from topic: \n{message}")
 
 
 def initialize_all_robots_corresponding_nodes():
-    """Initialize all the robots' corresponding nodes when the server starts.
+    """Spawn ROS nodes for each registered robot.
 
-    The function will create a process for each robot. Each process will create a ROS node
-    and subscribe to the topics that the robot publishes.
+    This function initializes a dedicated ROS node for each robot in the database,
+    spawning a separate process for each. These ROS nodes subscribe to the relevant
+    topics published by their associated robots.
 
+    :return: List of multiprocessing.Process objects for each spawned ROS node.
     """
+
     db = SessionLocal()
     robots = crud.get_multi(db)
     process_list = []
@@ -127,16 +160,19 @@ def initialize_all_robots_corresponding_nodes():
 
 
 def run_node(robotname, ros_port_queue):
-    """Run the ROS node
+    """Execute a ROS node subscribing to a specific robot's topics.
 
-    In this function, we will create a ROS node and initialize it. The node will subscribe
-    to the robot's topics.
+    This function creates and initializes a ROS node that listens to the topics
+    published by a given robot. The ports for ROS communications are retrieved from
+    a shared queue.
 
-    :param nodename: the name of the node.
-    :param ros_port_queue: We use a multiprocessing.Queue to store the available port and
-    pass it to the function. And we need to check if the queue is empty before creating the
-    node.
+    :param robotname: The name of the robot for which the node is being created.
+    :param ros_port_queue: A multiprocessing.Queue instance storing available ports.
+                           Two ports (for XML-RPC and TCPROS, respectively) are retrieved
+                           per node. The function checks the queue's availability
+                           before proceeding.
     """
+
     if ros_port_queue.empty():
         logger.error("No available port for ROS node")
         return

@@ -32,5 +32,5 @@ jobs:
 
     - name: Linting
       run: |
-        black . --line-length=79 --exclude="alembic|ros"
-        autoflake8 --in-place --remove-unused-variables --exclude "alembic, ros" --recursive .
+        black . --line-length=79 --exclude="alembic|share"
+        autoflake8 --in-place --remove-unused-variables --exclude "alembic, share, ros" --recursive .

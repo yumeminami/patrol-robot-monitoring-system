@@ -13,7 +13,7 @@ services:
       ROS_MASTER_URI: http://ros_core:11311 #TODO replace the real ros master uri
       REDIS_PASSWORD: sample_password
       ROS_HOSTNAME: 192.168.2.43
-      PYTHONPATH : /app/ros/devel/lib/python3/dist-packages
+      PYTHONPATH : /app/share/devel/lib/python3/dist-packages
     ports:
       - "8000:8000"
       - "45150-45200:45150-45200"

@@ -8,7 +8,8 @@ import rospy
 from app.utils.log import logger, log_queue
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
-from app.crud.robots import robot as crud
+from app.crud.sensors import sensor as sensor_crud
+from app.crud.robots import robot as robot_crud
 from app.schemas.robots import Robot
 
 from common.msg import robot_real_time_info
@@ -113,6 +114,7 @@ class Node:
                 data_class=msg_class,
                 callback=callback_method,
                 callback_args=callback_args,
+                queue_size=20,
             )
         except KeyError:
             logger.error(f"Topic type '{topic_type}' is not defined")
@@ -176,6 +178,28 @@ class Node:
             # logger.info(f"Received message from topic: \n{message}")
             logger.info(f"Updated sensor data for robot: {robot_name}")
 
+            db = SessionLocal()
+            robot = robot_crud.get_by_name(db=db, name=robot_name)
+            sensors = sensor_crud.get_multi_by_robot_id(
+                db=db, robot_id=robot.id
+            )
+            for sensor in sensors:
+                try:
+                    if sensor.name in info:
+                        sensor_crud.update(
+                            db,
+                            db_obj=sensor,
+                            obj_in={"value": info[sensor.name]},
+                        )
+                    else:
+                        logger.warning(
+                            f"Sensor '{sensor.name}' not found in message."
+                        )
+                except Exception as e:
+                    logger.error(
+                        f"Error occurred while updating sensor '{sensor.name}': {e}"
+                    )
+
         except Exception as e:
             logger.error(f"Error occurred while processing sensor data: {e}")
 
@@ -191,7 +215,7 @@ def initialize_all_robots_corresponding_nodes():
     """
 
     db = SessionLocal()
-    robots = crud.get_multi(db)
+    robots = robot_crud.get_multi(db)
     process_list = []
     for robot in robots:
         robot = Robot.from_orm(robot)

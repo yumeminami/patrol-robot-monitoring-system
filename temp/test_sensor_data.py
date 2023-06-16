@@ -2,6 +2,7 @@ import rospy
 
 from common.msg import sensor_data
 from common.msg import robot_real_time_info
+import time
 
 # print(sensor_data)
 # print(sensor_data.__slots__)
@@ -20,7 +21,7 @@ pub2 = rospy.Publisher(
 
 
 msg = sensor_data()
-msg.temperature = 30.0
+msg.temperature = 32.3
 msg.humidity = 50
 msg.light = 50
 msg.PM1_0 = 4
@@ -39,9 +40,9 @@ msg2.battery_state = 1
 msg2.battery_level = 100
 
 
-rate = rospy.Rate(1)
+rate = rospy.Rate(0.2)
 while not rospy.is_shutdown():
     pub.publish(msg)
     pub2.publish(msg2)
-    rate.sleep()
+    time.sleep(2)
     # print(msg)

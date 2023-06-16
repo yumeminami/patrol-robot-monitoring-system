@@ -1,0 +1,13 @@
+#位置控制action
+
+#目标位置 单位m
+int32 ABSorREL #相对或绝对
+int32 target_position
+float32 velocity
+---
+#是否到达指定位置
+bool inposition
+---
+#连续位置 速度反馈
+float32 position
+float32 velocity

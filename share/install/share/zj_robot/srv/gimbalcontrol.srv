@@ -1,0 +1,7 @@
+# 客户端请求时发送的参数
+int32 dwPTZCommand
+int32 dwStop
+int32 dwSpeed
+---
+# 云台控制结果
+bool result

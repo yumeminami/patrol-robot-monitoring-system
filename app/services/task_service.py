@@ -11,7 +11,12 @@ from app.db.redis import redis_client
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
 from app.schemas.tasks import TaskType, TaskStatus, Task
-from app.schemas.alarm_logs import AlarmLogBase, AlarmLogType, AlarmLogStatus, AlarmLogLevel, AlarmLogCreate
+from app.schemas.alarm_logs import (
+    AlarmLogCreate,
+    AlarmLogLevel,
+    AlarmLogStatus,
+    AlarmLogType,
+)
 from app.crud.robots import robot as robot_crud
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
@@ -217,10 +222,8 @@ def monitor_sensor_data(task: Task):
                     type=alarm_log_type,
                 )
                 print(alarm_log)
-                
+
                 alarm_log_crud.create(db, obj_in=alarm_log)
-
-
 
         db.close()
         time.sleep(5)

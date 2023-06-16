@@ -11,10 +11,12 @@ from app.db.redis import redis_client
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
 from app.schemas.tasks import TaskType, TaskStatus, Task
+from app.schemas.alarm_logs import AlarmLogBase, AlarmLogType, AlarmLogStatus, AlarmLogLevel, AlarmLogCreate
 from app.crud.robots import robot as robot_crud
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.crud.tasks import task as task_crud
+from app.crud.alarm_logs import alarm_log as alarm_log_crud
 from app.utils.log import logger
 
 
@@ -202,6 +204,23 @@ def monitor_sensor_data(task: Task):
                     f"Sensor: {sensor_name}, Lower Limit: {sensor.lower_limit}, Upper Limit: {sensor.upper_limit}, Current Value: {sensor_data[sensor_name]}"
                 )
                 # Initiating the alarm
-                # To be implemented
+                TYPENAME = sensor_name.upper()
+                if TYPENAME in AlarmLogType.__members__:
+                    alarm_log_type = AlarmLogType[TYPENAME].value
+                else:
+                    alarm_log_type = AlarmLogType.DEVICE.value
+                alarm_log = AlarmLogCreate(
+                    level=AlarmLogLevel.FATAL.value,
+                    task_id=task.id,
+                    status=AlarmLogStatus.UNPROCESSED.value,
+                    location=robot.position,
+                    type=alarm_log_type,
+                )
+                print(alarm_log)
+                
+                alarm_log_crud.create(db, obj_in=alarm_log)
+
+
+
         db.close()
         time.sleep(5)

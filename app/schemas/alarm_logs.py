@@ -18,6 +18,12 @@ class AlarmLogType(Enum):
     DEVICE = 0
     TEMPERATURE = 1
     HUMIDITY = 2
+    LIGHT = 3
+    PM1_0 = 4
+    PM2_5 = 5
+    PM10 = 6
+    SMOKE1 = 7
+    SMOKE2 = 8
 
 
 class AlarmLogBase(BaseModel):

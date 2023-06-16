@@ -174,7 +174,6 @@ class Node:
                 for field in message.__slots__
             }
 
-            print(info)
             redis_client.hset(robot_name, "sensor_data", str(info))
 
             # logger.info(f"Received message from topic: \n{message}")

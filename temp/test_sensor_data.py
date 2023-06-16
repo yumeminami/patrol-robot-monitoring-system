@@ -21,13 +21,13 @@ pub2 = rospy.Publisher(
 
 
 msg = sensor_data()
-msg.temperature = 40.0
+msg.temperature = 45.0
 msg.humidity = 50
 msg.light = 50
 msg.PM1_0 = 4
 msg.PM2_5 = 10
 msg.PM10 = 20
-msg.smoke1 = 0
+msg.smoke1 = 1
 msg.smoke2 = 0
 
 # print(msg.temperature)

@@ -35,6 +35,8 @@ def start_task(task_id, eta_time):
     crud.update(
         db, db_obj=task, obj_in={"status": TaskStatus.IN_PROGRESS.value}
     )
+    db.close()
+
     update_parameter()
 
     task = Task.from_orm(task)

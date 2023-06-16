@@ -67,6 +67,7 @@ class Node:
 
         db = SessionLocal()
         robot_name = rospy.get_name().strip("/").replace("_subscriber", "")
+        db.close()
 
         for topic in topic_list:
             topic = "/{robot_name}/{topic}".format(
@@ -173,6 +174,7 @@ class Node:
                 for field in message.__slots__
             }
 
+            print(info)
             redis_client.hset(robot_name, "sensor_data", str(info))
 
             # logger.info(f"Received message from topic: \n{message}")
@@ -199,6 +201,7 @@ class Node:
                     logger.error(
                         f"Error occurred while updating sensor '{sensor.name}': {e}"
                     )
+            db.close()
 
         except Exception as e:
             logger.error(f"Error occurred while processing sensor data: {e}")
@@ -216,6 +219,7 @@ def initialize_all_robots_corresponding_nodes():
 
     db = SessionLocal()
     robots = robot_crud.get_multi(db)
+    db.close()
     process_list = []
     for robot in robots:
         robot = Robot.from_orm(robot)

@@ -160,8 +160,8 @@ def monitor_sensor_data(task: Task):
 
     """
     logger.info("Sensor data monitoring initiated...")
-    db = SessionLocal()
     while True:
+        db = SessionLocal()
         patrol_state = rospy.get_param("/patrol_state")
         if patrol_state == 3:
             logger.info(
@@ -174,6 +174,7 @@ def monitor_sensor_data(task: Task):
             task_crud.update(
                 db, db_obj=task, obj_in={"status": TaskStatus.COMPLETED.value}
             )
+            db.close()
             break
         robot = robot_crud.get(db, task.robot_id)
         if robot is None:
@@ -202,5 +203,5 @@ def monitor_sensor_data(task: Task):
                 )
                 # Initiating the alarm
                 # To be implemented
-
+        db.close()
         time.sleep(5)

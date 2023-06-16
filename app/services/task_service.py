@@ -1,12 +1,21 @@
+import time
+import subprocess
+from datetime import datetime
 import xml.etree.ElementTree as ET
+
+import rospy
+from fastapi import HTTPException
+
+from app.db.database import SessionLocal
+from app.db.redis import redis_client
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
-from app.schemas.tasks import TaskType
+from app.schemas.tasks import TaskType, TaskStatus, Task
+from app.crud.robots import robot as robot_crud
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
+from app.crud.tasks import task as task_crud
 from app.utils.log import logger
-from fastapi import HTTPException
-import subprocess
 
 
 def indent(elem, level=0):
@@ -116,21 +125,10 @@ def run_node():
 
 
 def update_parameter():
-    # TODO Now is hard code, need to be changed
-    command = "rosparam set /patrol_state 1"
-
-    process = subprocess.Popen(
-        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    output, error = process.communicate()
-
-    if output:
-        print("Command output:")
-        print(output.decode("utf-8"))
-    if error:
-        print("Command error:")
-        print(error.decode("utf-8"))
-    print("Parameter updated")
+    try:
+        rospy.set_param("/patrol_state", 1)
+    except Exception as e:
+        logger.error(e)
 
 
 def kill_node():
@@ -150,15 +148,59 @@ def kill_node():
         print(error.decode("utf-8"))
 
 
-def monitor_sensor_data(task):
-    """When the task is running, monitor the sensor data.
-
-    1. Get the latest sensor data from the cache.
-
-    2. Check the sensor data is over the threshold or not.
-
-    3. If the sensor data is over the threshold, create the alarm.
-
-    4. while the robot status or task status is finished, stop the monitor.
+def monitor_sensor_data(task: Task):
     """
-    logger.info("Start to monitor sensor data...")
+    This function continually monitors sensor data throughout the task's runtime.
+
+    Steps:
+    1. Fetch the most recent sensor data from the cache.
+    2. Validate whether the sensor data exceeds the defined thresholds.
+    3. In case of threshold violation, initiate an alarm.
+    4. The monitoring stops when the task or robot status changes to 'finished'.
+
+    """
+    logger.info("Sensor data monitoring initiated...")
+    db = SessionLocal()
+    while True:
+        patrol_state = rospy.get_param("/patrol_state")
+        if patrol_state == 3:
+            logger.info(
+                "Task completed, terminating sensor data monitoring..."
+            )
+            task = task_crud.get(db, task.id)
+            if task is None:
+                logger.error("Task does not exist in the database.")
+                break
+            task_crud.update(
+                db, db_obj=task, obj_in={"status": TaskStatus.COMPLETED.value}
+            )
+            break
+        robot = robot_crud.get(db, task.robot_id)
+        if robot is None:
+            logger.error("Robot does not exist in the database.")
+            break
+
+        # Fetching the latest sensor data from the cache
+        sensor_data = redis_client.hget(robot.name, "sensor_data")
+        sensor_data = eval(sensor_data)
+        if sensor_data is None:
+            logger.error("No sensor data found in the cache.")
+            break
+
+        sensors = task.sensors
+        for sensor in sensors:
+            sensor_name = sensor.name.strip()
+            if (
+                sensor.lower_limit > sensor_data[sensor_name]
+                or sensor.upper_limit < sensor_data[sensor_name]
+            ):
+                logger.error(
+                    f"Threshold violation detected at {datetime.now()}"
+                )
+                logger.error(
+                    f"Sensor: {sensor_name}, Lower Limit: {sensor.lower_limit}, Upper Limit: {sensor.upper_limit}, Current Value: {sensor_data[sensor_name]}"
+                )
+                # Initiating the alarm
+                # To be implemented
+
+        time.sleep(5)

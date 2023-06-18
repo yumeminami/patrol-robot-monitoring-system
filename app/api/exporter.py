@@ -58,3 +58,32 @@ async def export_robots():
 
     else:
         raise HTTPException(status_code=400, detail="Unable to fetch tasks")
+
+
+@router.get("/alarm_log")
+async def export_alarm_logs():
+    url = "http://localhost:8000/api/alarm_logs"
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290IiwiZXhwIjoxNjg1MTI1MjIyfQ.Hkt-ptLsKkRrZ8UdT6AoVAf0gPaUuHA24OjqDH4QzRc"
+    }
+
+    params = {"export": True}
+
+    async with httpx.AsyncClient() as client:
+        r = await client.get(url, headers=headers, params=params)
+
+    if r.status_code == 200:
+        file_name = "alarm_logs.xlsx"
+        with open(file_name, "wb") as f:
+            f.write(r.content)
+
+        return FileResponse(
+            file_name,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=file_name,
+        )
+
+    else:
+        raise HTTPException(
+            status_code=400, detail="Unable to fetch alarm_logs"
+        )

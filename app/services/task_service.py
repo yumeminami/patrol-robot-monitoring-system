@@ -210,6 +210,7 @@ def monitor_sensor_data(task: Task):
                 )
                 # Initiating the alarm
                 TYPENAME = sensor_name.upper()
+                alarm_log_type = None
                 if TYPENAME in AlarmLogType.__members__:
                     alarm_log_type = AlarmLogType[TYPENAME].value
                 else:

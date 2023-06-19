@@ -1,0 +1,8 @@
+prefix=/home/zj/Project/zj-robot/devel
+
+Name: zj_robot
+Description: Description of zj_robot
+Version: 1.0.0
+Cflags: -I/home/zj/Project/zj-robot/devel/include
+Libs: -L${prefix}/lib -lzj_robot
+Requires: roscpp sensor_msgs std_msgs geometry_msgs cv_bridge image_transport nav_msgs actionlib actionlib_msgs

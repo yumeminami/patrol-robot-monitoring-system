@@ -1,0 +1,8 @@
+prefix=/home/zj/Project/zj-robot/install
+
+Name: auto_charge
+Description: Description of auto_charge
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: roscpp rospy std_msgs

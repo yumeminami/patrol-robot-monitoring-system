@@ -94,3 +94,55 @@ def stop_control(robot_name):
         pass
     except Exception as e:
         logger.error(f"Error: {e}")
+
+
+def gimbal_control(robot_name):
+    """
+    Manages the movement and configuration of a robot's gimbal.
+
+    This function handles the transmission of gimbal control commands to the designated ROS topic related to the robot.
+    The message structure for 'gimbal_control' should include the following fields:
+        - int32 command: Corresponds to a specific gimbal control action.
+        - int32 preset_index: Refers to predefined gimbal configurations (may vary according to robot model).
+
+    :param robot_name: the name of the robot whose gimbal is to be controlled.
+    :return: None
+    """
+
+    topic_name = robot_name + "/gimbal_command"
+    if not check_topic(topic_name):
+        return
+
+    try:
+        # TODO: Add the code that publishes the gimbal control message.
+        pass
+    except Exception as e:
+        logger.error(f"Error occurred during gimbal control: {e}")
+
+
+def camera_control(robot_name):
+    """
+    Oversees the state and operation of a robot's camera.
+
+    This function is responsible for issuing camera control commands to the appropriate ROS topic connected to the robot.
+    The 'camera_control' message should incorporate these elements:
+        - int32 camera_command: Defines the camera operation to be performed. The options are:
+            0: Stop preview and recording.
+            1: Start color camera preview.
+            2: Start color camera preview and recording.
+            3: Start infrared camera preview.
+            4: Start infrared camera preview and save images.
+
+    :param robot_name: the name of the robot whose camera is to be controlled.
+    :return: None
+    """
+
+    topic_name = robot_name + "/camera_command"
+    if not check_topic(topic_name):
+        return
+
+    try:
+        # TODO: Add the code that publishes the camera control message.
+        pass
+    except Exception as e:
+        logger.error(f"Error occurred during camera control: {e}")

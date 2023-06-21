@@ -1,6 +1,6 @@
+from datetime import datetime
 import time
 import subprocess
-from datetime import datetime
 import xml.etree.ElementTree as ET
 
 import rospy
@@ -26,12 +26,7 @@ from app.utils.log import logger
 
 
 def indent(elem, level=0):
-    """Indent the xml file
-
-    Due to the python version compatibility, we cannot use the latest version of xml.dom.minidom in
-    python3.8. So we use this function to indent the xml file.
-
-    """
+    """Indent the XML file recursively"""
     i = "\n" + level * "  "
     if len(elem):
         if not elem.text or not elem.text.strip():
@@ -48,46 +43,47 @@ def indent(elem, level=0):
 
 
 def create_task_xml(task_create, db):
-    # check type
+    # Check the task type
     if task_create.type == TaskType.AUTO.value:
         return
-    root = ET.Element("partrolpoints")
+
+    root = ET.Element("patrolpoints")
     root.set("Intro", "new patrol params")
 
-    # get checkpoints from task_create.checkpoint_ids
+    # Get checkpoints from task_create.checkpoint_ids
     checkpoint_list = []
     for id in task_create.checkpoint_ids:
         checkpoint = checkpoint_crud.get(db, id)
         if checkpoint is None:
             raise HTTPException(
                 status_code=400,
-                detail="checkpoint is not exist",
+                detail="Checkpoint does not exist",
             )
         checkpoint = CheckPoint.from_orm(checkpoint)
         checkpoint_list.append(checkpoint)
 
     # Add patrol points with their corresponding gimbal points and actions
     for checkpoint in checkpoint_list:
-        # add patrol points
+        # Add patrol point
         patrolpoint = ET.SubElement(root, "patrolpoint")
         patrolpoint.set("index", str(checkpoint.id))
         patrolpoint.set("position", str(checkpoint.position))
         patrolpoint.set("velocity", str(checkpoint.speed))
 
-        # get patrol point's corresponding gimbal points
+        # Get patrol point's corresponding gimbal points
         gimbalpoint_list = []
         for id in checkpoint.gimbal_points:
             gimbal_point = gimbal_point_crud.get(db, id)
             if gimbal_point is None:
                 raise HTTPException(
                     status_code=400,
-                    detail="gimbalpoint is not exist",
+                    detail="Gimbal point does not exist",
                 )
             gimbal_point = GimbalPoint.from_orm(gimbal_point)
             gimbalpoint_list.append(gimbal_point)
 
         for gimbalpoint in gimbalpoint_list:
-            # add gimbalpoint
+            # Add gimbal point
             gimbalpoint_ = ET.SubElement(patrolpoint, "gimbalpoint")
             gimbalpoint_.set("index", str(gimbalpoint.id))
             gimbalpoint_.set("presetpoint", str(gimbalpoint.preset_point))
@@ -102,7 +98,7 @@ def create_task_xml(task_create, db):
     indent(root)
     # Save the XML to the file with encoding and XML declaration
     tree = ET.ElementTree(root)
-    # TODO confirm the file name and path
+    # TODO: Confirm the file name and path
     tree.write("output.xml", encoding="utf-8", xml_declaration=True)
 
 
@@ -157,13 +153,13 @@ def kill_node():
 
 def monitor_sensor_data(task: Task):
     """
-    This function continually monitors sensor data throughout the task's runtime.
+    Continually monitor sensor data throughout the task's runtime.
 
     Steps:
     1. Fetch the most recent sensor data from the cache.
     2. Validate whether the sensor data exceeds the defined thresholds.
     3. In case of threshold violation, initiate an alarm.
-    4. The monitoring stops when the task or robot status changes to 'finished'.
+    4. Monitoring stops when the task or robot status changes to 'finished'.
 
     """
     logger.info("Sensor data monitoring initiated...")
@@ -188,7 +184,7 @@ def monitor_sensor_data(task: Task):
             logger.error("Robot does not exist in the database.")
             break
 
-        # Fetching the latest sensor data from the cache
+        # Fetch the latest sensor data from the cache
         sensor_data = redis_client.hget(robot.name, "sensor_data")
         sensor_data = eval(sensor_data)
         if sensor_data is None:
@@ -208,13 +204,13 @@ def monitor_sensor_data(task: Task):
                 logger.error(
                     f"Sensor: {sensor_name}, Lower Limit: {sensor.lower_limit}, Upper Limit: {sensor.upper_limit}, Current Value: {sensor_data[sensor_name]}"
                 )
-                # Initiating the alarm
+                # Initiate the alarm
                 TYPENAME = sensor_name.upper()
-                alarm_log_type = None
-                if TYPENAME in AlarmLogType.__members__:
-                    alarm_log_type = AlarmLogType[TYPENAME].value
-                else:
-                    alarm_log_type = AlarmLogType.DEVICE.value
+                alarm_log_type = (
+                    AlarmLogType[TYPENAME].value
+                    if TYPENAME in AlarmLogType.__members__
+                    else AlarmLogType.DEVICE.value
+                )
                 alarm_log = AlarmLogCreate(
                     level=AlarmLogLevel.FATAL.value,
                     task_id=task.id,

@@ -57,7 +57,8 @@ async def export_robots():
         )
 
     else:
-        raise HTTPException(status_code=400, detail="Unable to fetch tasks")
+        print(r)
+        raise HTTPException(status_code=400, detail="Unable to fetch robots")
 
 
 @router.get("/alarm_log")

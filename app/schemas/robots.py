@@ -13,7 +13,7 @@ class Robot(BaseModel):
     id: int
     name: str
     battery: int = 100
-    battery_status = RobotBatteryStatus.NOCHARGE
+    battery_status = RobotBatteryStatus.NOCHARGE.value
     status: int = 0
     velocity: float = 0.0
     position: float = 0.0

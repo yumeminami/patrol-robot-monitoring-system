@@ -9,12 +9,17 @@ class RobotBatteryStatus(Enum):
     CHARGING = 1
 
 
+class RobotStatus(Enum):
+    ONLINE = 0
+    OFFLINE = 1
+
+
 class Robot(BaseModel):
     id: int
     name: str
     battery: int = 100
-    battery_status = RobotBatteryStatus.NOCHARGE.value
-    status: int = 0
+    battery_status: int = RobotBatteryStatus.NOCHARGE.value
+    status: int = RobotStatus.OFFLINE.value
     velocity: float = 0.0
     position: float = 0.0
     task_id: int = 0

@@ -20,7 +20,7 @@ class TaskStatus(Enum):
 
 class TaskBase(BaseModel):
     type: int
-    status: int
+    status: int = TaskStatus.NOT_STARTED.value
     robot_id: int
     checkpoint_ids: List[int] = []
     start_position: float = 0

@@ -30,7 +30,7 @@ class AlarmLogBase(BaseModel):
     level: int
     task_id: Optional[int] = None
     type: int
-    status: int
+    status: int = AlarmLogStatus.UNPROCESSED.value
     location: int
     img_url: Optional[str] = None
     video_url: Optional[str] = None

@@ -53,6 +53,7 @@
 (setf (get common::velocity_control :datatype-) "common/velocity_control")
 (setf (get common::velocity_control :definition-)
       "float32 velocity_f #速度控制
+
 ")
 
 

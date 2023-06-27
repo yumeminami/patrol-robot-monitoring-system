@@ -58,10 +58,10 @@
   "67298657c9ef3f2768b496520fa1fd62")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<velocity_control>)))
   "Returns full string definition for message of type '<velocity_control>"
-  (cl:format cl:nil "float32 velocity_f #速度控制~%~%"))
+  (cl:format cl:nil "float32 velocity_f #速度控制~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'velocity_control)))
   "Returns full string definition for message of type 'velocity_control"
-  (cl:format cl:nil "float32 velocity_f #速度控制~%~%"))
+  (cl:format cl:nil "float32 velocity_f #速度控制~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <velocity_control>))
   (cl:+ 0
      4

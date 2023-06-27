@@ -37,7 +37,7 @@ class RobotCreate(BaseModel):
 class RobotUpdate(BaseModel):
     name: str
     status: int
-    speed: int
+    velocity: float
     position: int
     battery: int
     battery_status: int

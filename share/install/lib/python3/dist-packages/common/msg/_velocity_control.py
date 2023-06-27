@@ -11,7 +11,8 @@ class velocity_control(genpy.Message):
   _md5sum = "67298657c9ef3f2768b496520fa1fd62"
   _type = "common/velocity_control"
   _has_header = False  # flag to mark the presence of a Header object
-  _full_text = """float32 velocity_f #速度控制"""
+  _full_text = """float32 velocity_f #速度控制
+"""
   __slots__ = ['velocity_f']
   _slot_types = ['float32']
 

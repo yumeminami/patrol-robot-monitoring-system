@@ -4,9 +4,9 @@ from common.srv import *
 
 def stop_control_client():
     try:
-        rospy.wait_for_service("/zj_robot/stop_control", timeout=1)
+        rospy.wait_for_service("/zj_robot/stop_command", timeout=1)
         stop_control = rospy.ServiceProxy(
-            "/zj_robot/stop_control", StopControl
+            "/zj_robot/stop_command", StopControl
         )
         request = StopControlRequest()
         request.stop_type = 1

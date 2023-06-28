@@ -4,9 +4,9 @@ from common.srv import *
 
 def position_control_client():
     try:
-        rospy.wait_for_service("/zj_robot/position_control", timeout=1)
+        rospy.wait_for_service("/zj_robot/position_command", timeout=1)
         position_control = rospy.ServiceProxy(
-            "/zj_robot/position_control", PositionControl
+            "/zj_robot/position_command", PositionControl
         )
         request = PositionControlRequest()
         request.position_control_type = 1

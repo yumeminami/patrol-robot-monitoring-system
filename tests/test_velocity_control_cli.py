@@ -6,7 +6,7 @@ def velocity_control_client():
     try:
         rospy.wait_for_service("/zj_robot/velocity_control", timeout=1)
         velocity_control = rospy.ServiceProxy(
-            "/zj_robot/velocity_control", VelocityControl
+            "/zj_robot/velocity_command", VelocityControl
         )
         request = VelocityControlRequest()
         request.velocity_f = 100

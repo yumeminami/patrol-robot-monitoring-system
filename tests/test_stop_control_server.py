@@ -15,7 +15,7 @@ def stop_control_server():
         "stop_control_server", xmlrpc_port=45173, tcpros_port=45174
     )
     s = rospy.Service(
-        "/zj_robot/stop_control", StopControl, hanlde_stop_control
+        "/zj_robot/stop_command", StopControl, hanlde_stop_control
     )
     rospy.spin()
 

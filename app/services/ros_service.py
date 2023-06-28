@@ -18,7 +18,7 @@ def velocity_control(robot_name, **kwargs):
     """
 
     try:
-        service_name = "/{robot_name}/velocity_control".format(
+        service_name = "/{robot_name}/velocity_command".format(
             robot_name=robot_name
         )
         rospy.wait_for_service(service_name, timeout=1)
@@ -49,7 +49,7 @@ def position_control(robot_name, **kwargs):
     """
 
     try:
-        service_name = "/{robot_name}/position_control".format(
+        service_name = "/{robot_name}/position_command".format(
             robot_name=robot_name
         )
         rospy.wait_for_service(service_name, timeout=1)
@@ -84,7 +84,7 @@ def stop_control(robot_name, **kwargs):
     """
 
     try:
-        service_name = "/{robot_name}/stop_control".format(
+        service_name = "/{robot_name}/stop_command".format(
             robot_name=robot_name
         )
         rospy.wait_for_service(service_name, timeout=1)

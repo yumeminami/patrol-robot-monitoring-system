@@ -1,3 +1,4 @@
+from ._CameraControl import *
 from ._PositionControl import *
 from ._StopControl import *
 from ._TakePicture import *

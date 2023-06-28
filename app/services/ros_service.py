@@ -1,10 +1,13 @@
+from datetime import datetime
+
+import cv2
 import rospy
+from common.srv import *
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
 
 
 from app.utils.log import logger
-
-from common.srv import *
-from sensor_msgs.msg import Image
 
 
 def velocity_control(robot_name, **kwargs):
@@ -120,10 +123,16 @@ def take_picture(robot_name):
         request = TakePictureRequest()
 
         response = take_picture(request)
-        if response.status_code == 0:
+        if response.status_code == 0 and response.img is not None:
             logger.error(response.err_msg)
             return False
         # TODO save image
+        file_name = datetime.now().strftime("%Y%m%d%H%M%S")
+        bridge = CvBridge()
+        img = bridge.imgmsg_to_cv2(response.img, "bgr8")
+        cv2.imwrite(
+            "app/images/{file_name}.jpg".format(file_name=file_name), img
+        )
         return True
     except rospy.ROSException as e:
         logger.error(f"Error: {e}")

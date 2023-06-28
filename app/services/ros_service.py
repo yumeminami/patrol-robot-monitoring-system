@@ -26,7 +26,7 @@ def velocity_control(robot_name, **kwargs):
         velocity_control = rospy.ServiceProxy(service_name, VelocityControl)
 
         request = VelocityControlRequest()
-        request.velocity_f = kwargs.get("velocity_f")
+        request.velocity_f = float(kwargs.get("velocity_f"))
 
         response = velocity_control(request)
         if response.status_code == 0:
@@ -57,9 +57,11 @@ def position_control(robot_name, **kwargs):
         position_control = rospy.ServiceProxy(service_name, PositionControl)
 
         request = PositionControlRequest()
-        request.position_control_type = kwargs.get("position_control_type")
-        request.target_position_f = kwargs.get("target_position_f")
-        request.velocity_f = kwargs.get("velocity_f")
+        request.position_control_type = int(
+            kwargs.get("position_control_type")
+        )
+        request.target_position_f = float(kwargs.get("target_position_f"))
+        request.velocity_f = float(kwargs.get("velocity_f"))
 
         response = position_control(request)
         if response.status_code == 0:
@@ -90,7 +92,7 @@ def stop_control(robot_name, **kwargs):
         stop_control = rospy.ServiceProxy(service_name, StopControl)
 
         request = StopControlRequest()
-        request.stop_type = kwargs.get("stop_type")
+        request.stop_type = int(kwargs.get("stop_type"))
 
         response = stop_control(request)
         if response.status_code == 0:

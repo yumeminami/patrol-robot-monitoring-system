@@ -6,6 +6,10 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal
+from app.services.ros_service import velocity_control as velocity_control_ros
+from app.services.ros_service import position_control as position_control_ros
+from app.services.ros_service import stop_control as stop_control_ros
+from app.services.ros_service import take_picture as take_picture_ros
 
 
 def get_db():
@@ -35,14 +39,69 @@ router = create_generic_router(
 )
 
 
+# velocity control
+@router.post("/{id}/velocity_control")
+def velocity_control(
+    id: int, db: Session = Depends(get_db), velocity_f: float = 0.0
+):
+    robot = crud.get(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+
+    if velocity_control_ros(robot_name=robot.name, velocity_f=velocity_f):
+        return {"message": "Velocity control success"}
+    else:
+        return {"message": "Velocity control failed"}
+
+
+# position control
+@router.post("/{id}/position_control")
+def position_control(
+    id: int,
+    db: Session = Depends(get_db),
+    position_control_type: int = 0,
+    target_position_f: float = 0.0,
+    velocity_f: float = 0.0,
+):
+    robot = crud.get(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+
+    if position_control_ros(
+        robot_name=robot.name,
+        position_control_type=position_control_type,
+        target_position_f=target_position_f,
+        velocity_f=velocity_f,
+    ):
+        return {"message": "Position control success"}
+    else:
+        return {"message": "Position control failed"}
+
+
+# stop control
+@router.post("/{id}/stop_control")
+def stop_control(id: int, db: Session = Depends(get_db), stop_type: int = 0):
+    robot = crud.get(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+
+    if stop_control_ros(robot_name=robot.name, stop_type=stop_type):
+        return {"message": "Stop control success"}
+    else:
+        return {"message": "Stop control failed"}
+
+
 # take photo
 @router.get("/{id}/photo")
 def take_photo(id: int, db: Session = Depends(get_db)):
     robot = crud.get(db, id)
     if robot is None:
         raise HTTPException(status_code=404, detail="Robot not found")
-    # TODO: Take photo
-    return {"message": "Photo taken"}
+
+    if take_picture_ros(robot_name=robot.name):
+        return {"message": "Photo taken"}
+    else:
+        return {"message": "Photo failed"}
 
 
 # start or stop video stream

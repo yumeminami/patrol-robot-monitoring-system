@@ -1,6 +1,6 @@
 import rospy
 from common.srv import *
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 import cv2
 
 

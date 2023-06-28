@@ -3,8 +3,7 @@ from datetime import datetime
 import cv2
 import rospy
 from common.srv import *
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 
 
 from app.utils.log import logger

@@ -1,7 +1,6 @@
 import rospy
 from common.srv import *
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 import cv2
 
 
@@ -20,7 +19,7 @@ def take_pic_server():
     rospy.init_node(
         "take_picture_server", xmlrpc_port=45175, tcpros_port=45176
     )
-    s = rospy.Service("/zj_robot/take_picture", TakePicture, hanlde_take_pic)
+    rospy.Service("/zj_robot/take_picture", TakePicture, hanlde_take_pic)
     rospy.spin()
 
 

@@ -6,8 +6,10 @@ import cv2
 
 def take_pic_client():
     try:
-        rospy.wait_for_service("take_picture", timeout=1)
-        take_picture = rospy.ServiceProxy("take_picture", TakePicture)
+        rospy.wait_for_service("/zj_robot/take_picture", timeout=1)
+        take_picture = rospy.ServiceProxy(
+            "/zj_robot/take_picture", TakePicture
+        )
         request = TakePictureRequest()
         response = take_picture(request)
         if response.status_code == 1 and response.img is not None:

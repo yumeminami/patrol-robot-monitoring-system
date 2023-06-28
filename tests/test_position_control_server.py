@@ -25,7 +25,7 @@ def position_control_server():
         "position_control_server", xmlrpc_port=45171, tcpros_port=45172
     )
     s = rospy.Service(
-        "position_control", PositionControl, hanlde_position_control
+        "/zj_robot/position_control", PositionControl, hanlde_position_control
     )
     rospy.spin()
 

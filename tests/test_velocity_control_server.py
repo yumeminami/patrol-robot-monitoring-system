@@ -15,7 +15,7 @@ def velocity_control_server():
         "velocity_control_server", xmlrpc_port=45169, tcpros_port=45170
     )
     s = rospy.Service(
-        "velocity_control", VelocityControl, hanlde_vector_control
+        "/zj_robot/velocity_control", VelocityControl, hanlde_vector_control
     )
     rospy.spin()
 

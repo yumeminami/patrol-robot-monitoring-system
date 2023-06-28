@@ -20,7 +20,7 @@ def take_pic_server():
     rospy.init_node(
         "take_picture_server", xmlrpc_port=45175, tcpros_port=45176
     )
-    s = rospy.Service("take_picture", TakePicture, hanlde_take_pic)
+    s = rospy.Service("/zj_robot/take_picture", TakePicture, hanlde_take_pic)
     rospy.spin()
 
 

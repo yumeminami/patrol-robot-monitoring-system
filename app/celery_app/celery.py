@@ -32,6 +32,9 @@ def start_task(task_id, eta_time):
     db = SessionLocal()
 
     task = crud.get(db, task_id)
+    if task is None:
+        # If the is_everyday is True, we need to stop the task execution
+        return "task not found"
     crud.update(
         db, db_obj=task, obj_in={"status": TaskStatus.IN_PROGRESS.value}
     )

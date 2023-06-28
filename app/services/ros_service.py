@@ -1,148 +1,133 @@
 import rospy
 
-# from common.msg import position_command
-# from common.msg import velocity_command
-# from common.msg import stop_command
 
 from app.utils.log import logger
 
-
-def check_topic(topic_name):
-    """
-    Verifies the availability of a specific ROS topic.
-
-    This function checks if the specified topic exists among the published topics.
-    If the topic does not exist, it logs an error message.
-
-    :param topic_name: The name of the ROS topic to check.
-    :return: True if the topic is available, otherwise False.
-    """
-
-    topic_name_list = [
-        topic_items[0] for topic_items in rospy.get_published_topics()
-    ]
-    if topic_name not in topic_name_list:
-        logger.error(f"Topic: '{topic_name}' is not available")
-        return False
-    return True
+from common.srv import *
+from sensor_msgs.msg import Image
 
 
-def velocity_control(robot_name):
+def velocity_control(robot_name, **kwargs):
     """
     Controls the velocity of the specified robot.
 
-    This function publishes velocity commands to a designated ROS topic associated with the robot.
-    The velocity_command message should contain a single float32 field indicating the desired velocity.
-
     :param robot_name: The name of the robot to control.
     :return: None
     """
 
-    topic_name = robot_name + "/velocity_command"
-    if not check_topic(topic_name):
-        return
-
     try:
-        # TODO: Implement velocity control logic
-        pass
+        service_name = "/{robot_name}/velocity_control".format(
+            robot_name=robot_name
+        )
+        rospy.wait_for_service(service_name, timeout=1)
+        velocity_control = rospy.ServiceProxy(service_name, VelocityControl)
+
+        request = VelocityControlRequest()
+        request.velocity_f = kwargs.get("velocity_f")
+
+        response = velocity_control(request)
+        if response.status_code == 0:
+            logger.info("velocity control failed")
+            return False
+        return True
+    except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
     except Exception as e:
         logger.error(f"Error: {e}")
+        return False
 
 
-def position_control(robot_name):
+def position_control(robot_name, **kwargs):
     """
     Controls the position of the specified robot.
 
-    This function publishes position commands to a designated ROS topic associated with the robot.
-    The position_command message should contain:
-        - an int32 field for position control type (0: absolute, 1: relative),
-        - a float32 field for the target position,
-        - a float32 field for the velocity.
-
     :param robot_name: The name of the robot to control.
     :return: None
     """
 
-    topic_name = robot_name + "/position_command"
-    if not check_topic(topic_name):
-        return
-
     try:
-        # TODO: Implement position control logic
-        pass
+        service_name = "/{robot_name}/position_control".format(
+            robot_name=robot_name
+        )
+        rospy.wait_for_service(service_name, timeout=1)
+        position_control = rospy.ServiceProxy(service_name, PositionControl)
+
+        request = PositionControlRequest()
+        request.position_control_type = kwargs.get("position_control_type")
+        request.target_position_f = kwargs.get("target_position_f")
+        request.velocity_f = kwargs.get("velocity_f")
+
+        response = position_control(request)
+        if response.status_code == 0:
+            logger.error(response.err_msg)
+            return False
+        return True
+    except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
     except Exception as e:
         logger.error(f"Error: {e}")
+        return False
 
 
-def stop_control(robot_name):
+def stop_control(robot_name, **kwargs):
     """
     Sends a stop command to the specified robot.
 
-    This function publishes a stop command to a designated ROS topic associated with the robot.
-    The stop_command message should contain an int32 field for stop type (0: stop, 1: kill).
+    :param robot_name: The name of the robot to control.
+    :return: None
+    """
+
+    try:
+        service_name = "/{robot_name}/stop_control".format(
+            robot_name=robot_name
+        )
+        rospy.wait_for_service(service_name, timeout=1)
+        stop_control = rospy.ServiceProxy(service_name, StopControl)
+
+        request = StopControlRequest()
+        request.stop_type = kwargs.get("stop_type")
+
+        response = stop_control(request)
+        if response.status_code == 0:
+            logger.error(response.err_msg)
+            return False
+        return True
+    except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        return False
+
+
+def take_picture(robot_name):
+    """
+    Takes a picture using the specified robot's camera.
 
     :param robot_name: The name of the robot to control.
     :return: None
     """
 
-    topic_name = robot_name + "/stop_command"
-    if not check_topic(topic_name):
-        return
-
     try:
-        # TODO: Implement stop control logic
-        pass
+        service_name = "/{robot_name}/take_picture".format(
+            robot_name=robot_name
+        )
+        rospy.wait_for_service(service_name, timeout=1)
+        take_picture = rospy.ServiceProxy(service_name, TakePicture)
+
+        request = TakePictureRequest()
+
+        response = take_picture(request)
+        if response.status_code == 0:
+            logger.error(response.err_msg)
+            return False
+        # TODO save image
+        return True
+    except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
     except Exception as e:
         logger.error(f"Error: {e}")
-
-
-def gimbal_control(robot_name):
-    """
-    Manages the movement and configuration of a robot's gimbal.
-
-    This function handles the transmission of gimbal control commands to the designated ROS topic related to the robot.
-    The message structure for 'gimbal_control' should include the following fields:
-        - int32 command: Corresponds to a specific gimbal control action.
-        - int32 preset_index: Refers to predefined gimbal configurations (may vary according to robot model).
-
-    :param robot_name: the name of the robot whose gimbal is to be controlled.
-    :return: None
-    """
-
-    topic_name = robot_name + "/gimbal_command"
-    if not check_topic(topic_name):
-        return
-
-    try:
-        # TODO: Add the code that publishes the gimbal control message.
-        pass
-    except Exception as e:
-        logger.error(f"Error occurred during gimbal control: {e}")
-
-
-def camera_control(robot_name):
-    """
-    Oversees the state and operation of a robot's camera.
-
-    This function is responsible for issuing camera control commands to the appropriate ROS topic connected to the robot.
-    The 'camera_control' message should incorporate these elements:
-        - int32 camera_command: Defines the camera operation to be performed. The options are:
-            0: Stop preview and recording.
-            1: Start color camera preview.
-            2: Start color camera preview and recording.
-            3: Start infrared camera preview.
-            4: Start infrared camera preview and save images.
-
-    :param robot_name: the name of the robot whose camera is to be controlled.
-    :return: None
-    """
-
-    topic_name = robot_name + "/camera_command"
-    if not check_topic(topic_name):
-        return
-
-    try:
-        # TODO: Add the code that publishes the camera control message.
-        pass
-    except Exception as e:
-        logger.error(f"Error occurred during camera control: {e}")
+        return False

@@ -28,8 +28,6 @@ RUN pip3 install -r requirements.txt
 # Expose port
 EXPOSE 8000
 
-RUN bash -c "source install/setup.bash"
-
 CMD ["python3", "app/main.py"]
 
 

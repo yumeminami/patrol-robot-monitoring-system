@@ -166,7 +166,7 @@ def monitor_sensor_data(task: Task):
     while True:
         db = SessionLocal()
         patrol_state = rospy.get_param("/patrol_state")
-        if patrol_state == 3:
+        if patrol_state == 3 or patrol_state == 2:
             logger.info(
                 "Task completed, terminating sensor data monitoring..."
             )

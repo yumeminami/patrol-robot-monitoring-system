@@ -16,8 +16,8 @@ from app.services.ros_service import velocity_control as velocity_control_ros
 from app.services.ros_service import position_control as position_control_ros
 from app.services.ros_service import stop_control as stop_control_ros
 from app.services.ros_service import take_picture as take_picture_ros
+from app.services.ros_service import camera_control as camera_control_ros
 
-# from app.services.ros_service import create_video_streamer as create_video_streamer_ros
 from app.services.ros_service import latest_img_queue
 from app.services.ros_service import video_streamer
 
@@ -119,6 +119,23 @@ def take_photo(
         return FileResponse(file_name)
     else:
         return {"message": "Photo failed"}
+
+
+# camera control
+@router.post("/{id}/camera_control")
+def camera_control(
+    id: int, db: Session = Depends(get_db), camera_command: int = 0
+):
+    robot = crud.get(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+
+    if camera_control_ros(
+        robot_name=robot.name, camera_command=camera_command
+    ):
+        return {"message": "Camera control success"}
+    else:
+        return {"message": "Camera control failed"}
 
 
 async def generate_frames():

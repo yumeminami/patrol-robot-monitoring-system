@@ -169,7 +169,6 @@ def camera_control(robot_name, **kwargs):
         response = camera_control(request)
         if response.status_code == 0:
             return False
-        # TODO create the video streamer
         return True
     except rospy.ROSException as e:
         logger.error(f"Error: {e}")

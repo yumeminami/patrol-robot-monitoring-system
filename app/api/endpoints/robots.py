@@ -1,8 +1,13 @@
+import cv2
+from multiprocessing import Process
+import asyncio
+
 from app.schemas.robots import RobotCreate, RobotUpdate, Robot
 from app.crud.robots import robot as crud
 from app.api.api import create_generic_router
 
 from fastapi import Depends
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal
@@ -10,6 +15,12 @@ from app.services.ros_service import velocity_control as velocity_control_ros
 from app.services.ros_service import position_control as position_control_ros
 from app.services.ros_service import stop_control as stop_control_ros
 from app.services.ros_service import take_picture as take_picture_ros
+
+# from app.services.ros_service import create_video_streamer as create_video_streamer_ros
+from app.services.ros_service import latest_img_queue
+from app.services.ros_service import video_streamer
+
+video_processes = {}
 
 
 def get_db():
@@ -104,11 +115,33 @@ def take_photo(id: int, db: Session = Depends(get_db)):
         return {"message": "Photo failed"}
 
 
-# start or stop video stream
-@router.post("/{id}/video")
-def start_stop_video(id: int, db: Session = Depends(get_db)):
+async def generate_frames():
+    while True:
+        if not latest_img_queue.empty():
+            img = latest_img_queue.get()
+            _, img_encoded = cv2.imencode(".jpg", img)
+            frame_bytes = img_encoded.tobytes()
+            yield (
+                b"--frame\r\n"
+                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
+            )
+        else:
+            await asyncio.sleep(1)
+
+
+@router.get("/{id}/video")
+async def stream_video(id: int, db: Session = Depends(get_db)):
     robot = crud.get(db, id)
     if robot is None:
         raise HTTPException(status_code=404, detail="Robot not found")
-    # TODO: Start or stop video stream
-    return {"message": "Video stream started or stopped"}
+    robot_name = robot.name
+
+    if robot_name not in video_processes:
+        video_process = Process(target=video_streamer, args=(robot_name,))
+        video_process.start()
+        video_processes[robot_name] = video_process
+
+    return StreamingResponse(
+        generate_frames(),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )

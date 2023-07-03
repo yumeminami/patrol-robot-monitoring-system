@@ -13,6 +13,8 @@ from app.utils.log import logger
 
 from app.ros.ros import initialize_all_robots_corresponding_nodes
 
+from app.api.endpoints.robots import video_processes
+
 
 def create_app():
     app = FastAPI()
@@ -41,5 +43,7 @@ process_list = initialize_all_robots_corresponding_nodes()
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)  # type: ignore
     for process in process_list:
+        process.terminate()
+    for process in video_processes.values():
         process.terminate()
     logger.info(f.renderText("\nBye!"))

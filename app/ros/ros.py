@@ -147,7 +147,7 @@ class Node:
             redis_client.hset(robot_name, "robot_real_time_info", str(info))
 
             # logger.info(f"Received message from topic: \n{message}")
-            logger.info(f"Updated real-time info for robot: {robot_name}")
+            # logger.info(f"Updated real-time info for robot: {robot_name}")
 
         except Exception as e:
             logger.error(
@@ -177,7 +177,7 @@ class Node:
             redis_client.hset(robot_name, "sensor_data", str(info))
 
             # logger.info(f"Received message from topic: \n{message}")
-            logger.info(f"Updated sensor data for robot: {robot_name}")
+            # logger.info(f"Updated sensor data for robot: {robot_name}")
 
             db = SessionLocal()
             robot = robot_crud.get_by_name(db=db, name=robot_name)

@@ -119,14 +119,17 @@ async def generate_frames():
     while True:
         if not latest_img_queue.empty():
             img = latest_img_queue.get()
-            _, img_encoded = cv2.imencode(".jpg", img)
+            resized_img = cv2.resize(img, (640, 480))
+            _, img_encoded = cv2.imencode(
+                ".jpg", resized_img, [cv2.IMWRITE_JPEG_QUALITY, 80]
+            )
             frame_bytes = img_encoded.tobytes()
             yield (
                 b"--frame\r\n"
                 b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
             )
         else:
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.1)
 
 
 @router.get("/{id}/video")

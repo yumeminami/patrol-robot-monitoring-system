@@ -13,12 +13,6 @@ from app.utils.log import logger, log_queue
 from app.ros.ros import ros_port_queue
 
 
-# bridge = CvBridge()
-# img = cv2.imread("tests/ayanami.jpg")
-# img_msg = bridge.cv2_to_imgmsg(img, "bgr8")
-
-# latest_img = bridge.imgmsg_to_cv2(img_msg, "bgr8")
-
 latest_img_queue = Queue()
 
 
@@ -200,7 +194,7 @@ def video_streamer(robot_name):
     logger.info(f"xmlrpc_port: {xmlrpc_port}")
     logger.info(f"tcpros_port: {tcpros_port}")
     rospy.init_node(
-        "video_streamer_subscriber",
+        f"{robot_name}_video_stream_subscriber",
         xmlrpc_port=xmlrpc_port,
         tcpros_port=tcpros_port,
     )

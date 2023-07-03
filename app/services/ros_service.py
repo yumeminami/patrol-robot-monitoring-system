@@ -134,13 +134,11 @@ def take_picture(robot_name):
         if response.status_code == 0 and response.img is not None:
             logger.error(response.err_msg)
             return False
-        file_name = datetime.now().strftime("%Y%m%d%H%M%S")
+        file_name = datetime.now().strftime("%Y%m%d%H%M%S") + ".jpg"
         bridge = CvBridge()
         img = bridge.imgmsg_to_cv2(response.img, "bgr8")
-        cv2.imwrite(
-            "app/images/{file_name}.jpg".format(file_name=file_name), img
-        )
-        return True
+        cv2.imwrite("app/images/{file_name}".format(file_name=file_name), img)
+        return file_name
     except rospy.ROSException as e:
         logger.error(f"Error: {e}")
         return False

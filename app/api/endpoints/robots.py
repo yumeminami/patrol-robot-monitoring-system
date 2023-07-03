@@ -4,10 +4,11 @@ import asyncio
 
 from app.schemas.robots import RobotCreate, RobotUpdate, Robot
 from app.crud.robots import robot as crud
-from app.api.api import create_generic_router
+from app.api.api import create_generic_router, remove_file
 
 from fastapi import Depends
-from fastapi.responses import StreamingResponse
+from fastapi.background import BackgroundTasks
+from fastapi.responses import StreamingResponse, FileResponse
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal
@@ -104,13 +105,18 @@ def stop_control(id: int, db: Session = Depends(get_db), stop_type: int = 0):
 
 # take photo
 @router.get("/{id}/photo")
-def take_photo(id: int, db: Session = Depends(get_db)):
+def take_photo(
+    background_tasks: BackgroundTasks, id: int, db: Session = Depends(get_db)
+):
     robot = crud.get(db, id)
     if robot is None:
         raise HTTPException(status_code=404, detail="Robot not found")
 
-    if take_picture_ros(robot_name=robot.name):
-        return {"message": "Photo taken"}
+    file_name = take_picture_ros(robot_name=robot.name)
+    if file_name:
+        file_name = "app/images/" + file_name
+        background_tasks.add_task(remove_file, file_name)
+        return FileResponse(file_name)
     else:
         return {"message": "Photo failed"}
 

@@ -7,6 +7,7 @@ from app.crud.robots import robot as crud
 from app.api.api import create_generic_router, remove_file
 
 from fastapi import Depends
+from fastapi.exceptions import HTTPException
 from fastapi.background import BackgroundTasks
 from fastapi.responses import StreamingResponse, FileResponse
 from sqlalchemy.orm import Session
@@ -63,7 +64,7 @@ def velocity_control(
     if velocity_control_ros(robot_name=robot.name, velocity_f=velocity_f):
         return {"message": "Velocity control success"}
     else:
-        return {"message": "Velocity control failed"}
+        raise HTTPException(status_code=400, detail="Velocity control failed")
 
 
 # position control
@@ -87,7 +88,7 @@ def position_control(
     ):
         return {"message": "Position control success"}
     else:
-        return {"message": "Position control failed"}
+        raise HTTPException(status_code=400, detail="Position control failed")
 
 
 # stop control
@@ -100,7 +101,7 @@ def stop_control(id: int, db: Session = Depends(get_db), stop_type: int = 0):
     if stop_control_ros(robot_name=robot.name, stop_type=stop_type):
         return {"message": "Stop control success"}
     else:
-        return {"message": "Stop control failed"}
+        raise HTTPException(status_code=400, detail="Stop control failed")
 
 
 # take photo
@@ -118,7 +119,7 @@ def take_photo(
         background_tasks.add_task(remove_file, file_name)
         return FileResponse(file_name)
     else:
-        return {"message": "Photo failed"}
+        raise HTTPException(status_code=400, detail="Take photo failed")
 
 
 # camera control
@@ -135,7 +136,7 @@ def camera_control(
     ):
         return {"message": "Camera control success"}
     else:
-        return {"message": "Camera control failed"}
+        raise HTTPException(status_code=400, detail="Camera control failed")
 
 
 async def generate_frames():

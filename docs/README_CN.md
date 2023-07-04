@@ -24,7 +24,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy">
+  <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -32,14 +32,14 @@
   <a href="./README.md">English</a> | <strong>简体中文</strong>
   <p align="center">
     <br />
-    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy"><strong>探索项目 »</strong></a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system"><strong>探索项目 »</strong></a>
     <br />
     <br />
-    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy">快速开始</a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system">快速开始</a>
     ·
-    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy/issues">报告错误</a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system/issues">报告错误</a>
     ·
-    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy/issues">请求功能</a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system/issues">请求功能</a>
   </p>
 </div>
 
@@ -128,11 +128,11 @@ _以下是一个如何指导您安装和设置您的应用程序的例子。_
 
 1. 克隆仓库
    ```sh
-   git clone https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy.git
+   git clone https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system.git
    ```
 2. 导航到项目目录
    ```sh
-   cd patrol-robot-monitoring-system-cpy
+   cd patrol-robot-monitoring-system
    ```
 3. 构建镜像
    ```sh

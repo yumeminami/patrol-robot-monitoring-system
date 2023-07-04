@@ -24,7 +24,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy">
+  <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -32,14 +32,14 @@
   <strong>English</strong> | <a href="./README_CN.md">简体中文</a>
   <p align="center">
     <br />
-    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy"><strong>Explore the project »</strong></a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system"><strong>Explore the project »</strong></a>
     <br />
     <br />
-    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy">Quick Start</a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system">Quick Start</a>
     ·
-    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy/issues">Report Bug</a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system/issues">Report Bug</a>
     ·
-    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy/issues">Request Feature</a>
+    <a href="https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system/issues">Request Feature</a>
   </p>
 </div>
 
@@ -122,11 +122,11 @@ _Below is an example of how you can instruct your audience on installing and set
 
 1. Clone the repo
    ```sh
-   git clone https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system-cpy.git
+   git clone https://gitee.com/ZJCXJSLtd/patrol-robot-monitoring-system.git
    ```
 2. Navigate to the project directory
    ```sh
-   cd patrol-robot-monitoring-system-cpy
+   cd patrol-robot-monitoring-system
    ```
 3. Build the images
    ```sh

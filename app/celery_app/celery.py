@@ -23,7 +23,7 @@ app.autodiscover_tasks(["celery.tasks"], force=True)
 @app.task
 def start_task(task_id, eta_time):
     """Update the task status to IN_PROGRESS and update the ROS parameter
-    If the task is everyday task, update the eta_time to tomorrow and push the task to celery again.
+    If the task is everyday task, update the eta_time to tomorrow and push the task to celery again. Only the task is deleted, the function will end.
 
     :param task_id: get the task from database by task_id
 
@@ -32,8 +32,8 @@ def start_task(task_id, eta_time):
     db = SessionLocal()
 
     task = crud.get(db, task_id)
-    if task is None or task.status == TaskStatus.COMPLETED.value:
-        return "task not found or task is completed"
+    if task is None:
+        return "task not found"
     crud.update(
         db, db_obj=task, obj_in={"status": TaskStatus.IN_PROGRESS.value}
     )

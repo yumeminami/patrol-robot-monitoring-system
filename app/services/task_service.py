@@ -166,7 +166,7 @@ def monitor_sensor_data(task: Task):
     while True:
         db = SessionLocal()
         patrol_state = rospy.get_param("/patrol_state")
-        if patrol_state == 3 or patrol_state == 2:
+        if patrol_state == 3:
             logger.info(
                 "Task completed, terminating sensor data monitoring..."
             )
@@ -174,9 +174,12 @@ def monitor_sensor_data(task: Task):
             if task is None:
                 logger.error("Task does not exist in the database.")
                 break
-            task_crud.update(
-                db, db_obj=task, obj_in={"status": TaskStatus.COMPLETED.value}
-            )
+            if task.is_everyday is not False:
+                task_crud.update(
+                    db,
+                    db_obj=task,
+                    obj_in={"status": TaskStatus.COMPLETED.value},
+                )
             db.close()
             break
         robot = robot_crud.get(db, task.robot_id)
@@ -218,7 +221,6 @@ def monitor_sensor_data(task: Task):
                     location=robot.position,
                     type=alarm_log_type,
                 )
-                print(alarm_log)
 
                 alarm_log_crud.create(db, obj_in=alarm_log)
 

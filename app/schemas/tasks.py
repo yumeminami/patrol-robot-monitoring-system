@@ -36,7 +36,7 @@ class TaskBase(BaseModel):
         type = values.get("type")
         start_position = values.get("start_position")
         end_position = values.get("end_position")
-        speed = values.get("speed")
+        velocity = values.get("velocity")
         checkpoint_ids = values.get("checkpoint_ids")
 
         if type not in range(0, 2):
@@ -55,8 +55,8 @@ class TaskBase(BaseModel):
                 raise ValueError(
                     "start_position must be smaller than end_position"
                 )
-            if speed == 0:
-                raise ValueError("speed must be provided when type is auto")
+            if velocity == 0:
+                raise ValueError("velocity must be provided when type is auto")
             if checkpoint_ids:
                 raise ValueError(
                     "auto type task could not contain checkpoints"

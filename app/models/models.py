@@ -69,7 +69,7 @@ class CheckPoint(BaseModel):
 
     name = Column(String(50), index=True)
     position = Column(Integer, default=0)
-    speed = Column(Integer, default=0)
+    velocity = Column(Integer, default=0)
     gimbal_points = Column(JSON, default=[Integer])
 
 

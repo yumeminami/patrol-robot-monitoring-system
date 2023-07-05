@@ -32,7 +32,7 @@ def test_robot_module(test_app):
     # Update
     update_data = {
         "name": "Updated Robot",
-        "speed": read_robot.speed,
+        "velocity": read_robot.velocity,
         "position": read_robot.position,
         "status": read_robot.status,
     }

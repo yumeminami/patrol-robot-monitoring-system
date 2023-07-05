@@ -2,7 +2,7 @@
 key_map = {
     "name": "名称",
     "position": "位置",
-    "speed": "速度",
+    "velocity": "速度",
     "gimbal_points": "云台点",
     "preset_point": "预设点",
     "robot_id": "机器人ID",

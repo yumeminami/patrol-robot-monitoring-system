@@ -10,7 +10,7 @@ services:
     restart: always
     container_name: app
     environment:
-      ROS_MASTER_URI: http://ros_core:11311 #TODO replace the real ros master uri
+      ROS_MASTER_URI: http://ros_core:11311 
       REDIS_PASSWORD: sample_password
       ROS_HOSTNAME: 192.168.2.43
       PYTHONPATH : /app/share/devel/lib/python3/dist-packages
@@ -23,6 +23,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - db
+      - redis
       - ros_core
     command: python3 app/main.py
   
@@ -36,8 +37,9 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       REDIS_PASSWORD: sample_password
-      ROS_MASTER_URI: http://ros_core:11311 #TODO replace the real ros master uri
+      ROS_MASTER_URI: http://ros_core:11311 
     depends_on:
+      - db
       - redis
 
   

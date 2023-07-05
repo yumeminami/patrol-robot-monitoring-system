@@ -16,7 +16,6 @@ pandas
 python-multipart
 python-jose
 passlib
-alembic
 openpyxl
 celery
 redis

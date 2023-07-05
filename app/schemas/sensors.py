@@ -5,7 +5,7 @@ from typing import Optional
 class SensorBase(BaseModel):
     name: str
     value: float = 0.0
-    unit: str
+    unit: str = ""
     robot_id: int
 
 

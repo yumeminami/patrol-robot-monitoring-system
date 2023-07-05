@@ -131,5 +131,5 @@ class TaskCreate(TaskBase):
     pass
 
 
-class TaskUpdate(TaskBase):
-    pass
+class TaskUpdate(BaseModel):
+    status: int = TaskStatus.NOT_STARTED.value

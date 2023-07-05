@@ -13,8 +13,10 @@ class TaskLogCreate(TaskLogBase):
     pass
 
 
-class TaskLogUpdate(TaskLogBase):
-    pass
+class TaskLogUpdate(BaseModel):
+    task_id: Optional[int] = None
+    robot_id: Optional[int] = None
+    type: int = 0
 
 
 class TaskLog(TaskLogBase):

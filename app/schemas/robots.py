@@ -35,9 +35,9 @@ class RobotCreate(BaseModel):
 
 
 class RobotUpdate(BaseModel):
-    name: str
-    status: int
-    velocity: float
-    position: int
-    battery: int
-    battery_status: int
+    name: str = ""
+    status: int = RobotStatus.OFFLINE.value
+    velocity: float = 0.0
+    position: float = 0.0
+    battery: int = 100
+    battery_status: int = RobotBatteryStatus.NOCHARGE.value

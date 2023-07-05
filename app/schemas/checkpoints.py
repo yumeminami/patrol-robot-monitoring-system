@@ -16,8 +16,11 @@ class CheckPointCreate(CheckPointBase):
     pass
 
 
-class CheckPointUpdate(CheckPointBase):
-    pass
+class CheckPointUpdate(BaseModel):
+    name: str = ""
+    position: int = 0
+    velocity: int = 0
+    gimbal_points: List[int] = []
 
 
 class CheckPoint(CheckPointBase):

@@ -29,6 +29,8 @@ def start_task(task_id, eta_time):
 
     :return: success
     """
+
+    result = "success"
     db = SessionLocal()
 
     task = crud.get(db, task_id)
@@ -45,8 +47,9 @@ def start_task(task_id, eta_time):
     if task.is_everyday:
         eta_time = eta_time + timedelta(days=1)
         start_task.apply_async(args=(task_id, eta_time), eta=eta_time)
+        result = "everyday task"
 
     thread = threading.Thread(target=monitor_sensor_data, args=(task,))
     thread.start()
 
-    return "success"
+    return result

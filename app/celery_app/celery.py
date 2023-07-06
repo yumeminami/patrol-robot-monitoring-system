@@ -1,6 +1,6 @@
 import os
 import threading
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from celery import Celery
 
@@ -27,10 +27,10 @@ def start_task(task_id, eta_time):
 
     :param task_id: get the task from database by task_id
 
-    :return: success
+    :return: result: str
     """
 
-    result = "success"
+    result = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "once task"
     db = SessionLocal()
 
     task = crud.get(db, task_id)
@@ -47,7 +47,8 @@ def start_task(task_id, eta_time):
     if task.is_everyday:
         eta_time = eta_time + timedelta(days=1)
         start_task.apply_async(args=(task_id, eta_time), eta=eta_time)
-        result = "everyday task"
+
+        result = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "everyday task"
 
     thread = threading.Thread(target=monitor_sensor_data, args=(task,))
     thread.start()

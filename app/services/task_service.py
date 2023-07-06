@@ -68,7 +68,7 @@ def create_task_xml(task_create, db):
         patrolpoint = ET.SubElement(root, "patrolpoint")
         patrolpoint.set("index", str(checkpoint.id))
         patrolpoint.set("position", str(checkpoint.position))
-        patrolpoint.set("velocity", str(checkpoint.speed))
+        patrolpoint.set("velocity", str(checkpoint.velocity))
 
         # Get patrol point's corresponding gimbal points
         gimbalpoint_list = []

@@ -14,9 +14,14 @@ def flatten_dict(d):
         elif isinstance(v, list):
             value_list = []
             for item in v:
-                if isinstance(item, dict):
-                    value_list.append(flatten_dict(item))
-                else:
+                try:
+                    if isinstance(item, dict):
+                        item = flatten_dict(item)
+                    else:
+                        item = flatten_dict(vars(item))
+                except Exception as e:
+                    print(e)
+                finally:
                     value_list.append(item)
             print(value_list)
             items.append((new_key, ",".join(str(i) for i in value_list)))
@@ -29,8 +34,6 @@ def flatten_dict(d):
 
 def write_excel(data, filename):
     # Flatten the list of dictionaries and convert it to a pandas DataFrame
-    if isinstance(data, dict):
-        data = [data]
     flattened_data = [flatten_dict(d) for d in data]
     df = pd.DataFrame(flattened_data)
 

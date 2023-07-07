@@ -24,6 +24,12 @@ key_map = {
     "execution_time": "执行时间",
     "is_everyday": "是否每天",
     "unit": "单位",
+    "level": "等级",
+    "location": "位置",
+    "time": "时间",
+    "upper_limit": "上限",
+    "lower_limit": "下限",
+    "sensitivity": "灵敏度",
 }
 
 value_map = {

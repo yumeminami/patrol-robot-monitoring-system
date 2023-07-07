@@ -7,13 +7,60 @@ import rospy
 from common.srv import *
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-
+from enum import Enum
 
 from app.utils.log import logger, log_queue
 from app.ros.ros import ros_port_queue
 
 
 latest_img_queue = Queue()
+
+
+class PositionControlType(Enum):
+    ABSOLUTE = 0
+    RELATIVE = 1
+
+
+class StopControlType(Enum):
+    NORMAL = 0
+    EMERGENCY = 1
+    FREE = 2
+
+
+class CameraCommand(Enum):
+    STOP = 0
+    COLOR = 1
+    COLORANDSAVE = 2
+    IR = 3
+    IRANDSAVE = 4
+
+
+class GimbalControlCommand(Enum):
+    GOTO = 0
+    SET = 1
+    CLEAR = 2
+
+
+class GimbalMotionControlCommand(Enum):
+    UP_LEFT = 1
+    TILI_UP = 2
+    UP_RIGHT = 3
+    PAN_LEFT = 4
+    PAN_RIGHT = 6
+    DOWN_LEFT = 7
+    TILT_DOWN = 8
+    DOWN_RIGHT = 9
+
+
+def validate_enum_value(value, enum_type):
+    try:
+        value = int(value)
+        if value in enum_type.__members__.values():
+            return
+        else:
+            raise ValueError("Invalid enum value")
+    except (ValueError, AttributeError):
+        raise ValueError("Invalid enum value")
 
 
 def velocity_control(robot_name, **kwargs):
@@ -66,6 +113,7 @@ def position_control(robot_name, **kwargs):
         request.position_control_type = int(
             kwargs.get("position_control_type")
         )
+        validate_enum_value(request.position_control_type, PositionControlType)
         request.target_position_f = float(kwargs.get("target_position_f"))
         request.velocity_f = float(kwargs.get("velocity_f"))
 
@@ -75,6 +123,9 @@ def position_control(robot_name, **kwargs):
             return False
         return True
     except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
+    except ValueError as e:
         logger.error(f"Error: {e}")
         return False
     except Exception as e:
@@ -99,6 +150,7 @@ def stop_control(robot_name, **kwargs):
 
         request = StopControlRequest()
         request.stop_type = int(kwargs.get("stop_type"))
+        validate_enum_value(request.stop_type, StopControlType)
 
         response = stop_control(request)
         if response.status_code == 0:
@@ -106,6 +158,9 @@ def stop_control(robot_name, **kwargs):
             return False
         return True
     except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
+    except ValueError as e:
         logger.error(f"Error: {e}")
         return False
     except Exception as e:
@@ -165,12 +220,16 @@ def camera_control(robot_name, **kwargs):
 
         request = CameraCommandRequest()
         request.camera_command = int(kwargs.get("camera_command"))
+        validate_enum_value(request.camera_command, CameraCommandType)
 
         response = camera_control(request)
         if response.status_code == 0:
             return False
         return True
     except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
+    except ValueError as e:
         logger.error(f"Error: {e}")
         return False
     except Exception as e:
@@ -219,13 +278,23 @@ def gimbal_control(robot_name, **kwargs):
         request = GimbalControlRequest()
         request.command = int(kwargs.get("command"))
         request.preset_index = int(kwargs.get("preset_index"))
+        validate_enum_value(request.command, GimbalControlCommand)
 
         response = gimbal_control(request)
         if response.status_code == 0:
             return False
 
+        # TODO: implement the gimbal point creation and removement
+        if request.command == GimbalControlCommand.SET.value:
+            pass
+        elif request.command == GimbalControlCommand.CLEAR.value:
+            pass
+
         return True
     except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
+    except ValueError as e:
         logger.error(f"Error: {e}")
         return False
     except Exception as e:
@@ -252,12 +321,16 @@ def gimbal_motion_control(robot_name, **kwargs):
 
         request = GimbalMotionControlRequest()
         request.command = int(kwargs.get("command"))
+        validate_enum_value(request.command, GimbalMotionControlCommand)
 
         response = gimbal_motion_control(request)
         if response.status_code == 0:
             return False
         return True
     except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
+    except ValueError as e:
         logger.error(f"Error: {e}")
         return False
     except Exception as e:

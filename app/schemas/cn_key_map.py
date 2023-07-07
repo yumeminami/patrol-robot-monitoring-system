@@ -10,6 +10,7 @@ key_map = {
     "total_task_executed": "总任务执行数",
     "total_alarm_raised": "总报警次数",
     "battery": "电量",
+    "battery_status": "电池状态",
     "status": "状态",
     "task_id": "任务ID",
     "task_status": "任务状态",
@@ -22,4 +23,13 @@ key_map = {
     "vision_algorithms": "视觉算法",
     "execution_time": "执行时间",
     "is_everyday": "是否每天",
+    "unit": "单位",
+}
+
+value_map = {
+    "temperature": "温度",
+    "humidity": "湿度",
+    "light": "光照",
+    "smoke1": "烟雾1",
+    "smoke2": "烟雾2",
 }

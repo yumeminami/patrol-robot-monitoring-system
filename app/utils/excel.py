@@ -2,20 +2,27 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Font
-from app.schemas.cn_key_map import key_map
+from app.schemas.cn_key_map import key_map, value_map
 
 
-def flatten_dict(d, parent_key="", sep="_"):
+def flatten_dict(d):
     items = []
     for k, v in d.items():
         new_key = key_map.get(k, k)
-        new_key = parent_key + sep + k if parent_key else new_key
         if isinstance(v, dict):
-            items.extend(flatten_dict(v, new_key, sep=sep).items())
+            items.extend(flatten_dict(v).items())
         elif isinstance(v, list):
-            items.append((new_key, ", ".join(str(i) for i in v)))
+            value_list = []
+            for item in v:
+                if isinstance(item, dict):
+                    value_list.append(flatten_dict(item))
+                else:
+                    value_list.append(item)
+            print(value_list)
+            items.append((new_key, ",".join(str(i) for i in value_list)))
         else:
-            items.append((new_key, v))
+            new_value = value_map.get(v, v)
+            items.append((new_key, new_value))
 
     return dict(items)
 

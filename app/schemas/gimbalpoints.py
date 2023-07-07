@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class GimbalPointBase(BaseModel):
-    preset_point: int = 0
+    preset_index: int = 0
 
     class Config:
         orm_mode = True

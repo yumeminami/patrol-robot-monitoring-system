@@ -1,6 +1,7 @@
 import logging
 import colorlog
 import multiprocessing
+from logging.handlers import QueueHandler
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)

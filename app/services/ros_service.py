@@ -11,6 +11,9 @@ from enum import Enum
 
 from app.utils.log import logger, log_queue
 from app.ros.ros import ros_port_queue
+from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
+from app.db.database import SessionLocal
+from app.schemas.gimbalpoints import GimbalPointCreate
 
 
 latest_img_queue = Queue()
@@ -55,7 +58,7 @@ class GimbalMotionControlCommand(Enum):
 def validate_enum_value(value, enum_type):
     try:
         value = int(value)
-        if value in enum_type.__members__.values():
+        if value in [member.value for member in enum_type]:
             return
         else:
             raise ValueError("Invalid enum value")
@@ -113,7 +116,7 @@ def position_control(robot_name, **kwargs):
         request.position_control_type = int(
             kwargs.get("position_control_type")
         )
-        validate_enum_value(request.position_control_type, PositionControlType)
+        # validate_enum_value(request.position_control_type, PositionControlType)
         request.target_position_f = float(kwargs.get("target_position_f"))
         request.velocity_f = float(kwargs.get("velocity_f"))
 
@@ -150,7 +153,7 @@ def stop_control(robot_name, **kwargs):
 
         request = StopControlRequest()
         request.stop_type = int(kwargs.get("stop_type"))
-        validate_enum_value(request.stop_type, StopControlType)
+        # validate_enum_value(request.stop_type, StopControlType)
 
         response = stop_control(request)
         if response.status_code == 0:
@@ -220,7 +223,7 @@ def camera_control(robot_name, **kwargs):
 
         request = CameraCommandRequest()
         request.camera_command = int(kwargs.get("camera_command"))
-        validate_enum_value(request.camera_command, CameraCommandType)
+        # validate_enum_value(request.camera_command, CameraCommandType)
 
         response = camera_control(request)
         if response.status_code == 0:
@@ -284,11 +287,21 @@ def gimbal_control(robot_name, **kwargs):
         if response.status_code == 0:
             return False
 
-        # TODO: implement the gimbal point creation and removement
+        db = SessionLocal()
         if request.command == GimbalControlCommand.SET.value:
-            pass
+            if (
+                gimbal_point_crud.get_by_preset_index(
+                    db=db, preset_index=request.preset_index
+                )
+            ) is None:
+                gimbal_point = GimbalPointCreate(
+                    preset_index=request.preset_index
+                )
+                gimbal_point_crud.create(db=db, obj_in=gimbal_point)
         elif request.command == GimbalControlCommand.CLEAR.value:
-            pass
+            gimbal_point_crud.remove_by_preset_index(
+                db=db, preset_index=request.preset_index
+            )
 
         return True
     except rospy.ROSException as e:

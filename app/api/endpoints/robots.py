@@ -18,6 +18,10 @@ from app.services.ros_service import position_control as position_control_ros
 from app.services.ros_service import stop_control as stop_control_ros
 from app.services.ros_service import take_picture as take_picture_ros
 from app.services.ros_service import camera_control as camera_control_ros
+from app.services.ros_service import gimbal_control as gimbal_control_ros
+from app.services.ros_service import (
+    gimbal_motion_control as gimbal_motion_control_ros,
+)
 
 from app.services.ros_service import latest_img_queue
 from app.services.ros_service import video_streamer
@@ -172,3 +176,42 @@ async def stream_video(id: int, db: Session = Depends(get_db)):
         generate_frames(),
         media_type="multipart/x-mixed-replace; boundary=frame",
     )
+
+
+@router.post("/{id}/gimbal_control")
+def gimbal_control(
+    id: int,
+    command: int,
+    preset_index: int,
+    db: Session = Depends(get_db),
+):
+    robot = crud.get(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+    robot_name = robot.name
+
+    if gimbal_control_ros(
+        robot_name=robot_name, command=command, preset_index=preset_index
+    ):
+        return {"message": "Gimbal control success"}
+    else:
+        raise HTTPException(status_code=400, detail="Gimbal control failed")
+
+
+@router.post("/{id}/gimbal_motion_control")
+def gimbal_motion_control(
+    id: int,
+    command: int,
+    db: Session = Depends(get_db),
+):
+    robot = crud.get(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+    robot_name = robot.name
+
+    if gimbal_motion_control_ros(robot_name=robot_name, command=command):
+        return {"message": "Gimbal motion control success"}
+    else:
+        raise HTTPException(
+            status_code=400, detail="Gimbal motion control failed"
+        )

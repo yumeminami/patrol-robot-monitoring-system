@@ -199,3 +199,67 @@ def video_streamer(robot_name):
     rospy.Subscriber(topic_name, Image, callback)
     while not rospy.is_shutdown():
         rospy.spin()
+
+
+def gimbal_control(robot_name, **kwargs):
+    """
+    Set, clear or move the gimbal of the specified robot.
+
+    :param robot_name: The name of the robot to control.
+    :return: None
+    """
+
+    try:
+        service_name = "/{robot_name}/gimbal_control".format(
+            robot_name=robot_name
+        )
+        rospy.wait_for_service(service_name, timeout=1)
+        gimbal_control = rospy.ServiceProxy(service_name, GimbalControl)
+
+        request = GimbalControlRequest()
+        request.command = int(kwargs.get("command"))
+        request.preset_index = int(kwargs.get("preset_index"))
+
+        response = gimbal_control(request)
+        if response.status_code == 0:
+            return False
+
+        return True
+    except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        return False
+
+
+def gimbal_motion_control(robot_name, **kwargs):
+    """
+    Controls the gimbal of the specified robot.
+
+    :param robot_name: The name of the robot to control.
+    :return: None
+    """
+
+    try:
+        service_name = "/{robot_name}/gimbal_motion_control".format(
+            robot_name=robot_name
+        )
+        rospy.wait_for_service(service_name, timeout=1)
+        gimbal_motion_control = rospy.ServiceProxy(
+            service_name, GimbalMotionControl
+        )
+
+        request = GimbalMotionControlRequest()
+        request.command = int(kwargs.get("command"))
+
+        response = gimbal_motion_control(request)
+        if response.status_code == 0:
+            return False
+        return True
+    except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        return False

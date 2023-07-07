@@ -11,7 +11,8 @@ class stop_control(genpy.Message):
   _md5sum = "1b6fac8d08de0982f05ab0aa2f3aa6b5"
   _type = "common/stop_control"
   _has_header = False  # flag to mark the presence of a Header object
-  _full_text = """int32 stop_type #0 stop 1 stop 2 kill"""
+  _full_text = """int32 stop_type #0 stop 1 stop 2 自由停止
+"""
   __slots__ = ['stop_type']
   _slot_types = ['int32']
 

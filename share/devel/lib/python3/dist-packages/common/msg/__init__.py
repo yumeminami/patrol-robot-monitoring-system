@@ -2,6 +2,7 @@ from ._RobotRealTimeInfo import *
 from ._camera_control import *
 from ._charge_control import *
 from ._gimbal_control import *
+from ._gimbal_motion_control import *
 from ._position_control import *
 from ._robot_real_time_info import *
 from ._sensor_data import *

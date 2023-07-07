@@ -59,10 +59,10 @@
   "1b6fac8d08de0982f05ab0aa2f3aa6b5")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<stop_control>)))
   "Returns full string definition for message of type '<stop_control>"
-  (cl:format cl:nil "int32 stop_type #0 stop 1 stop 2 kill~%~%"))
+  (cl:format cl:nil "int32 stop_type #0 stop 1 stop 2 自由停止~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'stop_control)))
   "Returns full string definition for message of type 'stop_control"
-  (cl:format cl:nil "int32 stop_type #0 stop 1 stop 2 kill~%~%"))
+  (cl:format cl:nil "int32 stop_type #0 stop 1 stop 2 自由停止~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <stop_control>))
   (cl:+ 0
      4

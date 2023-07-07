@@ -63,7 +63,8 @@ class stop_control {
   static messageDefinition() {
     // Returns full string definition for message
     return `
-    int32 stop_type #0 stop 1 stop 2 kill
+    int32 stop_type #0 stop 1 stop 2 自由停止
+    
     `;
   }
 

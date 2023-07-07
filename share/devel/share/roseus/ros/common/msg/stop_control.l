@@ -52,7 +52,8 @@
 (setf (get common::stop_control :md5sum-) "1b6fac8d08de0982f05ab0aa2f3aa6b5")
 (setf (get common::stop_control :datatype-) "common/stop_control")
 (setf (get common::stop_control :definition-)
-      "int32 stop_type #0 stop 1 stop 2 kill
+      "int32 stop_type #0 stop 1 stop 2 自由停止
+
 ")
 
 

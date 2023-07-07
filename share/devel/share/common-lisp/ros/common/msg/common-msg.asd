@@ -10,6 +10,8 @@
     (:file "_package_charge_control" :depends-on ("_package"))
     (:file "gimbal_control" :depends-on ("_package_gimbal_control"))
     (:file "_package_gimbal_control" :depends-on ("_package"))
+    (:file "gimbal_motion_control" :depends-on ("_package_gimbal_motion_control"))
+    (:file "_package_gimbal_motion_control" :depends-on ("_package"))
     (:file "position_control" :depends-on ("_package_position_control"))
     (:file "_package_position_control" :depends-on ("_package"))
     (:file "robot_real_time_info" :depends-on ("_package_robot_real_time_info"))

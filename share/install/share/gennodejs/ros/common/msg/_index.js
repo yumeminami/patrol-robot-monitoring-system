@@ -3,6 +3,7 @@
 
 let position_control = require('./position_control.js');
 let velocity_control = require('./velocity_control.js');
+let gimbal_motion_control = require('./gimbal_motion_control.js');
 let setposition_control = require('./setposition_control.js');
 let stop_control = require('./stop_control.js');
 let voice_control = require('./voice_control.js');
@@ -15,6 +16,7 @@ let camera_control = require('./camera_control.js');
 module.exports = {
   position_control: position_control,
   velocity_control: velocity_control,
+  gimbal_motion_control: gimbal_motion_control,
   setposition_control: setposition_control,
   stop_control: stop_control,
   voice_control: voice_control,

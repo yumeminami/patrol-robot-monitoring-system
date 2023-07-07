@@ -152,9 +152,14 @@ struct Definition< ::common::gimbal_control_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "int32 command #云台预置点命令\n"
-"int32 preset_index #预置点编号\n"
+    return "int32 command #云台预置点命令 \n"
+"#39:GOTO_PRESET移动到预置点\n"
+"# 8:SET_PRESET 设置预置点\n"
+"# 9:CLE_PRESET 清除预置点\n"
 "\n"
+"int32 preset_index #预置点编号\n"
+"#去下面的网络界面设置预置点，移动好之后选择某个预置点按下设置符号即可设置\n"
+"#http://10.92.36.1/doc/page/config.asp\n"
 "\n"
 "\n"
 ;

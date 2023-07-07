@@ -146,7 +146,7 @@ struct Definition< ::common::stop_control_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "int32 stop_type #0 stop 1 stop 2 kill\n"
+    return "int32 stop_type #0 stop 1 stop 2 自由停止\n"
 ;
   }
 

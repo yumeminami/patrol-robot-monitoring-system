@@ -1,7 +1,7 @@
 import logging
 import colorlog
 import multiprocessing
-from logging.handlers import QueueHandler
+from logging import handlers
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -23,5 +23,5 @@ console_handler.setFormatter(
 logger.addHandler(console_handler)
 
 log_queue = multiprocessing.Queue()
-log_listener = logging.handlers.QueueListener(log_queue, console_handler)
+log_listener = handlers.QueueListener(log_queue, console_handler)
 log_listener.start()

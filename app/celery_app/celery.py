@@ -2,12 +2,13 @@ import os
 import threading
 from datetime import datetime, timedelta
 
+import rospy
 from celery import Celery
 
 from app.crud.tasks import task as crud
 from app.db.database import SessionLocal
 from app.schemas.tasks import Task, TaskStatus
-from app.services.task_service import monitor_sensor_data, update_parameter
+from app.services.task_service import monitor_sensor_data
 
 password = os.environ.get("REDIS_PASSWORD", "sample_password")
 app = Celery(
@@ -40,7 +41,11 @@ def start_task(task_id, eta_time):
     )
     db.close()
 
-    update_parameter()
+    try:
+        rospy.set_param("/patrol_state", 1)
+        # TODO call the corresponding service to pass the XML file to the robot
+    except Exception as e:
+        print(e)
 
     task = Task.from_orm(task)
     if task.is_everyday:

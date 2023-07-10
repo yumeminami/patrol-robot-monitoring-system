@@ -1,4 +1,3 @@
-import subprocess
 import time
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -100,55 +99,6 @@ def create_task_xml(task_create, db):
     tree = ET.ElementTree(root)
     # TODO: Confirm the file name and path
     tree.write("output.xml", encoding="utf-8", xml_declaration=True)
-
-
-def run_node():
-    """Run the robot ros node.(Deprecated)
-
-    At the first design, this step was belong to this system. But now, after the
-    discussion with the team, we decide to run the ros node in the robot.
-
-    """
-
-    # TODO Now is hard code, need to be changed
-    command = "rosrun zj_robot normal_patrol_state_machine"
-
-    process = subprocess.Popen(
-        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-
-    output, error = process.communicate()
-
-    if output:
-        print("Command output:")
-        print(output.decode("utf-8"))
-    if error:
-        print("Command error:")
-        print(error.decode("utf-8"))
-
-
-def update_parameter():
-    try:
-        rospy.set_param("/patrol_state", 1)
-    except Exception as e:
-        logger.error(e)
-
-
-def kill_node():
-    # TODO Now is hard code, need to be changed
-    command = "rosnode kill /normal_patrol_state_machine"
-
-    process = subprocess.Popen(
-        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    output, error = process.communicate()
-
-    if output:
-        print("Command output:")
-        print(output.decode("utf-8"))
-    if error:
-        print("Command error:")
-        print(error.decode("utf-8"))
 
 
 def monitor_sensor_data(task: Task):

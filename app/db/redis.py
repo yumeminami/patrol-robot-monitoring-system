@@ -1,5 +1,6 @@
-import redis
 import os
+
+import redis
 
 from app.utils.log import logger
 

@@ -1,8 +1,10 @@
-from pydantic import BaseModel, validator, root_validator
+from enum import Enum
 from typing import List
+
+from pydantic import BaseModel, root_validator, validator
+
 from .sensors import SensorForTask
 from .vision_algorithms import VisionAlgorithmForTask
-from enum import Enum
 
 
 class TaskType(Enum):

@@ -1,20 +1,18 @@
 import logging
 import multiprocessing
-from multiprocessing import Queue
 from datetime import datetime
+from multiprocessing import Queue
 
 import rospy
+from common.msg import *
+from common.msg import robot_real_time_info, sensor_data
 
-from app.utils.log import logger, log_queue
+from app.crud.robots import robot as robot_crud
+from app.crud.sensors import sensor as sensor_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
-from app.crud.sensors import sensor as sensor_crud
-from app.crud.robots import robot as robot_crud
 from app.schemas.robots import Robot
-
-from common.msg import robot_real_time_info
-from common.msg import sensor_data
-from common.msg import *
+from app.utils.log import log_queue, logger
 
 ros_port_queue = Queue()
 for i in range(45159, 45200):

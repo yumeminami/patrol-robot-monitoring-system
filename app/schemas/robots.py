@@ -1,7 +1,9 @@
-from pydantic import BaseModel
-from typing import List
-from .sensors import Sensor
 from enum import Enum
+from typing import List
+
+from pydantic import BaseModel
+
+from .sensors import Sensor
 
 
 class RobotBatteryStatus(Enum):

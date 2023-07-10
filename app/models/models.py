@@ -1,19 +1,18 @@
 from sqlalchemy import (
+    JSON,
+    Boolean,
     Column,
     DateTime,
+    Float,
     ForeignKey,
     Integer,
-    JSON,
     String,
-    Boolean,
     Time,
-    Float,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from app.db.database import engine
 
-from app.db.database import Base
+from app.db.database import Base, engine
 
 
 class BaseModel(Base):

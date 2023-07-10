@@ -1,27 +1,27 @@
-from datetime import datetime
-import time
 import subprocess
+import time
 import xml.etree.ElementTree as ET
+from datetime import datetime
 
 import rospy
 from fastapi import HTTPException
 
+from app.crud.alarm_logs import alarm_log as alarm_log_crud
+from app.crud.checkpoints import checkpoint as checkpoint_crud
+from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
+from app.crud.robots import robot as robot_crud
+from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
-from app.schemas.checkpoints import CheckPoint
-from app.schemas.gimbalpoints import GimbalPoint
-from app.schemas.tasks import TaskType, TaskStatus, Task
 from app.schemas.alarm_logs import (
     AlarmLogCreate,
     AlarmLogLevel,
     AlarmLogStatus,
     AlarmLogType,
 )
-from app.crud.robots import robot as robot_crud
-from app.crud.checkpoints import checkpoint as checkpoint_crud
-from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
-from app.crud.tasks import task as task_crud
-from app.crud.alarm_logs import alarm_log as alarm_log_crud
+from app.schemas.checkpoints import CheckPoint
+from app.schemas.gimbalpoints import GimbalPoint
+from app.schemas.tasks import Task, TaskStatus, TaskType
 from app.utils.log import logger
 
 

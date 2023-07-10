@@ -1,29 +1,27 @@
-import cv2
-from multiprocessing import Process
 import asyncio
+from multiprocessing import Process
 
-from app.schemas.robots import RobotCreate, RobotUpdate, Robot
-from app.crud.robots import robot as crud
-from app.api.api import create_generic_router, remove_file
-
+import cv2
 from fastapi import Depends
-from fastapi.exceptions import HTTPException
 from fastapi.background import BackgroundTasks
-from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.exceptions import HTTPException
+from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 
+from app.api.api import create_generic_router, remove_file
+from app.crud.robots import robot as crud
 from app.db.database import SessionLocal
-from app.services.ros_service import velocity_control as velocity_control_ros
-from app.services.ros_service import position_control as position_control_ros
-from app.services.ros_service import stop_control as stop_control_ros
-from app.services.ros_service import take_picture as take_picture_ros
+from app.schemas.robots import Robot, RobotCreate, RobotUpdate
 from app.services.ros_service import camera_control as camera_control_ros
 from app.services.ros_service import gimbal_control as gimbal_control_ros
 from app.services.ros_service import (
     gimbal_motion_control as gimbal_motion_control_ros,
 )
-
 from app.services.ros_service import latest_img_queue
+from app.services.ros_service import position_control as position_control_ros
+from app.services.ros_service import stop_control as stop_control_ros
+from app.services.ros_service import take_picture as take_picture_ros
+from app.services.ros_service import velocity_control as velocity_control_ros
 from app.services.ros_service import video_streamer
 
 video_processes = {}

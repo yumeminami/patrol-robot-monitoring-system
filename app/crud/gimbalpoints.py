@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+
 from app.crud.base import CRUDBase
 from app.models.models import GimbalPoint
 from app.schemas.gimbalpoints import GimbalPointCreate, GimbalPointUpdate

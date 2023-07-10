@@ -1,14 +1,13 @@
 import os
 import threading
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 from celery import Celery
 
-from app.services.task_service import update_parameter, monitor_sensor_data
 from app.crud.tasks import task as crud
-from app.schemas.tasks import Task
-from app.schemas.tasks import TaskStatus
 from app.db.database import SessionLocal
+from app.schemas.tasks import Task, TaskStatus
+from app.services.task_service import monitor_sensor_data, update_parameter
 
 password = os.environ.get("REDIS_PASSWORD", "sample_password")
 app = Celery(

@@ -1,13 +1,12 @@
-from app.schemas.tasks import Task, TaskCreate, TaskUpdate, TaskStatus
-from app.crud.tasks import task as crud
-from app.api.api import create_generic_router
 from fastapi import HTTPException
-from app.services.task_service import (
-    create_task_xml,
-)
-from app.utils.parse_execution_time import parse_execution_time
+
+from app.api.api import create_generic_router
 from app.celery_app.celery import start_task
+from app.crud.tasks import task as crud
+from app.schemas.tasks import Task, TaskCreate, TaskStatus, TaskUpdate
+from app.services.task_service import create_task_xml
 from app.utils.log import logger
+from app.utils.parse_execution_time import parse_execution_time
 
 
 def before_created(task_create, db):

@@ -174,7 +174,7 @@ def monitor_sensor_data(task: Task):
             if task is None:
                 logger.error("Task does not exist in the database.")
                 break
-            if task.is_everyday is not False:
+            if task.is_everyday is False:
                 task_crud.update(
                     db,
                     db_obj=task,

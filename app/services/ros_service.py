@@ -38,9 +38,9 @@ class CameraCommand(Enum):
 
 
 class GimbalControlCommand(Enum):
-    GOTO = 0
-    SET = 1
-    CLEAR = 2
+    GOTO = 1
+    SET = 2
+    CLEAR = 3
 
 
 class GimbalMotionControlCommand(Enum):

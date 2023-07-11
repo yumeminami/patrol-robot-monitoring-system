@@ -18,6 +18,7 @@ app = Celery(
 )
 
 app.autodiscover_tasks(["celery.tasks"], force=True)
+app.conf.broker_transport_options = {"visibility_timeout": 60*60*24*2}
 
 
 @app.task

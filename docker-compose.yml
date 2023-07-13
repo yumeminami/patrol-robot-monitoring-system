@@ -30,7 +30,7 @@ services:
   celery-worker:
     container_name: celery-worker
     image: app:latest
-    command: celery -A app.celery_app.celery worker --loglevel=info --concurrency=1 -E
+    command: celery -A app.celery_app.celery worker --loglevel=info
     volumes:
       - ./:/app
       - /etc/timezone:/etc/timezone:ro

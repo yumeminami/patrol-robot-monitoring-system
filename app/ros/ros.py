@@ -19,7 +19,10 @@ for i in range(45159, 45200):
     ros_port_queue.put(i)
 
 
-topic_list = ["robot_real_time_info", "sensor_data"]
+topic_list = {
+    "robot_real_time_info": robot_real_time_info,
+    "sensor_data": sensor_data,
+}
 
 
 class Node:
@@ -67,60 +70,26 @@ class Node:
         robot_name = rospy.get_name().strip("/").replace("_subscriber", "")
         db.close()
 
-        for topic in topic_list:
-            topic = "/{robot_name}/{topic}".format(
-                robot_name=robot_name, topic=topic
-            )
-            self.wait_for_topic(robot_name, topic)
+        for topic_name, topic_type in topic_list.items():
+            try:
+                msg_class = topic_type
 
-    def wait_for_topic(self, robot_name, topic):
-        """Ensures a topic is available before creating a subscription.
+                callback_method = getattr(self, f"{topic_name}_callback")
 
-        This function periodically checks if a given topic is being published. Once the topic
-        is available, it creates a subscriber that listens to the topic. The callback function
-        for each subscriber is determined by the topic type.
-
-        :param robotname: The name of the robot that publishes the topic
-        :param topic: The topic to subscribe to
-        """
-
-        published_topics = [
-            toptics_types[0] for toptics_types in rospy.get_published_topics()
-        ]
-        while topic not in published_topics:
-            current_time = datetime.now().strftime("%H:%M:%S")
-            # logger.debug(
-            #     f"Waiting for topic '{topic}' to become available... time: {current_time}"
-            # )
-            rospy.sleep(5)
-            published_topics = [
-                toptics_types[0]
-                for toptics_types in rospy.get_published_topics()
-            ]
-
-        topic_type = rospy.get_published_topics()[
-            published_topics.index(topic)
-        ][1].split("/")[-1]
-
-        try:
-            msg_class = globals()[topic_type]
-
-            callback_method = getattr(self, f"{topic_type}_callback")
-
-            callback_args = {"robot_name": robot_name}
-            self.subscribers[topic] = rospy.Subscriber(
-                name=topic,
-                data_class=msg_class,
-                callback=callback_method,
-                callback_args=callback_args,
-                queue_size=20,
-            )
-        except KeyError:
-            logger.error(f"Topic type '{topic_type}' is not defined")
-        except AttributeError:
-            logger.error(
-                f"Callback function for topic type '{topic_type}' is not defined"
-            )
+                callback_args = {"robot_name": robot_name}
+                self.subscribers[topic_name] = rospy.Subscriber(
+                    name=f"/{robot_name}/{topic_name}",
+                    data_class=msg_class,
+                    callback=callback_method,
+                    callback_args=callback_args,
+                    queue_size=20,
+                )
+            except KeyError:
+                logger.error(f"Topic type '{topic_type}' is not defined")
+            except AttributeError:
+                logger.error(
+                    f"Callback function for topic type '{topic_name}' is not defined"
+                )
 
     def robot_real_time_info_callback(self, message, args):
         """Callback function for handling robot real-time info.
@@ -174,7 +143,7 @@ class Node:
 
             redis_client.hset(robot_name, "sensor_data", str(info))
 
-            # logger.info(f"Received message from topic: \n{message}")
+            logger.info(f"Received message from topic: \n{message}")
             # logger.info(f"Updated sensor data for robot: {robot_name}")
 
             db = SessionLocal()

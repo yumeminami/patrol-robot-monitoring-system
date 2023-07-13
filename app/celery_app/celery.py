@@ -2,7 +2,6 @@ import os
 import threading
 from datetime import datetime, timedelta
 
-import rospy
 from celery import Celery
 
 from app.crud.tasks import task as task_crud
@@ -11,7 +10,8 @@ from app.crud.sensors import sensor as sensor_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.tasks import Task, TaskStatus
-from app.services.task_service import monitor_sensor_data
+from app.services.task_service import monitor_sensor_data, create_task_xml
+from app.services.ros_service import PatrolCommand, patrol_control
 from app.utils.log import logger
 
 password = os.environ.get("REDIS_PASSWORD", "sample_password")
@@ -36,10 +36,11 @@ app.conf.beat_schedule = {
 
 @app.task()
 def start_task(task_id, eta_time):
-    """Update the task status to IN_PROGRESS and update the ROS parameter
+    """Call the patrol_control function to start the task.
     If the task is everyday task, update the eta_time to tomorrow and push the task to celery again. Only the task is deleted, the function will end.
 
     :param task_id: get the task from database by task_id
+    :param eta_time: the time that the task will start
 
     :return: result: str
     """
@@ -55,9 +56,22 @@ def start_task(task_id, eta_time):
     )
     db.close()
 
+    robot = robot_crud.get(db, task.robot_id)
+    if robot is None:
+        return "robot not found"
+
     try:
-        rospy.set_param("/patrol_state", 1)
-        # TODO call the corresponding service to pass the XML file to the robot
+        file_name = create_task_xml(task, db)
+        xml_data = None
+        with open(file_name, "r") as f:
+            xml_data = f.read()
+        if patrol_control(
+            robot_name=robot.name,
+            patrol_command=PatrolCommand.START.value,
+            xml_data=xml_data,
+        ):
+            logger.error(f"Robot '{robot.name}' start task failed.")
+
     except Exception as e:
         print(e)
 

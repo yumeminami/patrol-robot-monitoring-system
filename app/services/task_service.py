@@ -41,17 +41,17 @@ def indent(elem, level=0):
             elem.tail = i
 
 
-def create_task_xml(task_create, db):
+def create_task_xml(task, db):
     # Check the task type
-    if task_create.type == TaskType.AUTO.value:
+    if task.type == TaskType.AUTO.value:
         return
 
     root = ET.Element("patrolpoints")
     root.set("Intro", "new patrol params")
 
-    # Get checkpoints from task_create.checkpoint_ids
+    # Get checkpoints from task.checkpoint_ids
     checkpoint_list = []
-    for id in task_create.checkpoint_ids:
+    for id in task.checkpoint_ids:
         checkpoint = checkpoint_crud.get(db, id)
         if checkpoint is None:
             raise HTTPException(
@@ -97,8 +97,9 @@ def create_task_xml(task_create, db):
     indent(root)
     # Save the XML to the file with encoding and XML declaration
     tree = ET.ElementTree(root)
-    # TODO: Confirm the file name and path
-    tree.write("output.xml", encoding="utf-8", xml_declaration=True)
+    file_name = "{}.xml".format(datetime.now().strftime("%Y%m%d%H%M%S"))
+    tree.write(file_name, encoding="utf-8", xml_declaration=True)
+    return file_name
 
 
 def monitor_sensor_data(task: Task):

@@ -55,6 +55,11 @@ class GimbalMotionControlCommand(Enum):
     DOWN_RIGHT = 9
 
 
+class PatrolCommand(Enum):
+    STOP = 0
+    START = 1
+
+
 def validate_enum_value(value, enum_type):
     try:
         value = int(value)
@@ -361,6 +366,38 @@ def gimbal_motion_control(robot_name, **kwargs):
         if response.status_code == 0:
             return False
         return True
+    except rospy.ROSException as e:
+        logger.error(f"Error: {e}")
+        return False
+    except ValueError as e:
+        logger.error(f"Error: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        return False
+
+
+def patrol_control(robot_name, **kwargs):
+    """ """
+    try:
+        service_name = "/{robot_name}/patrol_control".format(
+            robot_name=robot_name
+        )
+        rospy.wait_for_service(service_name, timeout=1)
+        patrol_control = rospy.ServiceProxy(service_name, PatrolControl)
+
+        request = PatrolControlRequest()
+        request.command = int(kwargs.get("patrol_command"))
+        validate_enum_value(request.command, PatrolControlCommand)
+
+        if request.command == PatrolCommand.START.value:
+            request.xml_data = kwargs.get("xml_data")
+
+        response = patrol_control(request)
+        if response.status_code == 0:
+            return False
+        return True
+
     except rospy.ROSException as e:
         logger.error(f"Error: {e}")
         return False

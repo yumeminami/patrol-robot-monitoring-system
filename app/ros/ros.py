@@ -146,29 +146,6 @@ class Node:
             # logger.info(f"Received message from topic: \n{message}")
             # logger.info(f"Updated sensor data for robot: {robot_name}")
 
-            db = SessionLocal()
-            robot = robot_crud.get_by_name(db=db, name=robot_name)
-            sensors = sensor_crud.get_multi_by_robot_id(
-                db=db, robot_id=robot.id
-            )
-            for sensor in sensors:
-                try:
-                    if sensor.name in info:
-                        sensor_crud.update(
-                            db,
-                            db_obj=sensor,
-                            obj_in={"value": info[sensor.name]},
-                        )
-                    else:
-                        logger.warning(
-                            f"Sensor '{sensor.name}' not found in message."
-                        )
-                except Exception as e:
-                    logger.error(
-                        f"Error occurred while updating sensor '{sensor.name}': {e}"
-                    )
-            db.close()
-
         except Exception as e:
             logger.error(f"Error occurred while processing sensor data: {e}")
 

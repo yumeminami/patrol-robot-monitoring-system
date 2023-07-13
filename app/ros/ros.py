@@ -1,14 +1,11 @@
 import logging
 import multiprocessing
-from datetime import datetime
 from multiprocessing import Queue
 
 import rospy
-from common.msg import *
 from common.msg import robot_real_time_info, sensor_data
 
 from app.crud.robots import robot as robot_crud
-from app.crud.sensors import sensor as sensor_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.robots import Robot

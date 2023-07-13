@@ -11,6 +11,7 @@ from sensor_msgs.msg import Image
 
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.db.database import SessionLocal
+from app.db.redis import redis_client
 from app.ros.ros import ros_port_queue
 from app.schemas.gimbalpoints import GimbalPointCreate
 from app.utils.log import log_queue, logger
@@ -87,6 +88,13 @@ def velocity_control(robot_name, **kwargs):
         if response.status_code == 0:
             logger.info("velocity control failed")
             return False
+        
+        # Update the velocity to redis manually(FOR TEST ONLY)
+        info = redis_client.hget(robot_name, "robot_real_time_info")
+        info = eval(info)
+        info["velocity"] = request.velocity_f
+        redis_client.hset(robot_name, "robot_real_time_info", str(info))
+
         return True
     except rospy.ROSException as e:
         logger.error(f"Error: {e}")
@@ -123,6 +131,13 @@ def position_control(robot_name, **kwargs):
         if response.status_code == 0:
             logger.error(response.err_msg)
             return False
+
+        # Update the velocity to redis manually(FOR TEST ONLY)
+        info = redis_client.hget(robot_name, "robot_real_time_info")
+        info = eval(info)
+        info["velocity"] = request.velocity_f
+        redis_client.hset(robot_name, "robot_real_time_info", str(info))
+
         return True
     except rospy.ROSException as e:
         logger.error(f"Error: {e}")
@@ -158,6 +173,13 @@ def stop_control(robot_name, **kwargs):
         if response.status_code == 0:
             logger.error(response.err_msg)
             return False
+
+        # Update the velocity to redis manually(FOR TEST ONLY)
+        info = redis_client.hget(robot_name, "robot_real_time_info")
+        info = eval(info)
+        info["velocity"] = 0
+        redis_client.hset(robot_name, "robot_real_time_info", str(info))
+
         return True
     except rospy.ROSException as e:
         logger.error(f"Error: {e}")

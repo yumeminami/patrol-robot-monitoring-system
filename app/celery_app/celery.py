@@ -15,10 +15,7 @@ from app.services.task_service import monitor_sensor_data
 from app.utils.log import logger
 
 password = os.environ.get("REDIS_PASSWORD", "sample_password")
-app = Celery(
-    "tasks",
-    broker=f"redis://:{password}@redis:6379/0"
-)
+app = Celery("tasks", broker=f"redis://:{password}@redis:6379/0")
 
 app.autodiscover_tasks(["celery.tasks"], force=True)
 app.conf.broker_transport_options = {"visibility_timeout": 60 * 60 * 24 * 2}

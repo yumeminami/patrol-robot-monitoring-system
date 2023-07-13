@@ -17,8 +17,7 @@ from app.utils.log import logger
 password = os.environ.get("REDIS_PASSWORD", "sample_password")
 app = Celery(
     "tasks",
-    broker=f"redis://:{password}@redis:6379/0",
-    backend=f"redis://:{password}@redis:6379/0",
+    broker=f"redis://:{password}@redis:6379/0"
 )
 
 app.autodiscover_tasks(["celery.tasks"], force=True)
@@ -38,7 +37,7 @@ app.conf.beat_schedule = {
 }
 
 
-@app.task(expires=60 * 60 * 24 * 2)
+@app.task()
 def start_task(task_id, eta_time):
     """Update the task status to IN_PROGRESS and update the ROS parameter
     If the task is everyday task, update the eta_time to tomorrow and push the task to celery again. Only the task is deleted, the function will end.
@@ -78,7 +77,7 @@ def start_task(task_id, eta_time):
     return result
 
 
-@app.task(expires=0)
+@app.task()
 def update_robot_data(**kwargs):
     """
     Update the robot data from redis to database
@@ -108,7 +107,7 @@ def update_robot_data(**kwargs):
         db.close()
 
 
-@app.task(expires=0)
+@app.task()
 def update_sensor_data(**kwargs):
     """
     Update the sensor data from redis to database

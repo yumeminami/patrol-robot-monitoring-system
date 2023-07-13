@@ -1,7 +1,6 @@
 import rospy
 
 from common.msg import sensor_data
-from common.msg import robot_real_time_info
 import time
 
 # print(sensor_data)
@@ -13,11 +12,11 @@ pub = rospy.Publisher(
     "{robot}/sensor_data".format(robot="zj_robot"), sensor_data, queue_size=10
 )
 
-pub2 = rospy.Publisher(
-    "{robot}/robot_real_time_info".format(robot="zj_robot"),
-    robot_real_time_info,
-    queue_size=10,
-)
+# pub2 = rospy.Publisher(
+#     "{robot}/robot_real_time_info".format(robot="zj_robot"),
+#     robot_real_time_info,
+#     queue_size=10,
+# )
 
 
 msg = sensor_data()
@@ -32,17 +31,17 @@ msg.smoke2 = 0
 
 # print(msg.temperature)
 
-msg2 = robot_real_time_info()
-msg2.position = 0
-msg2.velocity = 0
-msg2.position_control_state = 0
-msg2.battery_state = 1
-msg2.battery_level = 100
+# msg2 = robot_real_time_info()
+# msg2.position = 0
+# msg2.velocity = 0
+# msg2.position_control_state = 0
+# msg2.battery_state = 1
+# msg2.battery_level = 100
 
 
 rate = rospy.Rate(0.2)
 while not rospy.is_shutdown():
     pub.publish(msg)
-    pub2.publish(msg2)
+    # pub2.publish(msg2)
     time.sleep(2)
     # print(msg)

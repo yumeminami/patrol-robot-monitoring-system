@@ -143,7 +143,7 @@ class Node:
 
             redis_client.hset(robot_name, "sensor_data", str(info))
 
-            logger.info(f"Received message from topic: \n{message}")
+            # logger.info(f"Received message from topic: \n{message}")
             # logger.info(f"Updated sensor data for robot: {robot_name}")
 
             db = SessionLocal()

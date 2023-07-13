@@ -55,7 +55,7 @@ class GimbalMotionControlCommand(Enum):
     DOWN_RIGHT = 9
 
 
-class PatrolCommand(Enum):
+class PatrolControlCommand(Enum):
     STOP = 0
     START = 1
 
@@ -387,10 +387,10 @@ def patrol_control(robot_name, **kwargs):
         patrol_control = rospy.ServiceProxy(service_name, PatrolControl)
 
         request = PatrolControlRequest()
-        request.command = int(kwargs.get("patrol_command"))
-        validate_enum_value(request.command, PatrolControlCommand)
+        request.patrol_command = int(kwargs.get("patrol_command"))
+        validate_enum_value(request.patrol_command, PatrolControlCommand)
 
-        if request.command == PatrolCommand.START.value:
+        if request.patrol_command == PatrolControlCommand.START.value:
             request.xml_data = kwargs.get("xml_data")
 
         response = patrol_control(request)

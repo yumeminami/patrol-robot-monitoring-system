@@ -11,7 +11,7 @@ from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.tasks import Task, TaskStatus
 from app.services.task_service import monitor_sensor_data, create_task_xml
-from app.services.ros_service import PatrolCommand, patrol_control
+from app.services.ros_service import PatrolControlCommand, patrol_control
 from app.utils.log import logger
 
 password = os.environ.get("REDIS_PASSWORD", "sample_password")
@@ -65,12 +65,14 @@ def start_task(task_id, eta_time):
         xml_data = None
         with open(file_name, "r") as f:
             xml_data = f.read()
+
         if patrol_control(
             robot_name=robot.name,
-            patrol_command=PatrolCommand.START.value,
+            patrol_command=PatrolControlCommand.START.value,
             xml_data=xml_data,
         ):
-            logger.error(f"Robot '{robot.name}' start task failed.")
+            logger.error(f"Robot '{robot.name}' start task success!")
+        os.remove(file_name)
 
     except Exception as e:
         print(e)

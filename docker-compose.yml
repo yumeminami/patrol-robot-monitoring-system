@@ -30,7 +30,7 @@ services:
   celery-worker:
     container_name: celery-worker
     image: app:latest
-    command: celery -A app.celery_app.celery worker -B --loglevel=info
+    command: celery -A app.celery_app.celery worker -B --loglevel=error
     volumes:
       - ./:/app
       - /etc/timezone:/etc/timezone:ro
@@ -38,6 +38,7 @@ services:
     environment:
       REDIS_PASSWORD: sample_password
       ROS_MASTER_URI: http://ros_core:11311 
+      PYTHONPATH : /app/share/devel/lib/python3/dist-packages
     depends_on:
       - db
       - redis

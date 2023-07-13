@@ -113,12 +113,12 @@ def monitor_sensor_data(task: Task):
     4. Monitoring stops when the task or robot status changes to 'finished'.
 
     """
-    logger.info("Sensor data monitoring initiated...")
+    logger.error("Sensor data monitoring initiated...")
     while True:
         db = SessionLocal()
         patrol_state = rospy.get_param("/patrol_state")
-        if patrol_state == 3:
-            logger.info(
+        if patrol_state == 0:
+            logger.error(
                 "Task completed, terminating sensor data monitoring..."
             )
             task = task_crud.get(db, task.id)

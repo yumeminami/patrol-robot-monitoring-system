@@ -1,0 +1,9 @@
+int32 patrol_command 
+#0结束巡检节点 1开启巡检节点+更新任务xml文件
+#任务进行过程中 patrol_state为2代表巡检任务正在执行
+#               patrol_state为0代表节点处于待命状态，可以随时开启巡检
+string xml_data
+---
+int32 status_code #0失败，1完成
+
+

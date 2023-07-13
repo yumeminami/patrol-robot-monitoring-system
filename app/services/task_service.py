@@ -116,7 +116,13 @@ def monitor_sensor_data(task: Task):
     logger.error("Sensor data monitoring initiated...")
     while True:
         db = SessionLocal()
-        patrol_state = rospy.get_param("/patrol_state")
+
+        robot = robot_crud.get(db, task.robot_id)
+        if robot is None:
+            logger.error("Robot does not exist in the database.")
+            break
+
+        patrol_state = rospy.get_param(f"/{robot.name}/patrol_state")
         if patrol_state == 0:
             logger.error(
                 "Task completed, terminating sensor data monitoring..."
@@ -132,10 +138,6 @@ def monitor_sensor_data(task: Task):
                     obj_in={"status": TaskStatus.COMPLETED.value},
                 )
             db.close()
-            break
-        robot = robot_crud.get(db, task.robot_id)
-        if robot is None:
-            logger.error("Robot does not exist in the database.")
             break
 
         # Fetch the latest sensor data from the cache

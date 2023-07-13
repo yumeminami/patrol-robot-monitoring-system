@@ -21,14 +21,14 @@ app.autodiscover_tasks(["celery.tasks"], force=True)
 app.conf.broker_transport_options = {"visibility_timeout": 60 * 60 * 24 * 2}
 
 app.conf.beat_schedule = {
-    "update-robot-data-every-5-seconds": {
+    "update-robot-data-every-seconds": {
         "task": "app.celery_app.celery.update_robot_data",
-        "schedule": 5.0,
+        "schedule": 1.0,
         "kwargs": {"robot_name": "zj_robot"},
     },
-    "update-sensor-data-every-5-seconds": {
+    "update-sensor-data-every-seconds": {
         "task": "app.celery_app.celery.update_sensor_data",
-        "schedule": 5.0,
+        "schedule": 1.0,
         "kwargs": {"robot_name": "zj_robot"},
     },
 }
@@ -90,6 +90,11 @@ def update_robot_data(**kwargs):
 
     db = SessionLocal()
     robot = robot_crud.get_by_name(db=db, name=robot_name)
+
+    robot_real_time_info["battery"] = robot_real_time_info["battery_level"]
+    robot_real_time_info["battery_status"] = robot_real_time_info[
+        "battery_state"
+    ]
 
     try:
         robot = robot_crud.update(

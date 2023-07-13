@@ -88,7 +88,7 @@ def velocity_control(robot_name, **kwargs):
         if response.status_code == 0:
             logger.info("velocity control failed")
             return False
-        
+
         # Update the velocity to redis manually(FOR TEST ONLY)
         info = redis_client.hget(robot_name, "robot_real_time_info")
         info = eval(info)

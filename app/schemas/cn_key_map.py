@@ -4,7 +4,7 @@ key_map = {
     "position": "位置",
     "velocity": "速度",
     "gimbal_points": "云台点",
-    "preset_point": "预设点",
+    "preset_index": "预设点",
     "robot_id": "机器人ID",
     "total_distance": "总里程",
     "total_task_executed": "总任务执行数",

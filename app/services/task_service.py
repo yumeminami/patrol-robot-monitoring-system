@@ -85,7 +85,7 @@ def create_task_xml(task_create, db):
             # Add gimbal point
             gimbalpoint_ = ET.SubElement(patrolpoint, "gimbalpoint")
             gimbalpoint_.set("index", str(gimbalpoint.id))
-            gimbalpoint_.set("presetpoint", str(gimbalpoint.preset_point))
+            gimbalpoint_.set("presetpoint", str(gimbalpoint.preset_index))
 
             for k, action in enumerate(
                 ["takepicture", "takevideo", "recordvoice"], start=1

@@ -1,6 +1,7 @@
 import time
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from ast import literal_eval
 
 import rospy
 from fastapi import HTTPException
@@ -142,7 +143,7 @@ def monitor_sensor_data(task: Task):
 
         # Fetch the latest sensor data from the cache
         sensor_data = redis_client.hget(robot.name, "sensor_data")
-        sensor_data = eval(sensor_data)
+        sensor_data = literal_eval(sensor_data)
         if sensor_data is None:
             logger.error("No sensor data found in the cache.")
             break

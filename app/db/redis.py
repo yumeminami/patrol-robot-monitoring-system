@@ -10,5 +10,6 @@ redis_client = redis.Redis(
     port=6379,
     db=0,
     password=os.environ.get("REDIS_PASSWORD", "sample_password"),
+    decode_responses=True,
 )
 logger.info("Connected to redis!")

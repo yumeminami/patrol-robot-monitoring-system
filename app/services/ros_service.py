@@ -1,4 +1,5 @@
 import logging
+from ast import literal_eval
 from datetime import datetime
 from enum import Enum
 from multiprocessing import Queue
@@ -96,7 +97,6 @@ def velocity_control(robot_name, **kwargs):
 
         # Update the velocity to redis manually(FOR TEST ONLY)
         info = redis_client.hget(robot_name, "robot_real_time_info")
-        info = eval(info)
         info["velocity"] = request.velocity_f
         redis_client.hset(robot_name, "robot_real_time_info", str(info))
 
@@ -139,7 +139,7 @@ def position_control(robot_name, **kwargs):
 
         # Update the velocity to redis manually(FOR TEST ONLY)
         info = redis_client.hget(robot_name, "robot_real_time_info")
-        info = eval(info)
+        info = literal_eval(info)
         info["velocity"] = request.velocity_f
         redis_client.hset(robot_name, "robot_real_time_info", str(info))
 
@@ -181,7 +181,7 @@ def stop_control(robot_name, **kwargs):
 
         # Update the velocity to redis manually(FOR TEST ONLY)
         info = redis_client.hget(robot_name, "robot_real_time_info")
-        info = eval(info)
+        info = literal_eval(info)
         info["velocity"] = 0
         redis_client.hset(robot_name, "robot_real_time_info", str(info))
 

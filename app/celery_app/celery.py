@@ -1,17 +1,18 @@
 import os
 import threading
+from ast import literal_eval
 from datetime import datetime, timedelta
 
 from celery import Celery
 
-from app.crud.tasks import task as task_crud
 from app.crud.robots import robot as robot_crud
 from app.crud.sensors import sensor as sensor_crud
+from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.tasks import Task, TaskStatus
-from app.services.task_service import monitor_sensor_data, create_task_xml
 from app.services.ros_service import PatrolControlCommand, patrol_control
+from app.services.task_service import create_task_xml, monitor_sensor_data
 from app.utils.log import logger
 
 password = os.environ.get("REDIS_PASSWORD", "sample_password")
@@ -90,6 +91,11 @@ def start_task(task_id, eta_time):
     return result
 
 
+def get_redis_data(key: str, sub_key: str) -> dict:
+    data = redis_client.hget(key, sub_key)
+    return literal_eval(data) if data else None
+
+
 @app.task()
 def update_robot_data(**kwargs):
     """
@@ -97,10 +103,8 @@ def update_robot_data(**kwargs):
     """
 
     robot_name = kwargs.get("robot_name")
-    robot_real_time_info = redis_client.hget(
-        robot_name, "robot_real_time_info"
-    )
-    robot_real_time_info = eval(robot_real_time_info)
+    robot_real_time_info = get_redis_data(robot_name, "robot_real_time_info")
+
     if robot_real_time_info is None:
         logger.error("No robot realtime info found in the cache.")
 
@@ -132,8 +136,7 @@ def update_sensor_data(**kwargs):
     """
 
     robot_name = kwargs.get("robot_name")
-    sensor_data = redis_client.hget(robot_name, "sensor_data")
-    sensor_data = eval(sensor_data)
+    sensor_data = get_redis_data(robot_name, "sensor_data")
     if sensor_data is None:
         logger.error("No sensor data found in the cache.")
 

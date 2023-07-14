@@ -84,7 +84,6 @@ async def get_robots(token: str = Depends(oauth2_scheme)):
                 translated_data.append(translated_item)
 
             return translated_data
-            return data
         except httpx.HTTPError as e:
             return JSONResponse(
                 status_code=e.response.status_code, content=str(e)
@@ -167,7 +166,6 @@ async def get_tasks(token: str = Depends(oauth2_scheme)):
                 translated_data.append(translated_item)
 
             return translated_data
-            return data
         except httpx.HTTPError as e:
             return JSONResponse(
                 status_code=e.response.status_code, content=str(e)
@@ -261,7 +259,6 @@ async def get_alarm_logs(token: str = Depends(oauth2_scheme)):
                 translated_data.append(translated_item)
 
             return translated_data
-            return data
         except httpx.HTTPError as e:
             return JSONResponse(
                 status_code=e.response.status_code, content=str(e)

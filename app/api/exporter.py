@@ -2,25 +2,26 @@ import httpx
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
+from app.utils.excel import write_excel
+
 router = APIRouter()
 
 
 @router.get("/task")
 async def export_tasks():
-    url = "http://localhost:8000/api/tasks"
+    url = "http://localhost:8000/api/zh/tasks"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290IiwiZXhwIjoxNjg1MTI1MjIyfQ.Hkt-ptLsKkRrZ8UdT6AoVAf0gPaUuHA24OjqDH4QzRc"
     }
 
-    params = {"export": True}
-
     async with httpx.AsyncClient() as client:
-        r = await client.get(url, headers=headers, params=params)
+        r = await client.get(url, headers=headers)
 
     if r.status_code == 200:
         file_name = "tasks.xlsx"
-        with open(file_name, "wb") as f:
-            f.write(r.content)
+
+        data = r.json()
+        write_excel(data, file_name)
 
         return FileResponse(
             file_name,
@@ -34,20 +35,19 @@ async def export_tasks():
 
 @router.get("/robot")
 async def export_robots():
-    url = "http://localhost:8000/api/robots"
+    url = "http://localhost:8000/api/zh/robots"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290IiwiZXhwIjoxNjg1MTI1MjIyfQ.Hkt-ptLsKkRrZ8UdT6AoVAf0gPaUuHA24OjqDH4QzRc"
     }
 
-    params = {"export": True}
-
     async with httpx.AsyncClient() as client:
-        r = await client.get(url, headers=headers, params=params)
+        r = await client.get(url, headers=headers)
 
     if r.status_code == 200:
         file_name = "robots.xlsx"
-        with open(file_name, "wb") as f:
-            f.write(r.content)
+
+        data = r.json()
+        write_excel(data, file_name)
 
         return FileResponse(
             file_name,
@@ -62,20 +62,19 @@ async def export_robots():
 
 @router.get("/alarm_log")
 async def export_alarm_logs():
-    url = "http://localhost:8000/api/alarm_logs"
+    url = "http://localhost:8000/api/zh/alarm_logs"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290IiwiZXhwIjoxNjg1MTI1MjIyfQ.Hkt-ptLsKkRrZ8UdT6AoVAf0gPaUuHA24OjqDH4QzRc"
     }
 
-    params = {"export": True}
-
     async with httpx.AsyncClient() as client:
-        r = await client.get(url, headers=headers, params=params)
+        r = await client.get(url, headers=headers)
 
     if r.status_code == 200:
         file_name = "alarm_logs.xlsx"
-        with open(file_name, "wb") as f:
-            f.write(r.content)
+
+        data = r.json()
+        write_excel(data, file_name)
 
         return FileResponse(
             file_name,

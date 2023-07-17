@@ -13,6 +13,7 @@ from app.api.endpoints.robots import video_processes
 from app.api.router import router as api_router
 from app.ros.ros import initialize_all_robots_corresponding_nodes
 from app.utils.log import logger
+from app.ws.websocket_manager import router as ws_router
 
 
 def create_app():
@@ -28,6 +29,7 @@ def create_app():
 
     app.include_router(deps_router, tags=["token"])
     app.include_router(api_router, prefix="/api")
+    app.include_router(ws_router, tags="websocket")
 
     return app
 

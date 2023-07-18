@@ -1,7 +1,0 @@
-float32 velocity_f #速度控制
----
-int32 status_code #0失败，1完成
-string err_msg
-
-
-

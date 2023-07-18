@@ -1,7 +1,0 @@
-int32 stop_type #0 stop 1 stop 2 kill
----
-int32 status_code #0失败，1完成
-string err_msg
-
-
-

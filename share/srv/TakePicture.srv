@@ -1,7 +1,0 @@
-string take_picture
----
-sensor_msgs/Image img
-int32 status_code #0失败，1完成
-string err_msg
-
-

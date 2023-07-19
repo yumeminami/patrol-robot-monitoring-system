@@ -185,7 +185,7 @@ class Node:
         image = req.img
         bridge = CvBridge()
         image_cv = bridge.imgmsg_to_cv2(
-            req.image, desired_encoding="passthrough"
+            image, desired_encoding="passthrough"
         )
         cv2.imwrite(
             f"app/static/images/{task_id}_{checkpoint_id}.jpg", image_cv

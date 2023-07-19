@@ -48,7 +48,7 @@ def create_task_xml(task, db):
         return
 
     root = ET.Element("patrolpoints")
-    root.set("Intro", "new patrol params")
+    root.set("Intro", f"{task.id}")
 
     # Get checkpoints from task.checkpoint_ids
     checkpoint_list = []

@@ -3,6 +3,7 @@ import sys
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pyfiglet import Figlet
 
@@ -35,6 +36,7 @@ def create_app():
 
 
 app = create_app()
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 f = Figlet(font="speed")
 logger.info(f.renderText("\nPatrol Robot System"))

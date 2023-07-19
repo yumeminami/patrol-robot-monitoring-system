@@ -1,10 +1,13 @@
+import cv2
 import logging
 import multiprocessing
 from multiprocessing import Queue
 
 import rospy
 from common.msg import robot_real_time_info, sensor_data
+from common.srv import PatrolPicture, PatrolPictureResponse
 from std_srvs.srv import Empty, EmptyResponse
+from cv_bridge import CvBridge
 
 # from app.celery_app.celery import image_detection
 from app.crud.robots import robot as robot_crud
@@ -24,7 +27,7 @@ topic_list = {
 }
 
 service_list = {
-    "accept_image": Empty,
+    "patrol_picture": PatrolPicture,
 }
 
 
@@ -176,13 +179,23 @@ class Node:
         except Exception as e:
             logger.error(f"Error occurred while processing sensor data: {e}")
 
-    def accept_image_callback(self, req):
-        # TODO: implement this function
-        # image_detection.apply_async(args=(req.image, req.task_id))
-        # response = AcceptImageResponse()
-        # response.status_code = 1
+    def patrol_picture_callback(self, req):
+        task_id = int(req.patrol_task_name)
+        checkpoint_id = req.patrol_point_index
+        image = req.img
+        bridge = CvBridge()
+        image_cv = bridge.imgmsg_to_cv2(
+            req.image, desired_encoding="passthrough"
+        )
+        cv2.imwrite(
+            f"app/static/images/{task_id}_{checkpoint_id}.jpg", image_cv
+        )
 
-        return EmptyResponse()
+        # image_detection.apply_async(args=(image, task_id, checkpoint_id))
+        response = PatrolPictureResponse()
+        response.status_code = 1
+
+        return response
 
 
 def initialize_all_robots_corresponding_nodes():

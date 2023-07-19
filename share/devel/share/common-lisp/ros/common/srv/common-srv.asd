@@ -13,6 +13,8 @@
     (:file "_package_GimbalMotionControl" :depends-on ("_package"))
     (:file "PatrolControl" :depends-on ("_package_PatrolControl"))
     (:file "_package_PatrolControl" :depends-on ("_package"))
+    (:file "PatrolPicture" :depends-on ("_package_PatrolPicture"))
+    (:file "_package_PatrolPicture" :depends-on ("_package"))
     (:file "PositionControl" :depends-on ("_package_PositionControl"))
     (:file "_package_PositionControl" :depends-on ("_package"))
     (:file "StopControl" :depends-on ("_package_StopControl"))

@@ -10,6 +10,7 @@
 # 引用
 import rospy
 import sys
+from rospy.core import rospydebug
 sys.path.append('../../../devel/lib/python3/dist-packages/')
 import smach
 import smach_ros
@@ -17,6 +18,9 @@ from common.msg import position_control
 from common.srv import *
 import threading
 import time
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
+import cv2
 
 import xml.dom.minidom
 
@@ -53,11 +57,13 @@ def clearparam():
 # 定义xml paser类
 class XMLPaser:
     def __init__(self):
+        self.docElement=None
         pass
     # 使用minidom解析器打开 XML 文档
     def openxml(self,xmlpath):
         DOMTree      = xml.dom.minidom.parse(xmlpath)
         patrolpoints = DOMTree.documentElement
+        self.docElement=patrolpoints
         if patrolpoints.hasAttribute("Intro"): 
             rospy.logdebug("Root element : %s" % patrolpoints.getAttribute("Intro"))
         # 在集合中获取所有巡检点
@@ -83,6 +89,12 @@ class XMLPaser:
                 # for shooting in shootings: 
                 # alghrithm = shooting.getElementsByTagName('mvalghrithm')[0]
                 #     print ("    alghrithm: %s" % alghrithm.childNodes[0].data)
+
+    #获取任务名称
+    def getpatroltaskname(self):
+        print("获取巡检任务名称")
+        return self.docElement.getAttribute("Intro")
+
 
     #获取巡检点数目
     def getpatrolpositionnumber(self,patrolpoints): 
@@ -166,6 +178,7 @@ class Preparation(smach.State):
         patrolpoints = xml_paser.openxml(XMLPATH)
         xml_paser.printpatrolpoints(patrolpoints)
 
+        rospy.set_param("patrol_task_name",xml_paser.getpatroltaskname())
         rospy.set_param("target_position",xml_paser.getpatrolposition(patrolpoints,patrolpointindex))
         rospy.set_param("target_gimbal_position",xml_paser.getgimbalposition(patrolpoints,patrolpointindex,gimbalpointindex))
         rospy.set_param("target_velocity",xml_paser.getpatrolvelocity(patrolpoints,patrolpointindex))
@@ -214,6 +227,23 @@ class Camera(smach.State):
             rospy.set_param("camera_state",ACTION_REQUEST)
         rospy.logdebug('Executing state camera')
         if rospy.get_param("camera_state") == ACTION_COMPLETED:
+
+            client = rospy.ServiceProxy("patrol_picture",PatrolPicture)
+            req = PatrolPictureRequest()
+            req.patrol_task_name=rospy.get_param("patrol_task_name")
+            req.patrol_point_index=rospy.get_param("patrol_point_index")
+            req.gimbal_point_index=rospy.get_param("gimbal_point_index")
+            #服务端发送图片
+            bridge = CvBridge()
+            image = cv2.imread(rospy.get_param("img_path"))
+            req.img=bridge.cv2_to_imgmsg(image,"bgr8")
+            try:
+                resp=client.call(req)
+                rospy.loginfo("拍照服务调用结果:%d",resp.status_code)
+            except rospy.ServiceException:
+                #服务调用失败
+                print("服务调用失败")
+
             rospy.set_param("camera_state",ACTION_STANDBY)
             return 'camera_completed'
         else:

@@ -1,0 +1,6 @@
+string patrol_task_name
+int32 patrol_point_index
+int32 gimbal_point_index
+sensor_msgs/Image img
+---
+int32 status_code #0失败 1完成

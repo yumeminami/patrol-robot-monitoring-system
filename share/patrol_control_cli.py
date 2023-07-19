@@ -25,6 +25,19 @@ xml="""
             <takevideo   index = "1" param = "videoparam2"></takevideo>
             <recordvoice index = "1" param = "voiceparam2"></recordvoice>
         </gimbalpoint>
+
+    <patrolpoint index="1" position="-1000" velocity="200">
+        <!-- 云台位置定义 云台位置定义 预置点序号-->
+        <gimbalpoint index="1" presetpoint = "2">
+            <takepicture index = "1" param = "pictureparam1"></takepicture>
+            <takevideo   index = "1" param = "videoparam1"></takevideo>
+            <recordvoice index = "1" param = "voiceparam1"></recordvoice>
+        </gimbalpoint>
+        <gimbalpoint index="2" presetpoint = "1">
+            <takepicture index = "1" param = "pictureparam2"></takepicture>
+            <takevideo   index = "1" param = "videoparam2"></takevideo>
+            <recordvoice index = "1" param = "voiceparam2"></recordvoice>
+        </gimbalpoint>
     </patrolpoint>
 
 

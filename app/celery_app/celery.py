@@ -1,7 +1,7 @@
 import os
 import threading
 from ast import literal_eval
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from celery import Celery
 
@@ -79,11 +79,6 @@ def start_task(task_id, eta_time):
         print(e)
 
     task = Task.from_orm(task)
-    if task.is_everyday:
-        eta_time = eta_time + timedelta(days=1)
-        start_task.apply_async(args=(task_id, eta_time), eta=eta_time)
-
-        result = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "everyday task"
 
     thread = threading.Thread(target=monitor_sensor_data, args=(task,))
     thread.start()

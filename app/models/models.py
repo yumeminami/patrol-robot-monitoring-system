@@ -132,4 +132,13 @@ class GimbalPoint(BaseModel):
     preset_index = Column(Integer, nullable=False, unique=True)
 
 
+class PatrolImage(BaseModel):
+    __tablename__ = "patrol_images"
+    uuid = Column(String(50), index=True)
+    image_url = Column(String(100), default="")
+    task_id = Column(
+        Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
+    )
+
+
 Base.metadata.create_all(bind=engine)

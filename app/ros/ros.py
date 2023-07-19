@@ -4,7 +4,9 @@ from multiprocessing import Queue
 
 import rospy
 from common.msg import robot_real_time_info, sensor_data
+from std_srvs.srv import Empty, EmptyResponse
 
+# from app.celery_app.celery import image_detection
 from app.crud.robots import robot as robot_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
@@ -19,6 +21,10 @@ for i in range(45159, 45200):
 topic_list = {
     "robot_real_time_info": robot_real_time_info,
     "sensor_data": sensor_data,
+}
+
+service_list = {
+    "accept_image": Empty,
 }
 
 
@@ -88,6 +94,30 @@ class Node:
                     f"Callback function for topic type '{topic_name}' is not defined"
                 )
 
+    def create_service(self):
+        db = SessionLocal()
+        robot_name = rospy.get_name().strip("/").replace("_subscriber", "")
+        db.close()
+
+        for service_name, service_type in service_list.items():
+            try:
+                srv_class = service_type
+
+                callback_method = getattr(self, f"{service_name}_callback")
+
+                self.services[service_name] = rospy.Service(
+                    name=f"/{robot_name}/{service_name}",
+                    service_class=srv_class,
+                    handler=callback_method,
+                )
+
+            except KeyError:
+                logger.error(f"Service type '{service_type}' is not defined")
+            except AttributeError:
+                logger.error(
+                    f"Callback function for service type '{service_name}' is not defined"
+                )
+
     def robot_real_time_info_callback(self, message, args):
         """Callback function for handling robot real-time info.
 
@@ -145,6 +175,14 @@ class Node:
 
         except Exception as e:
             logger.error(f"Error occurred while processing sensor data: {e}")
+
+    def accept_image_callback(self, req):
+        # TODO: implement this function
+        # image_detection.apply_async(args=(req.image, req.task_id))
+        # response = AcceptImageResponse()
+        # response.status_code = 1
+
+        return EmptyResponse()
 
 
 def initialize_all_robots_corresponding_nodes():

@@ -7,7 +7,7 @@ from .sensors import Sensor
 
 
 class RobotBatteryStatus(Enum):
-    CHARGING = 0 
+    CHARGING = 0
     NOCHARGE = 1
 
 

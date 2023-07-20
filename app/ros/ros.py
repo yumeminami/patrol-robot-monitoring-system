@@ -60,6 +60,7 @@ class Node:
     def initialize(self):
         logger.info("Initializing node...")
         self.create_subscribers()
+        self.create_service()
 
     def create_subscribers(self):
         """Establishes ROS topic subscriptions for the node.
@@ -83,7 +84,7 @@ class Node:
                 callback_method = getattr(self, f"{topic_name}_callback")
 
                 callback_args = {"robot_name": robot_name}
-                self.subscribers[topic_name] = rospy.Subscriber(
+                rospy.Subscriber(
                     name=f"/{robot_name}/{topic_name}",
                     data_class=msg_class,
                     callback=callback_method,
@@ -108,7 +109,7 @@ class Node:
 
                 callback_method = getattr(self, f"{service_name}_callback")
 
-                self.services[service_name] = rospy.Service(
+                rospy.Service(
                     name=f"/{robot_name}/{service_name}",
                     service_class=srv_class,
                     handler=callback_method,
@@ -184,9 +185,7 @@ class Node:
         checkpoint_id = req.patrol_point_index
         image = req.img
         bridge = CvBridge()
-        image_cv = bridge.imgmsg_to_cv2(
-            image, desired_encoding="passthrough"
-        )
+        image_cv = bridge.imgmsg_to_cv2(image, desired_encoding="passthrough")
         cv2.imwrite(
             f"app/static/images/{task_id}_{checkpoint_id}.jpg", image_cv
         )

@@ -17,7 +17,7 @@ def patrol_pic_client():
         bridge = CvBridge()
         img = cv2.imread("all.jpg")
         # print(img.shape)
-        img_msg = bridge.cv2_to_imgmsg(img)
+        img_msg = bridge.cv2_to_imgmsg(img, "bgr8")
         request.img = img_msg
         patrol_picture(request)
     except Exception as e:

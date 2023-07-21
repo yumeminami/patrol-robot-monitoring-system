@@ -13,6 +13,7 @@ from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.robots import Robot
 from app.utils.log import log_queue, logger
+from app.services.task_service import image_detection
 
 available_ports = Queue()
 for i in range(45159, 45200):
@@ -182,9 +183,7 @@ class Node:
         checkpoint_id = req.patrol_point_index
         image = req.img
 
-        from app.celery_app.celery import image_detection
-
-        image_detection.apply_async(args=(image, task_id, checkpoint_id))
+        image_detection(image, task_id, checkpoint_id)
         response = PatrolPictureResponse()
         response.status_code = 1
 

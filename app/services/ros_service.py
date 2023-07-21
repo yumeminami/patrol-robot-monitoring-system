@@ -16,6 +16,8 @@ from app.db.redis import redis_client
 from app.ros.ros import ros_port_queue
 from app.schemas.gimbalpoints import GimbalPointCreate
 from app.utils.log import log_queue, logger
+from app.utils.images import ROS_Image_to_cv2
+from app.settings import config
 
 latest_img_queue = Queue()
 
@@ -219,9 +221,9 @@ def take_picture(robot_name):
             logger.error(response.err_msg)
             return False
         file_name = datetime.now().strftime("%Y%m%d%H%M%S") + ".jpg"
-        bridge = CvBridge()
-        img = bridge.imgmsg_to_cv2(response.img, "bgr8")
-        cv2.imwrite("app/images/{file_name}".format(file_name=file_name), img)
+        file_path = config.IMAGE_DIR + file_name
+        img = ROS_Image_to_cv2(response.img)
+        cv2.imwrite(file_path, img)
         return file_name
     except rospy.ROSException as e:
         logger.error(f"Error: {e}")

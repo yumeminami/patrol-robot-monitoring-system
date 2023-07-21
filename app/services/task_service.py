@@ -1,3 +1,4 @@
+import os
 import base64
 import time
 import uuid
@@ -218,7 +219,7 @@ def image_detection(image, task_id, checkpoint_id):
     image_file_path = f"{config.IMAGE_DIR}/{image_id}.jpg"
 
     patrol_image = PatrolImageCreate(
-        image_url=image_file_path,
+        image_url=os.path.relpath(image_file_path, 'app'),
         task_id=task_id,
         uuid=image_id,
     )
@@ -262,7 +263,7 @@ def image_detection(image, task_id, checkpoint_id):
     ) as f:
         f.write(merge_image_data)
     patrol_image_merge = PatrolImageCreate(
-        image_url=f"{config.IMAGE_DIR}/{merge_image_file_path}",
+        image_url=os.path.relpath(merge_image_file_path, 'app'),
         task_id=task_id,
         uuid=image_id,
     )

@@ -22,7 +22,6 @@ from app.schemas.alarm_logs import (
     AlarmLogCreate,
     AlarmLogLevel,
     AlarmLogStatus,
-    AlarmLogType,
 )
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
@@ -169,19 +168,13 @@ def monitor_sensor_data(task: Task):
                 logger.error(
                     f"Sensor: {sensor_name}, Lower Limit: {sensor.lower_limit}, Upper Limit: {sensor.upper_limit}, Current Value: {sensor_data[sensor_name]}"
                 )
-                # Initiate the alarm
-                TYPENAME = sensor_name.upper()
-                alarm_log_type = (
-                    AlarmLogType[TYPENAME].value
-                    if TYPENAME in AlarmLogType.__members__
-                    else AlarmLogType.DEVICE.value
-                )
                 alarm_log = AlarmLogCreate(
                     level=AlarmLogLevel.FATAL.value,
                     task_id=task.id,
                     status=AlarmLogStatus.UNPROCESSED.value,
                     location=robot.position,
-                    type=alarm_log_type,
+                    type=sensor_name,
+                    detail=f"Sensor: {sensor_name}, Lower Limit: {sensor.lower_limit}, Upper Limit: {sensor.upper_limit}, Current Value: {sensor_data[sensor_name]}",
                 )
 
                 alarm_log_crud.create(db, obj_in=alarm_log)
@@ -219,7 +212,7 @@ def image_detection(image, task_id, checkpoint_id):
     image_file_path = f"{config.IMAGE_DIR}/{image_id}.jpg"
 
     patrol_image = PatrolImageCreate(
-        image_url=os.path.relpath(image_file_path, 'app'),
+        image_url=os.path.relpath(image_file_path, "app"),
         task_id=task_id,
         uuid=image_id,
     )
@@ -263,7 +256,7 @@ def image_detection(image, task_id, checkpoint_id):
     ) as f:
         f.write(merge_image_data)
     patrol_image_merge = PatrolImageCreate(
-        image_url=os.path.relpath(merge_image_file_path, 'app'),
+        image_url=os.path.relpath(merge_image_file_path, "app"),
         task_id=task_id,
         uuid=image_id,
     )
@@ -272,5 +265,17 @@ def image_detection(image, task_id, checkpoint_id):
     # TODO 3. create alarm if the detection result is abnormal
     if len(alarms) > 0:
         logger.error(f"Alarms detected: {alarms}")
+
+    alarm_log = AlarmLogCreate(
+        level=AlarmLogLevel.WARNING.value,
+        task_id=task_id,
+        status=AlarmLogStatus.UNPROCESSED.value,
+        location=checkpoint.position,
+        type=vision_algorithm.name,
+        img_url=os.path.relpath(merge_image_file_path, "app"),
+        detail=f"Alarms detected: {alarms}",
+    )
+
+    alarm_log_crud.create(db, obj_in=alarm_log)
     db.close()
     return

@@ -89,12 +89,13 @@ class AlarmLog(BaseModel):
     task_id = Column(
         Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
     )
-    type = Column(Integer, default=0)
+    type = Column(String(50), index=True)
     time = Column(DateTime, default=func.now())
     status = Column(Integer, default=0)
     location = Column(Integer, default=0)
     img_url = Column(String(100), default="")
     video_url = Column(String(100), default="")
+    detail = Column(String(100), default="")
 
 
 class RobotLog(BaseModel):

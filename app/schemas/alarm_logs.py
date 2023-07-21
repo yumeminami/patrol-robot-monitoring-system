@@ -15,26 +15,15 @@ class AlarmLogStatus(Enum):
     PROCESSED = 1
 
 
-class AlarmLogType(Enum):
-    DEVICE = 0
-    TEMPERATURE = 1
-    HUMIDITY = 2
-    LIGHT = 3
-    PM1_0 = 4
-    PM2_5 = 5
-    PM10 = 6
-    SMOKE1 = 7
-    SMOKE2 = 8
-
-
 class AlarmLogBase(BaseModel):
     level: int
     task_id: Optional[int] = None
-    type: int
+    type: str
     status: int = AlarmLogStatus.UNPROCESSED.value
     location: int
     img_url: Optional[str] = None
     video_url: Optional[str] = None
+    detail: Optional[str] = None
 
     @validator("status")
     def status_validator(cls, v):

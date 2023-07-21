@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class PatrolImage(BaseModel):
+    id: int
     image_url: str
     task_id: int
     uuid: str
@@ -10,13 +11,9 @@ class PatrolImage(BaseModel):
         orm_mode = True
 
 
-class PatrolImageCreate(BaseModel):
-    image_url: str
-    task_id: int
-    uuid: str
+class PatrolImageCreate(PatrolImage):
+    pass
 
 
-class PatrolImageUpdate(BaseModel):
-    image_url: str
-    task_id: int
-    uuid: str
+class PatrolImageUpdate(PatrolImage):
+    pass

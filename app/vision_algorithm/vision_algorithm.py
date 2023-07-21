@@ -1,9 +1,6 @@
-import base64
 import json
 import os
-from uuid import uuid4
 
-import cv2
 import requests
 
 from app.utils.log import logger
@@ -16,7 +13,13 @@ class VisionAlgorithm:
         with open(CONFIG_PATH, "r") as f:
             self.config = json.load(f)
 
-    def detect(self, image_id: str, image_base64: str, algorithm: str, sensitivity: float):
+    def detect(
+        self,
+        image_id: str,
+        image_base64: str,
+        algorithm: str,
+        sensitivity: float,
+    ):
         vision_algorithm_api_url = os.environ.get("VISION_ALGORITHM_API_URL")
         if vision_algorithm_api_url is None:
             raise Exception("VISION_ALGORITHM_API_URL is not set")
@@ -64,8 +67,6 @@ class VisionAlgorithm:
             response = requests.get(url, json=params)
             image_data = response.json()["data"]["img"]
             print(response.json().keys())
-            if image_data is None:
-                logger.error("merge image data is None")
         except KeyError as e:
             logger.error(f"image data is None: {e}")
         except Exception as e:

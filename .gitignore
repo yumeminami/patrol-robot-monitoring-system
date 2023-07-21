@@ -132,3 +132,6 @@ dmypy.json
 sql_app.db
 
 .vscode/
+
+app/static/images/*.jpg
+app/static/images/*.png

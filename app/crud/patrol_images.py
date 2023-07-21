@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from app.models.models import PatrolImage
-from app.schemas.patrol_image import PatrolImageCreate, PatrolImageUpdate
+from app.schemas.patrol_images import PatrolImageCreate, PatrolImageUpdate
 
 
 class CRUDPatrolImage(

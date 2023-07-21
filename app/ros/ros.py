@@ -6,19 +6,17 @@ from multiprocessing import Queue
 import rospy
 from common.msg import robot_real_time_info, sensor_data
 from common.srv import PatrolPicture, PatrolPictureResponse
-from std_srvs.srv import Empty, EmptyResponse
 from cv_bridge import CvBridge
 
-# from app.celery_app.celery import image_detection
 from app.crud.robots import robot as robot_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.robots import Robot
 from app.utils.log import log_queue, logger
 
-ros_port_queue = Queue()
+available_ports = Queue()
 for i in range(45159, 45200):
-    ros_port_queue.put(i)
+    available_ports.put(i)
 
 
 topic_list = {
@@ -58,7 +56,6 @@ class Node:
         logger.setLevel(level=logging.DEBUG)
 
     def initialize(self):
-        logger.info("Initializing node...")
         self.create_subscribers()
         self.create_service()
 
@@ -184,13 +181,10 @@ class Node:
         task_id = int(req.patrol_task_name)
         checkpoint_id = req.patrol_point_index
         image = req.img
-        bridge = CvBridge()
-        image_cv = bridge.imgmsg_to_cv2(image, desired_encoding="passthrough")
-        cv2.imwrite(
-            f"app/static/images/{task_id}_{checkpoint_id}.jpg", image_cv
-        )
 
-        # image_detection.apply_async(args=(image, task_id, checkpoint_id))
+        from app.celery_app.celery import image_detection
+
+        image_detection.apply_async(args=(image, task_id, checkpoint_id))
         response = PatrolPictureResponse()
         response.status_code = 1
 
@@ -207,6 +201,7 @@ def initialize_all_robots_corresponding_nodes():
     :return: List of multiprocessing.Process objects for each spawned ROS node.
     """
 
+    logger.info("Initializing ROS node...")
     db = SessionLocal()
     robots = robot_crud.get_multi(db)
     db.close()
@@ -214,15 +209,16 @@ def initialize_all_robots_corresponding_nodes():
     for robot in robots:
         robot = Robot.from_orm(robot)
         process = multiprocessing.Process(
-            target=run_node, args=(robot.name, ros_port_queue)
+            target=run_node, args=(robot.name, available_ports)
         )
         process_list.append(process)
         process.start()
+    logger.info("ROS node initialized.")
 
     return process_list
 
 
-def run_node(robotname, ros_port_queue):
+def run_node(robotname, available_ports):
     """Execute a ROS node subscribing to a specific robot's topics.
 
     This function creates and initializes a ROS node that listens to the topics
@@ -230,17 +226,17 @@ def run_node(robotname, ros_port_queue):
     a shared queue.
 
     :param robotname: The name of the robot for which the node is being created.
-    :param ros_port_queue: A multiprocessing.Queue instance storing available ports.
+    :param available_ports: A multiprocessing.Queue instance storing available ports.
                            Two ports (for XML-RPC and TCPROS, respectively) are retrieved
                            per node. The function checks the queue's availability
                            before proceeding.
     """
 
-    if ros_port_queue.empty():
+    if available_ports.empty():
         logger.error("No available port for ROS node")
         return
-    xmlrpc_port = ros_port_queue.get()
-    tcpros_port = ros_port_queue.get()
+    xmlrpc_port = available_ports.get()
+    tcpros_port = available_ports.get()
     nodename = f"{robotname}_subscriber"
     logger.debug(f"Creating node: {nodename}")
     logger.debug(f"xmlrpc_port: {xmlrpc_port}")

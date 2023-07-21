@@ -11,12 +11,13 @@ def patrol_pic_client():
             "/zj_robot/patrol_picture", PatrolPicture
         )
         request = PatrolPictureRequest()
-        request.patrol_task_name = "1"
-        request.patrol_point_index = 100
+        request.patrol_task_name = "227"
+        request.patrol_point_index = 13
         request.gimbal_point_index = 1
         bridge = CvBridge()
-        img = cv2.imread("tests/test.png")
-        img_msg = bridge.cv2_to_imgmsg(img, "bgr8")
+        img = cv2.imread("all.jpg")
+        # print(img.shape)
+        img_msg = bridge.cv2_to_imgmsg(img)
         request.img = img_msg
         patrol_picture(request)
     except Exception as e:

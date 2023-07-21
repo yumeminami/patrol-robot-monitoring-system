@@ -12,9 +12,19 @@
 #     hello_str = "1"
 #     pub.publish(hello_str)
 #     rate.sleep()
-import datetime
+# import datetime
 
-# print(datetime.datetime.now().astimezone())
-print(datetime.datetime.now())
-current_date = datetime.datetime.now().date()
-print(current_date)
+# # print(datetime.datetime.now().astimezone())
+# print(datetime.datetime.now())
+# current_date = datetime.datetime.now().date()
+# print(current_date)
+from cv_bridge import CvBridge
+import cv2
+
+img = cv2.imread("all.jpg")
+bridge = CvBridge()
+img_msg = bridge.cv2_to_imgmsg(img, "bgr8")
+from app.celery_app.celery import image_detection
+
+# image_detection.delay(img_msg, 227, 13)
+image_detection(img_msg, 227, 13)

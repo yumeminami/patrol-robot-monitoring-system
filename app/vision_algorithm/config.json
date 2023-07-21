@@ -1,29 +1,29 @@
 {
     "cable": {
-        "normal": "正常",
-        "leak_oil": "漏油",
-        "morph": "变形",
-        "drop": "掉落",
-        "alarms": ["leak_oil", "morph", "drop"]
+        "normals": "正常",
+        "leaks": "漏油",
+        "morphs": "变形",
+        "drops": "掉落",
+        "alarms": ["leaks", "morphs", "drops"]
     },
     "gallery": {
-        "normal": "正常",
-        "crack": "裂缝",
-        "dig": "挖掘痕迹",
-        "normal_arch": "正常架构",
-        "drop_arch": "掉落架构",
-        "warp_arch": "变形架构",
-        "alarms": ["crack", "dig", "drop_arch", "warp_arch"]
+        "normal_pipes": "正常",
+        "cracks": "裂缝",
+        "digs": "挖掘痕迹",
+        "normal_archs": "正常架构",
+        "drop_archs": "掉落架构",
+        "warp_frames": "变形架构",
+        "alarms": ["cracks", "digs", "drop_archs", "warp_frames"]
     },
     "water": {
-        "normal_pipe": "正常水管",
-        "leak_pipe": "漏水水管",
-        "alarms": ["leak_pipe"]
+        "normal_pipes": "正常水管",
+        "leakings": "漏水水管",
+        "alarms": ["leakings"]
     },
     "vents": {
-        "normal": "正常",
-        "vents_gag": "通风口堵塞",
-        "alarms": ["vents_gag"]
+        "vents": "正常",
+        "vents_gags": "通风口堵塞",
+        "alarms": ["vents_gags"]
     },
     "drain": {
         "drain_gag": "排水沟堵塞",
@@ -47,9 +47,9 @@
         "alarms": ["dust", "damp"]
     },
     "fireExtinguisher": {
-        "fire_extinguisher_normal": "正常",
-        "fire_extinguisher_abnormal": "异常",
-        "alarms": ["fire_extinguisher_abnormal"]
+        "normal": "正常",
+        "abnormal": "异常",
+        "alarms": ["abnormal"]
     },
     "rust": {
         "rust": "锈蚀",
@@ -60,8 +60,8 @@
     "pound": {
         "seeper": "积水",
         "rubbish": "垃圾",
-        "muck": "淤泥",
-        "alarms":["seeper", "rubbish", "muck"]
+        "silt": "淤泥",
+        "alarms":["seeper", "rubbish", "silt"]
     },
     "animal": {
         "cat": "猫",
@@ -71,14 +71,14 @@
         "alarms": ["cat", "frog", "snake", "mouse"]
     },
     "hatPhoto": {
-        "helmet_person": "佩戴安全帽的行人",
-        "no_helmet_person": "未佩戴安全帽的行人",
-        "alarms": ["no_helmet_person"]
+        "hats": "佩戴安全帽的行人",
+        "persons": "未佩戴安全帽的行人",
+        "alarms": ["persons"]
     },
     "fall": {
-        "normal_person": "正常的行人",
-        "fall_person": "跌倒的行人",
-        "alarms":["fall_person"]
+        "normal": "正常的行人",
+        "fall": "跌倒的行人",
+        "alarms":["fall"]
     },
     "gas": {
         "normal_gas": "正常的气体检测仪",

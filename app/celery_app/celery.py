@@ -1,19 +1,28 @@
+import base64
 import os
 import threading
+import uuid
 from ast import literal_eval
 from datetime import datetime
 
+import cv2
 from celery import Celery
 
+from app.crud.checkpoints import checkpoint as checkpoint_crud
+from app.crud.patrol_images import patrol_image as patrol_image_crud
 from app.crud.robots import robot as robot_crud
 from app.crud.sensors import sensor as sensor_crud
 from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
+from app.schemas.patrol_images import PatrolImageCreate
 from app.schemas.tasks import Task, TaskStatus
 from app.services.ros_service import PatrolControlCommand, patrol_control
 from app.services.task_service import create_task_xml, monitor_sensor_data
+from app.settings import config
+from app.utils.images import ROS_Image_to_cv2
 from app.utils.log import logger
+from app.vision_algorithm.vision_algorithm import vision_algorithm as vs
 
 password = os.environ.get("REDIS_PASSWORD", "sample_password")
 app = Celery("tasks", broker=f"redis://:{password}@redis:6379/0")
@@ -45,7 +54,6 @@ def start_task(task_id, eta_time):
 
     :return: result: str
     """
-
     result = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "once task"
     db = SessionLocal()
 
@@ -156,3 +164,90 @@ def update_sensor_data(**kwargs):
         )
     finally:
         db.close()
+
+
+@app.task()
+def image_detection(image, task_id, checkpoint_id):
+    """
+    Detect the image and save the result to database
+
+    1. Check if the task and checkpoint exist in the database.
+
+    2. Call the corresponding HTTP API to detect the image.
+
+    3. Save the detection result to the database.
+
+    4. Create alarm if the detection result is abnormal.
+    """
+
+    db = SessionLocal()
+    task = task_crud.get(db, task_id)
+    if task is None:
+        logger.error("Task does not exist in the database.")
+        return
+
+    checkpoint = checkpoint_crud.get(db, checkpoint_id)
+    if checkpoint is None:
+        logger.error("Checkpoint does not exist in the database.")
+        return
+
+    image_id = str(uuid.uuid4())
+    image_cv = ROS_Image_to_cv2(image)
+    image_file_path = f"{config.IMAGE_DIR}/{image_id}.jpg"
+
+    patrol_image = PatrolImageCreate(
+        image_url=image_file_path,
+        task_id=task_id,
+        uuid=image_id,
+    )
+    patrol_image_crud.create(db, obj_in=patrol_image)
+    cv2.imwrite(image_file_path, image_cv)
+
+    task = Task.from_orm(task)
+    vision_algorithms = task.vision_algorithms
+
+    # Detect
+    alarms = []
+    _, img_encoded = cv2.imencode(".jpg", image_cv)
+    image_base64 = base64.b64encode(img_encoded).decode()
+    for vision_algorithm in vision_algorithms:
+        print(vision_algorithm.name)
+        if vision_algorithm.sensitivity == 0:
+            continue
+        try:
+            detected_alarms = vs.detect(
+                image_id=image_id,
+                image_base64=image_base64,
+                algorithm=vision_algorithm.name,
+                sensitivity=vision_algorithm.sensitivity,
+            )
+            alarms.extend(detected_alarms)
+        except Exception as e:
+            logger.error("")
+            # return
+
+    # Merge
+    merge_image_base64 = vs.merge(image_id, image_base64)
+    if merge_image_base64 is None:
+        logger.error("Nothing Detected.")
+        return
+
+    merge_image_file_path = f"{config.IMAGE_DIR}/{image_id}_merge.jpg"
+    merge_image_data = base64.b64decode(merge_image_base64)
+    with open(
+        merge_image_file_path,
+        "wb",
+    ) as f:
+        f.write(merge_image_data)
+    patrol_image_merge = PatrolImageCreate(
+        image_url=f"{config.IMAGE_DIR}/{merge_image_file_path}",
+        task_id=task_id,
+        uuid=image_id,
+    )
+    patrol_image_crud.create(db, obj_in=patrol_image_merge)
+
+    # TODO 3. create alarm if the detection result is abnormal
+    if len(alarms) > 0:
+        logger.error(f"Alarms detected: {alarms}")
+    db.close()
+    return

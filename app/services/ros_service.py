@@ -13,7 +13,7 @@ from sensor_msgs.msg import Image
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
-from app.ros.ros import ros_port_queue
+from app.ros.ros import available_ports
 from app.schemas.gimbalpoints import GimbalPointCreate
 from app.utils.log import log_queue, logger
 from app.utils.images import ROS_Image_to_cv2
@@ -276,8 +276,8 @@ def video_streamer(robot_name):
 
     handler = logging.handlers.QueueHandler(log_queue)
     logger.addHandler(handler)
-    xmlrpc_port = ros_port_queue.get()
-    tcpros_port = ros_port_queue.get()
+    xmlrpc_port = available_ports.get()
+    tcpros_port = available_ports.get()
     logger.info(f"xmlrpc_port: {xmlrpc_port}")
     logger.info(f"tcpros_port: {tcpros_port}")
     rospy.init_node(

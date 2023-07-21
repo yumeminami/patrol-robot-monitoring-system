@@ -6,7 +6,7 @@ import cv2
 
 def hanlde_take_pic(req):
     bridge = CvBridge()
-    img = cv2.imread("tests/ayanami.jpg")
+    img = cv2.imread("test.jpg")
 
     img_msg = bridge.cv2_to_imgmsg(img, "bgr8")
     response = TakePictureResponse()
@@ -16,9 +16,7 @@ def hanlde_take_pic(req):
 
 
 def take_pic_server():
-    rospy.init_node(
-        "take_picture_server", xmlrpc_port=45175, tcpros_port=45176
-    )
+    rospy.init_node("take_picture_server", xmlrpc_port=9999, tcpros_port=10000)
     rospy.Service("/zj_robot/take_picture", TakePicture, hanlde_take_pic)
     rospy.spin()
 

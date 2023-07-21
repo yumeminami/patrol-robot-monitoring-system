@@ -1,19 +1,22 @@
 from pydantic import BaseModel
 
 
-class PatrolImage(BaseModel):
-    id: int
+class PatrolImageBase(BaseModel):
     image_url: str
     task_id: int
     uuid: str
 
+
+class PatrolImageCreate(PatrolImageBase):
+    pass
+
+
+class PatrolImageUpdate(PatrolImageBase):
+    pass
+
+
+class PatrolImage(PatrolImageBase):
+    id: int
+
     class Config:
         orm_mode = True
-
-
-class PatrolImageCreate(PatrolImage):
-    pass
-
-
-class PatrolImageUpdate(PatrolImage):
-    pass

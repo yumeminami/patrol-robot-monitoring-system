@@ -23,6 +23,9 @@ class VisionAlgorithm:
         vision_algorithm_api_url = os.environ.get("VISION_ALGORITHM_API_URL")
         if vision_algorithm_api_url is None:
             raise Exception("VISION_ALGORITHM_API_URL is not set")
+        if algorithm not in self.config.keys():
+            print(self.config.keys())
+            raise Exception("algorithm not found")
 
         url = f"{vision_algorithm_api_url}/{algorithm}/"
 
@@ -66,7 +69,6 @@ class VisionAlgorithm:
         try:
             response = requests.get(url, json=params)
             image_data = response.json()["data"]["img"]
-            print(response.json().keys())
         except KeyError as e:
             logger.error(f"image data is None: {e}")
         except Exception as e:

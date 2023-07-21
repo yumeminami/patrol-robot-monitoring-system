@@ -1,0 +1,120 @@
+{
+    "cable": {
+        "normal": "正常",
+        "leak_oil": "漏油",
+        "morph": "变形",
+        "drop": "掉落",
+        "alarms": ["leak_oil", "morph", "drop"]
+    },
+    "gallery": {
+        "normal": "正常",
+        "crack": "裂缝",
+        "dig": "挖掘痕迹",
+        "normal_arch": "正常架构",
+        "drop_arch": "掉落架构",
+        "warp_arch": "变形架构",
+        "alarms": ["crack", "dig", "drop_arch", "warp_arch"]
+    },
+    "water": {
+        "normal_pipe": "正常水管",
+        "leak_pipe": "漏水水管",
+        "alarms": ["leak_pipe"]
+    },
+    "vents": {
+        "normal": "正常",
+        "vents_gag": "通风口堵塞",
+        "alarms": ["vents_gag"]
+    },
+    "drain": {
+        "drain_gag": "排水沟堵塞",
+        "alarms": ["drain_gag"]
+    },
+    "lighting": {
+        "control_box_on": "控制箱打开",
+        "control_box_off": "控制箱关闭",
+        "emergency_device_on": "应急装置打开",
+        "emergency_device_off": "应急装置关闭",
+        "switch_box_on": "配电箱打开",
+        "switch_box_off": "配电箱关闭",
+        "lamp_on": "灯具打开",
+        "lamp_off": "灯具关闭",
+        "alarms": ["control_box_on", "emergency_device_on", "switch_box_on", "lamp_off"]
+    },
+    "dust": {
+        "dry_clean": "干燥清洁",
+        "dust": "灰尘",
+        "damp": "潮湿",
+        "alarms": ["dust", "damp"]
+    },
+    "fireExtinguisher": {
+        "fire_extinguisher_normal": "正常",
+        "fire_extinguisher_abnormal": "异常",
+        "alarms": ["fire_extinguisher_abnormal"]
+    },
+    "rust": {
+        "rust": "锈蚀",
+        "normal": "正常",
+        "alarms": ["rust"]
+
+    },
+    "pound": {
+        "seeper": "积水",
+        "rubbish": "垃圾",
+        "muck": "淤泥",
+        "alarms":["seeper", "rubbish", "muck"]
+    },
+    "animal": {
+        "cat": "猫",
+        "frog": "青蛙",
+        "snake": "蛇",
+        "mouse": "老鼠",
+        "alarms": ["cat", "frog", "snake", "mouse"]
+    },
+    "hatPhoto": {
+        "helmet_person": "佩戴安全帽的行人",
+        "no_helmet_person": "未佩戴安全帽的行人",
+        "alarms": ["no_helmet_person"]
+    },
+    "fall": {
+        "normal_person": "正常的行人",
+        "fall_person": "跌倒的行人",
+        "alarms":["fall_person"]
+    },
+    "gas": {
+        "normal_gas": "正常的气体检测仪",
+        "abnormal_gas": "气体检测仪报警",
+        "alarms": ["abnormal_gas"]
+    },
+    "catchment": {
+        "abnormal_level": "异常水位",
+        "normal_level": "正常水位",
+        "alarms": ["abnormal_level"]
+    },
+    "ports": {
+        "escape": "逃生口",
+        "escape_gag": "逃生口堵塞",
+        "escalator": "扶梯",
+        "escalator_damaged": "扶梯异常",
+        "alarms": ["escape_gag", "escalator_damaged"]
+    },
+    "wire": {
+        "normal_wire": "正常的接地线",
+        "ground_wire_drop": "接地线掉落",
+        "alarms": ["ground_wire_drop"]
+    },
+    "leak": {
+        "normal": "正常",
+        "leak": "漏水",
+        "alarms": ["leak"]
+    },
+    "drainPound": {
+        "normal": "正常",
+        "drain_pound": "排水沟积水",
+        "alarms": ["drain_pound"]
+    },
+    "smoke": {
+        "reflective_clothes": "反光衣",
+        "smoke": "抽烟",
+        "alarms": ["smoke"]
+    }
+}

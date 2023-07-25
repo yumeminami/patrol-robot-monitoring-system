@@ -11,9 +11,9 @@
         "cracks": "裂缝",
         "digs": "挖掘痕迹",
         "normal_archs": "正常架构",
-        "drop_archs": "掉落架构",
+        "arch_drops": "架构掉落",
         "warp_frames": "变形架构",
-        "alarms": ["cracks", "digs", "drop_archs", "warp_frames"]
+        "alarms": ["cracks", "digs", "arch_drops", "warp_frames"]
     },
     "water": {
         "normal_pipes": "正常水管",
@@ -22,8 +22,8 @@
     },
     "vents": {
         "vents": "正常",
-        "vents_gags": "通风口堵塞",
-        "alarms": ["vents_gags"]
+        "vents_gag": "通风口堵塞",
+        "alarms": ["vents_gag"]
     },
     "drain": {
         "drain_gag": "排水沟堵塞",

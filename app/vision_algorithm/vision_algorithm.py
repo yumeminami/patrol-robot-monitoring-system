@@ -40,9 +40,10 @@ class VisionAlgorithm:
             receive_data = response.json()
         except Exception as e:
             logger.error(f"vision_algorithm detect error: {e}")
-            return None
+            return None, None
         print(receive_data["data"]["counts"])
         counts = receive_data["data"]["counts"]
+        img = receive_data["data"]["img"]
         alarms = self.config[algorithm]["alarms"]
         detected_alarm = []
 
@@ -53,7 +54,7 @@ class VisionAlgorithm:
         except Exception as e:
             logger.error(f"vision_algorithm detect error: {e}")
         finally:
-            return detected_alarm
+            return detected_alarm, img
 
     def merge(self, image_id, image_base64):
         vision_algorithm_api_url = os.environ.get("VISION_ALGORITHM_API_URL")

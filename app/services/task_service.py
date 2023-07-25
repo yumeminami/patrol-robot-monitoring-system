@@ -1,5 +1,5 @@
-import os
 import base64
+import os
 import time
 import uuid
 import xml.etree.ElementTree as ET
@@ -7,6 +7,7 @@ from ast import literal_eval
 from datetime import datetime
 
 import cv2
+import numpy as np
 import rospy
 from fastapi import HTTPException
 
@@ -209,6 +210,7 @@ def image_detection(image, task_id, checkpoint_id):
 
     image_id = str(uuid.uuid4())
     image_cv = ROS_Image_to_cv2(image)
+    image_cv = cv2.resize(image_cv, (640, 480))  # Resize image
     image_file_path = f"{config.IMAGE_DIR}/{image_id}.jpg"
 
     patrol_image = PatrolImageCreate(
@@ -223,7 +225,6 @@ def image_detection(image, task_id, checkpoint_id):
     vision_algorithms = task.vision_algorithms
 
     # Detect
-    alarms = []
     _, img_encoded = cv2.imencode(".jpg", image_cv)
     image_base64 = base64.b64encode(img_encoded).decode()
     for vision_algorithm in vision_algorithms:
@@ -231,28 +232,45 @@ def image_detection(image, task_id, checkpoint_id):
         if vision_algorithm.sensitivity == 0:
             continue
         try:
-            detected_alarms = vs.detect(
+            detected_alarms, detected_image_base64 = vs.detect(
                 image_id=image_id,
                 image_base64=image_base64,
                 algorithm=vision_algorithm.name,
                 sensitivity=vision_algorithm.sensitivity,
             )
+            detected_image_file_path = (
+                f"{config.IMAGE_DIR}/{image_id}_{vision_algorithm.name}.jpg"
+            )
+            detected_image_data = base64.b64decode(detected_image_base64)
+            detected_image_cv = cv2.imdecode(
+                np.fromstring(detected_image_data, dtype=np.uint8),
+                cv2.IMREAD_COLOR,
+            )
+            detected_image_cv = cv2.resize(
+                detected_image_cv, (640, 480)
+            )  # Resize image
+            cv2.imwrite(detected_image_file_path, detected_image_cv)
+            patrol_image_detected = PatrolImageCreate(
+                image_url=os.path.relpath(detected_image_file_path, "app"),
+                task_id=task_id,
+                uuid=image_id,
+            )
+            patrol_image_crud.create(db, obj_in=patrol_image_detected)
             if (len(detected_alarms)) > 0:
-                logger.error(f"Alarms detected: {alarms}")
+                logger.error(f"Alarms detected: {detected_alarms}")
                 alarm_log = AlarmLogCreate(
                     level=AlarmLogLevel.WARNING.value,
                     task_id=task_id,
                     status=AlarmLogStatus.UNPROCESSED.value,
                     location=checkpoint.position,
                     type=vision_algorithm.name,
-                    img_url=os.path.relpath(merge_image_file_path, "app"),
-                    detail=f"Alarms detected: {alarms}",
+                    img_url=os.path.relpath(detected_image_file_path, "app"),
+                    detail=f"Alarms detected: {detected_alarms}",
                 )
-
-            alarm_log_crud.create(db, obj_in=alarm_log)
+                alarm_log_crud.create(db, obj_in=alarm_log)
         except Exception as e:
-            logger.error("")
-            # return
+            logger.error(e)
+            return
 
     # Merge
     merge_image_base64 = vs.merge(image_id, image_base64)
@@ -262,11 +280,11 @@ def image_detection(image, task_id, checkpoint_id):
 
     merge_image_file_path = f"{config.IMAGE_DIR}/{image_id}_merge.jpg"
     merge_image_data = base64.b64decode(merge_image_base64)
-    with open(
-        merge_image_file_path,
-        "wb",
-    ) as f:
-        f.write(merge_image_data)
+    merge_image_cv = cv2.imdecode(
+        np.fromstring(merge_image_data, dtype=np.uint8), cv2.IMREAD_COLOR
+    )
+    merge_image_cv = cv2.resize(merge_image_cv, (640, 480))  # Resize image
+    cv2.imwrite(merge_image_file_path, merge_image_cv)
     patrol_image_merge = PatrolImageCreate(
         image_url=os.path.relpath(merge_image_file_path, "app"),
         task_id=task_id,

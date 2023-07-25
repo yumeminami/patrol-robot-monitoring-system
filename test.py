@@ -21,10 +21,10 @@
 from cv_bridge import CvBridge
 import cv2
 
-img = cv2.imread("all.jpg")
+img = cv2.imread("hat.jpg")
 bridge = CvBridge()
 img_msg = bridge.cv2_to_imgmsg(img, "bgr8")
-from app.celery_app.celery import image_detection
+from app.services.task_service import image_detection
 
 # image_detection.delay(img_msg, 227, 13)
-image_detection(img_msg, 227, 13)
+image_detection(img_msg, 230, 13)

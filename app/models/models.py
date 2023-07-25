@@ -140,6 +140,11 @@ class PatrolImage(BaseModel):
     task_id = Column(
         Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
     )
+    checkpoint_id = Column(
+        Integer,
+        ForeignKey("checkpoints.id", ondelete="CASCADE"),
+        nullable=False,
+    )
 
 
 Base.metadata.create_all(bind=engine)

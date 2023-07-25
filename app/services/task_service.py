@@ -217,6 +217,7 @@ def image_detection(image, task_id, checkpoint_id):
         image_url=os.path.relpath(image_file_path, "app"),
         task_id=task_id,
         uuid=image_id,
+        checkpoint_id=checkpoint_id,
     )
     patrol_image_crud.create(db, obj_in=patrol_image)
     cv2.imwrite(image_file_path, image_cv)
@@ -254,6 +255,7 @@ def image_detection(image, task_id, checkpoint_id):
                 image_url=os.path.relpath(detected_image_file_path, "app"),
                 task_id=task_id,
                 uuid=image_id,
+                checkpoint_id=checkpoint_id,
             )
             patrol_image_crud.create(db, obj_in=patrol_image_detected)
             if (len(detected_alarms)) > 0:
@@ -289,6 +291,7 @@ def image_detection(image, task_id, checkpoint_id):
         image_url=os.path.relpath(merge_image_file_path, "app"),
         task_id=task_id,
         uuid=image_id,
+        checkpoint_id=checkpoint_id,
     )
     patrol_image_crud.create(db, obj_in=patrol_image_merge)
 

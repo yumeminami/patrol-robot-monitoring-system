@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class PatrolImageBase(BaseModel):
     image_url: str
     task_id: int
+    checkpoint_id: int
     uuid: str
 
 

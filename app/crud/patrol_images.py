@@ -13,5 +13,14 @@ class CRUDPatrolImage(
             db.query(self.model).filter(PatrolImage.task_id == task_id).first()
         )
 
+    def get_by_checkpoint_id(
+        self, db: Session, *, checkpoint_id: int
+    ) -> PatrolImage:
+        return (
+            db.query(self.model)
+            .filter(PatrolImage.checkpoint_id == checkpoint_id)
+            .first()
+        )
+
 
 patrol_image = CRUDPatrolImage(PatrolImage)

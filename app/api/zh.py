@@ -202,15 +202,34 @@ def alarm_enum_to_literally(enum_key: str, value: int) -> str:
     }
 
     alarm_log_type_mapping = {
-        0: "设备",
-        1: "温度",
-        2: "湿度",
-        3: "光照",
-        4: "PM1.0",
-        5: "PM2.5",
-        6: "PM10",
-        7: "烟雾1",
-        8: "烟雾2",
+        "temperature": "温度",
+        "humidity": "湿度",
+        "light": "光照",
+        "PM1_0": "PM1.0",
+        "PM2_5": "PM2.5",
+        "PM10": "PM10",
+        "smoke1": "烟雾1",
+        "smoke2": "烟雾2",
+        "cable": "电缆",
+        "gallery": "管廊",
+        "water": "水",
+        "vents": "通风口",
+        "drain": "排水",
+        "lighting": "照明",
+        "dust": "灰尘",
+        "fireExtinguisher": "灭火器",
+        "rust": "生锈",
+        "pound": "破损",
+        "animal": "动物",
+        "hatPhoto": "安全帽",
+        "fall": "跌落",
+        "gas": "气体",
+        "catchment": "集水坑",
+        "ports": "逃生口",
+        "wire": "接地线",
+        "leak": "漏水",
+        "drainPound": "排水坑",
+        "smoke": "抽烟",
     }
 
     # Check if the enum key exists in the translation mapping and return the translated value
@@ -249,7 +268,7 @@ async def get_alarm_logs(token: str = Depends(oauth2_scheme)):
                     translated_value = value
 
                     # Convert enum values to literal meanings
-                    if isinstance(value, int) and key in [
+                    if key in [
                         "level",
                         "status",
                         "type",

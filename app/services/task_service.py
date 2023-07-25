@@ -237,7 +237,19 @@ def image_detection(image, task_id, checkpoint_id):
                 algorithm=vision_algorithm.name,
                 sensitivity=vision_algorithm.sensitivity,
             )
-            alarms.extend(detected_alarms)
+            if (len(detected_alarms)) > 0:
+                logger.error(f"Alarms detected: {alarms}")
+                alarm_log = AlarmLogCreate(
+                    level=AlarmLogLevel.WARNING.value,
+                    task_id=task_id,
+                    status=AlarmLogStatus.UNPROCESSED.value,
+                    location=checkpoint.position,
+                    type=vision_algorithm.name,
+                    img_url=os.path.relpath(merge_image_file_path, "app"),
+                    detail=f"Alarms detected: {alarms}",
+                )
+
+            alarm_log_crud.create(db, obj_in=alarm_log)
         except Exception as e:
             logger.error("")
             # return
@@ -262,20 +274,5 @@ def image_detection(image, task_id, checkpoint_id):
     )
     patrol_image_crud.create(db, obj_in=patrol_image_merge)
 
-    # TODO 3. create alarm if the detection result is abnormal
-    if len(alarms) > 0:
-        logger.error(f"Alarms detected: {alarms}")
-
-    alarm_log = AlarmLogCreate(
-        level=AlarmLogLevel.WARNING.value,
-        task_id=task_id,
-        status=AlarmLogStatus.UNPROCESSED.value,
-        location=checkpoint.position,
-        type=vision_algorithm.name,
-        img_url=os.path.relpath(merge_image_file_path, "app"),
-        detail=f"Alarms detected: {alarms}",
-    )
-
-    alarm_log_crud.create(db, obj_in=alarm_log)
     db.close()
     return

@@ -1,6 +1,5 @@
 from sqlalchemy import (
     JSON,
-    Boolean,
     Column,
     DateTime,
     Float,
@@ -32,12 +31,6 @@ class Robot(BaseModel):
     status = Column(Integer, default=0)
     velocity = Column(Float, default=0.0)
     position = Column(Float, default=0.0)
-    tasks = relationship(
-        "Task",
-        back_populates="robot",
-        lazy="dynamic",
-        cascade="all, delete-orphan",
-    )
     sensors = relationship(
         "Sensor",
         back_populates="robot",
@@ -49,8 +42,8 @@ class Robot(BaseModel):
 class Task(BaseModel):
     __tablename__ = "tasks"
 
+    name = Column(String(50), index=True)
     type = Column(Integer, default=0)
-    status = Column(Integer, default=0)
     robot_id = Column(Integer, ForeignKey("robots.id"))
     checkpoint_ids = Column(JSON, default=[])
     start_position = Column(Float, default=0)
@@ -59,7 +52,6 @@ class Task(BaseModel):
     sensors = Column(JSON, default=[])
     vision_algorithms = Column(JSON, default=[])
     execution_time = Column(JSON, default=[Time])
-    robot = relationship("Robot", back_populates="tasks")
 
 
 class CheckPoint(BaseModel):

@@ -12,17 +12,8 @@ class TaskType(Enum):
     MANUAL = 1
 
 
-class TaskStatus(Enum):
-    NOT_STARTED = 0
-    IN_PROGRESS = 1
-    PENDING = 2
-    COMPLETED = 3
-    STOPPED = 4
-
-
 class TaskBase(BaseModel):
     type: int
-    status: int = TaskStatus.NOT_STARTED.value
     robot_id: int
     checkpoint_ids: List[int] = []
     start_position: float = 0
@@ -69,14 +60,6 @@ class TaskBase(BaseModel):
                 )
 
         return values
-
-    @validator("status")
-    def status_validator(cls, v):
-        if v not in range(0, 4):
-            raise ValueError(
-                "status must be not started(0), in progress(1), pending(2), completed(3) or stopped(4)"
-            )
-        return v
 
     @validator("sensors")
     def sensors_validator(cls, v, values):
@@ -133,4 +116,4 @@ class TaskCreate(TaskBase):
 
 
 class TaskUpdate(BaseModel):
-    status: int = TaskStatus.NOT_STARTED.value
+    pass

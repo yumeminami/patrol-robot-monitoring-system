@@ -27,7 +27,7 @@ from app.schemas.alarm_logs import (
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
 from app.schemas.patrol_images import PatrolImageCreate
-from app.schemas.tasks import Task, TaskStatus, TaskType
+from app.schemas.tasks import Task, TaskType
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
 from app.utils.log import logger
@@ -144,7 +144,6 @@ def monitor_sensor_data(task: Task):
             task_crud.update(
                 db,
                 db_obj=task,
-                obj_in={"status": TaskStatus.COMPLETED.value},
             )
             db.close()
             break

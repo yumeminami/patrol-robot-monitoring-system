@@ -1,9 +1,7 @@
-from fastapi import HTTPException
-
 from app.api.api import create_generic_router
 from app.celery_app.celery import start_task
 from app.crud.tasks import task as crud
-from app.schemas.tasks import Task, TaskCreate, TaskStatus, TaskUpdate
+from app.schemas.tasks import Task, TaskCreate, TaskUpdate
 from app.utils.log import logger
 from app.utils.parse_execution_time import parse_execution_time
 
@@ -19,27 +17,7 @@ def after_created(task, db):
         logger.info(f"Task {task.id} will start at {execution_time}")
 
 
-def before_update(id, task_update, db):
-    """
-    Before task updated, check if the task is completed or stopped
-    If it is, raise an exception to tell the user that the task cannot be updated
-    """
-    task = crud.get(db, id)
-    task = task.__dict__
-    if task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
-    if (
-        task["status"] == TaskStatus.COMPLETED.value
-        or task["status"] == TaskStatus.STOPPED.value
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail="task is already completed, cannot be updated",
-        )
-
-
 hooks = {
     "after_created": after_created,
-    "before_update": before_update,
 }
 router = create_generic_router(crud, TaskCreate, TaskUpdate, Task, hooks=hooks)

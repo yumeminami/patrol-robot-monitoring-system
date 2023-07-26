@@ -35,19 +35,7 @@ def get_db():
         db.close()
 
 
-def after_read(robot):
-    tasks = robot.tasks.all()
-    robot = Robot.from_orm(robot)
-    if tasks:
-        task = tasks[-1]
-        robot.task_id = task.id
-        robot.task_status = task.status
-    return robot
-
-
-robot_hooks = {
-    "after_read": after_read,
-}
+robot_hooks = {}
 
 router = create_generic_router(
     crud, RobotCreate, RobotUpdate, Robot, hooks=robot_hooks

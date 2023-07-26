@@ -10,7 +10,7 @@ from app.crud.sensors import sensor as sensor_crud
 from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
-from app.schemas.tasks import Task, TaskStatus
+from app.schemas.tasks import Task
 from app.services.ros_service import PatrolControlCommand, patrol_control
 from app.services.task_service import create_task_xml, monitor_sensor_data
 from app.utils.log import logger
@@ -51,9 +51,6 @@ def start_task(task_id, eta_time):
     task = task_crud.get(db, task_id)
     if task is None:
         return "task not found"
-    task_crud.update(
-        db, db_obj=task, obj_in={"status": TaskStatus.IN_PROGRESS.value}
-    )
     db.close()
 
     robot = robot_crud.get(db, task.robot_id)

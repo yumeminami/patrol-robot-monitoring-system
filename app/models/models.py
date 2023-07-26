@@ -59,7 +59,6 @@ class Task(BaseModel):
     sensors = Column(JSON, default=[])
     vision_algorithms = Column(JSON, default=[])
     execution_time = Column(JSON, default=[Time])
-    is_everyday = Column(Boolean, default=False)
     robot = relationship("Robot", back_populates="tasks")
 
 

@@ -22,7 +22,6 @@ key_map = {
     "end_position": "结束位置",
     "vision_algorithms": "视觉算法",
     "execution_time": "执行时间",
-    "is_everyday": "是否每天",
     "unit": "单位",
     "level": "等级",
     "location": "位置",

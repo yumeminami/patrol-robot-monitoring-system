@@ -31,7 +31,6 @@ class TaskBase(BaseModel):
     sensors: List[SensorForTask] = []
     vision_algorithms: List[VisionAlgorithmForTask] = []
     execution_time: List[str]
-    is_everyday: bool = False
 
     @root_validator(pre=True)
     def type_validator(cls, values):

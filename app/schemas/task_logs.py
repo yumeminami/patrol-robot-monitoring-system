@@ -7,6 +7,7 @@ from pydantic import BaseModel
 class TaskLogBase(BaseModel):
     task_id: Optional[int] = None
     robot_id: Optional[int] = None
+    execution_time: Optional[str] = None
     type: int
 
 
@@ -17,6 +18,7 @@ class TaskLogCreate(TaskLogBase):
 class TaskLogUpdate(BaseModel):
     task_id: Optional[int] = None
     robot_id: Optional[int] = None
+    execution_time: Optional[str] = None
     type: int = 0
 
 

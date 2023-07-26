@@ -4,7 +4,6 @@ from typing import List
 from pydantic import BaseModel, root_validator, validator
 
 from .sensors import SensorForTask
-from .vision_algorithms import VisionAlgorithmForTask
 
 
 class TaskType(Enum):
@@ -20,7 +19,7 @@ class TaskBase(BaseModel):
     end_position: float = 0
     velocity: float = 0
     sensors: List[SensorForTask] = []
-    vision_algorithms: List[VisionAlgorithmForTask] = []
+    vision_algorithms: List[int] = []
     execution_time: List[str]
 
     @root_validator(pre=True)

@@ -117,6 +117,7 @@ class VisionAlgorithm(BaseModel):
     __tablename__ = "vision_algorithms"
 
     name = Column(String(50), index=True)
+    sensitivity = Column(Float, default=0.5)
 
 
 class GimbalPoint(BaseModel):

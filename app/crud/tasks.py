@@ -19,5 +19,11 @@ class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
             .all()
         )
 
+    def get_all(
+        self,
+        db: Session,
+    ) -> List[Task]:
+        return db.query(self.model).all()
+
 
 task = CRUDTask(Task)

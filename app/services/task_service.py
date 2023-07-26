@@ -15,11 +15,11 @@ from app.crud.alarm_logs import alarm_log as alarm_log_crud
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.crud.patrol_images import patrol_image as patrol_image_crud
+from app.crud.robots import robot as robot_crud
+from app.crud.tasks import task as task_crud
 from app.crud.vision_algorithms import (
     vision_algorithm as vision_algorithm_crud,
 )
-from app.crud.robots import robot as robot_crud
-from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.alarm_logs import (
@@ -138,16 +138,12 @@ def monitor_sensor_data(task: Task):
         patrol_state = rospy.get_param(f"/{robot.name}/patrol_state")
         if patrol_state == 0:
             logger.error(
-                "Task completed, terminating sensor data monitoring..."
+                "Patrol completed, terminating sensor data monitoring..."
             )
             task = task_crud.get(db, task.id)
             if task is None:
                 logger.error("Task does not exist in the database.")
                 break
-            task_crud.update(
-                db,
-                db_obj=task,
-            )
             db.close()
             break
 

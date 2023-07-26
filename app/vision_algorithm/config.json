@@ -58,10 +58,10 @@
 
     },
     "pound": {
-        "seeper": "积水",
+        "pound": "积水",
         "rubbish": "垃圾",
         "silt": "淤泥",
-        "alarms":["seeper", "rubbish", "silt"]
+        "alarms":["pound", "rubbish", "silt"]
     },
     "animal": {
         "cat": "猫",

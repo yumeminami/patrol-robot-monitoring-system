@@ -15,6 +15,9 @@ from app.crud.alarm_logs import alarm_log as alarm_log_crud
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.crud.patrol_images import patrol_image as patrol_image_crud
+from app.crud.vision_algorithms import (
+    vision_algorithm as vision_algorithm_crud,
+)
 from app.crud.robots import robot as robot_crud
 from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
@@ -222,7 +225,10 @@ def image_detection(image, task_id, checkpoint_id):
     cv2.imwrite(image_file_path, image_cv)
 
     task = Task.from_orm(task)
-    vision_algorithms = task.vision_algorithms
+    vision_algorithm_ids = task.vision_algorithms
+    vision_algorithms = []
+    for id in vision_algorithm_ids:
+        vision_algorithms.append(vision_algorithm_crud.get(db, id))
 
     # Detect
     _, img_encoded = cv2.imencode(".jpg", image_cv)

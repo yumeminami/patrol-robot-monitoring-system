@@ -12,6 +12,7 @@ class TaskType(Enum):
 
 
 class TaskBase(BaseModel):
+    name: str
     type: int
     robot_id: int
     checkpoint_ids: List[int] = []

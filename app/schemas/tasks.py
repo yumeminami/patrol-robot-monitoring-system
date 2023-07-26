@@ -21,7 +21,7 @@ class TaskBase(BaseModel):
     velocity: float = 0
     sensors: List[SensorForTask] = []
     vision_algorithms: List[int] = []
-    execution_time: List[str]
+    execution_times: List[str]
 
     @root_validator(pre=True)
     def type_validator(cls, values):

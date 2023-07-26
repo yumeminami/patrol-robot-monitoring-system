@@ -21,6 +21,7 @@ key_map = {
     "start_position": "起始位置",
     "end_position": "结束位置",
     "vision_algorithms": "视觉算法",
+    "execution_times": "执行时间",
     "execution_time": "执行时间",
     "unit": "单位",
     "level": "等级",

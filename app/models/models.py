@@ -51,7 +51,7 @@ class Task(BaseModel):
     velocity = Column(Float, default=0)
     sensors = Column(JSON, default=[])
     vision_algorithms = Column(JSON, default=[])
-    execution_time = Column(JSON, default=[Time])
+    execution_times = Column(JSON, default=[Time])
 
 
 class CheckPoint(BaseModel):

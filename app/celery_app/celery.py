@@ -139,6 +139,7 @@ def push_task_to_celery(task):
         execution_time_obj = now.replace(
             hour=hour, minute=minute, second=0, microsecond=0
         )
+        now = now.replace(second=0, microsecond=0)
         if execution_time_obj < now:
             logger.info(f"Task {task.id} has been expired at {execution_time}")
             continue

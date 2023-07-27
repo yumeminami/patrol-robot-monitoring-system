@@ -16,6 +16,7 @@ from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.crud.patrol_images import patrol_image as patrol_image_crud
 from app.crud.robots import robot as robot_crud
+from app.crud.task_logs import task_log as task_log_crud
 from app.crud.tasks import task as task_crud
 from app.crud.vision_algorithms import (
     vision_algorithm as vision_algorithm_crud,
@@ -31,6 +32,7 @@ from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
 from app.schemas.patrol_images import PatrolImageCreate
 from app.schemas.tasks import Task, TaskType
+from app.schemas.task_logs import TaskLogCreate
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
 from app.utils.log import logger
@@ -115,7 +117,7 @@ def create_task_xml(task, db):
     return file_name
 
 
-def monitor_sensor_data(task: Task):
+def monitor_sensor_data(task: Task, execution_date: str):
     """
     Continually monitor sensor data throughout the task's runtime.
 
@@ -138,6 +140,14 @@ def monitor_sensor_data(task: Task):
                 logger.info(
                     "Patrol completed, terminating sensor data monitoring..."
                 )
+
+                task_log_create = TaskLogCreate(
+                    task_id=task.id,
+                    robot_id=task.robot_id,
+                    execution_date=execution_date,
+                    type=task.type,
+                )
+                task_log_crud.create(db, obj_in=task_log_create)
                 db.close()
                 break
 
@@ -295,3 +305,15 @@ def image_detection(image, task_id, checkpoint_id):
 
     db.close()
     return
+
+
+def fit_frequency(task):
+    """
+    Fit the task frequency to the current time
+    1. Get the latest task log time
+    2. Calculate the time difference between the latest task log time and the current time is fit to the task frequency
+    """
+    db = SessionLocal()
+    latest_task_log = task_log_crud.get_the_latest_task_log(db, task.id)
+    logger.info(f"The task last executed at {latest_task_log.execution_date}")
+    return True

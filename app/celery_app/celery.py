@@ -12,7 +12,11 @@ from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.tasks import Task
 from app.services.ros_service import PatrolControlCommand, patrol_control
-from app.services.task_service import create_task_xml, monitor_sensor_data
+from app.services.task_service import (
+    create_task_xml,
+    monitor_sensor_data,
+    fit_frequency,
+)
 from app.utils.log import logger
 from app.utils.parse_execution_time import parse_execution_time
 
@@ -173,7 +177,8 @@ def regular_query_tasks():
         Push all the task execution times to celery.
         At the same time, the task id and the execution time are stored in redis.
         """
-        push_task_to_celery(task)
+        if fit_frequency(task):
+            push_task_to_celery(task)
 
     db.close()
     return (
@@ -211,7 +216,8 @@ def start_task(task_id, execution_time):
 
     task = Task.from_orm(task)
 
-    thread = Thread(target=monitor_sensor_data, args=(task,))
+    execution_date = f"{datetime.now().strftime('%Y-%m-%d')} {execution_time}"
+    thread = Thread(target=monitor_sensor_data, args=(task, execution_date))
     thread.start()
 
     redis_client.hdel(f"task_{task_id}", execution_time)

@@ -110,7 +110,7 @@ class TaskLog(BaseModel):
     robot_id = Column(
         Integer, ForeignKey("robots.id", ondelete="CASCADE"), nullable=False
     )
-    execution_time = Column(JSON, default=[Time])
+    execution_date = Column(JSON, default=[Time])
     type = Column(Integer, default=0)
 
 

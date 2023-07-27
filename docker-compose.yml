@@ -31,7 +31,7 @@ services:
   celery-worker:
     container_name: celery-worker
     image: app:latest
-    command: celery -A app.celery_app.celery worker -B --loglevel=error
+    command: celery -A app.celery_app.celery worker -B --loglevel=info
     volumes:
       - ./:/app
       - /etc/timezone:/etc/timezone:ro

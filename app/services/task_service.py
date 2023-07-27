@@ -126,26 +126,23 @@ def monitor_sensor_data(task: Task):
     4. Monitoring stops when the task or robot status changes to 'finished'.
 
     """
-    logger.error("Sensor data monitoring initiated...")
+    logger.info("Sensor data monitoring initiated...")
     while True:
         db = SessionLocal()
 
         robot = robot_crud.get(db, task.robot_id)
-        if robot is None:
-            logger.error("Robot does not exist in the database.")
-            break
-
-        patrol_state = rospy.get_param(f"/{robot.name}/patrol_state")
-        if patrol_state == 0:
-            logger.error(
-                "Patrol completed, terminating sensor data monitoring..."
-            )
-            task = task_crud.get(db, task.id)
-            if task is None:
-                logger.error("Task does not exist in the database.")
+        try:
+            patrol_state = rospy.get_param(f"/{robot.name}/patrol_state")
+            logger.info(f"Patrol state: {patrol_state}")
+            if patrol_state == 0:
+                logger.info(
+                    "Patrol completed, terminating sensor data monitoring..."
+                )
+                db.close()
                 break
-            db.close()
-            break
+
+        except Exception as e:
+            logger.error(e)
 
         # Fetch the latest sensor data from the cache
         sensor_data = redis_client.hget(robot.name, "sensor_data")

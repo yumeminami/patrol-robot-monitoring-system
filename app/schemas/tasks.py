@@ -33,7 +33,7 @@ class TaskBase(BaseModel):
 
         if type not in [TaskType.AUTO.value, TaskType.MANUAL.value]:
             raise ValueError("type must be auto or manual")
-        
+
         if type == TaskType.AUTO.value:
             if not start_position or not end_position:
                 raise ValueError(

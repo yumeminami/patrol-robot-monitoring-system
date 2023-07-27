@@ -1,6 +1,8 @@
 import os
 from ast import literal_eval
 from datetime import datetime
+from threading import Thread
+
 from celery import Celery
 
 from app.crud.robots import robot as robot_crud
@@ -8,7 +10,11 @@ from app.crud.sensors import sensor as sensor_crud
 from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
+from app.schemas.tasks import Task
+from app.services.ros_service import PatrolControlCommand, patrol_control
+from app.services.task_service import create_task_xml, monitor_sensor_data
 from app.utils.log import logger
+from app.utils.parse_execution_time import parse_execution_time
 
 password = os.environ.get("REDIS_PASSWORD", "sample_password")
 app = Celery(
@@ -21,14 +27,14 @@ app.autodiscover_tasks(["celery.tasks"], force=True)
 app.conf.broker_transport_options = {"visibility_timeout": 60 * 60 * 24 * 2}
 
 app.conf.beat_schedule = {
-    "update-robot-data-every-seconds": {
+    "update-robot-data-every-5-seconds": {
         "task": "app.celery_app.celery.update_robot_data",
-        "schedule": 1.0,
+        "schedule": 5.0,
         "kwargs": {"robot_name": "zj_robot"},
     },
-    "update-sensor-data-every-seconds": {
+    "update-sensor-data-every-5-seconds": {
         "task": "app.celery_app.celery.update_sensor_data",
-        "schedule": 1.0,
+        "schedule": 5.0,
         "kwargs": {"robot_name": "zj_robot"},
     },
     "regular-query-tasks-every-day": {
@@ -110,6 +116,40 @@ def update_sensor_data(**kwargs):
         db.close()
 
 
+def push_task_to_celery(task):
+    """
+    Push all the task execution times to celery.
+    If the task has been modified, the old task will be revoked.
+    If the task execution time has expired, the task will not be pushed to celery.
+    At the same time, the task id and the execution time are stored in redis.
+    """
+
+    task_id = task.id
+    celery_task_info = redis_client.hgetall(f"task_{task_id}")
+    if celery_task_info:
+        # If the task has been modified, the old task will be revoked.
+        for celery_task_id in celery_task_info.values():
+            app.control.revoke(celery_task_id, terminate=True)
+        redis_client.delete(f"task_{task_id}")
+
+    for execution_time in task.execution_times:
+        # If the task execution time has expired, the task will not be pushed to celery.
+        now = datetime.now()
+        hour, minute = map(int, execution_time.split(":"))
+        execution_time_obj = now.replace(
+            hour=hour, minute=minute, second=0, microsecond=0
+        )
+        if execution_time_obj < now:
+            logger.info(f"Task {task.id} has been expired at {execution_time}")
+            continue
+        eta_time = parse_execution_time(execution_time)
+        celery_task = start_task.apply_async(
+            args=[task.id, execution_time], eta=eta_time
+        )
+        redis_client.hset(f"task_{task.id}", execution_time, celery_task.id)
+        logger.info(f"Task {task.id} will start at {execution_time}")
+
+
 @app.task()
 def regular_query_tasks():
     """
@@ -132,15 +172,7 @@ def regular_query_tasks():
         Push all the task execution times to celery.
         At the same time, the task id and the execution time are stored in redis.
         """
-        # for execution_time in task.execution_times:
-        #     eta_time = parse_execution_time(execution_time)
-        #     celery_task_id = start_task.apply_async(
-        #         args=(task.id), eta=eta_time
-        #     )
-        #     redis_client.hset(
-        #         f"task_{task.id}", execution_time, celery_task_id
-        #     )
-        #     logger.error(f"Task {task.id} will start at {execution_time}")
+        push_task_to_celery(task)
 
     db.close()
     return (
@@ -151,54 +183,39 @@ def regular_query_tasks():
 @app.task()
 def start_task(task_id, execution_time):
     """
-    Before the task execution, we need to query the task from database and check it again.
-    There will be kinds of situations:
-
-    1. The task is not deleted and not modified.
-    2. The task is deleted.
-    3. The task is modified.
-
-    Situation 1:
-    Start the task.
-
-    Situation 2:
-    Do not start the task.
-
-    Situation 3:
-    Update the task and start the task.
-
-
+    Start the task
+    1. Get the task and robot information from the database
+    2. Generate the task xml file and order the robot to execute the task
+    3. Start the thread to monitor the sensor data
     """
 
-    # with SessionLocal() as db:
-    #     task = task_crud.get(db, task_id)
-    #     if task is None:
-    #         return "task not found"
+    db = SessionLocal()
+    task = task_crud.get(db, task_id)
+    robot = robot_crud.get(db, task.robot_id)
 
-    #     robot = robot_crud.get(db, task.robot_id)
-    #     if robot is None:
-    #         return "robot not found"
+    try:
+        file_name = create_task_xml(task, db)
+        xml_data = None
+        with open(file_name, "r") as f:
+            xml_data = f.read()
+        if patrol_control(
+            robot_name=robot.name,
+            patrol_command=PatrolControlCommand.START.value,
+            xml_data=xml_data,
+        ):
+            logger.error(f"Robot '{robot.name}' start task success!")
+        os.remove(file_name)
+    except Exception as e:
+        logger.error(f"start task error: {e}")
 
-    #     try:
-    #         file_name = create_task_xml(task, db)
-    #         xml_data = None
-    #         with open(file_name, "r") as f:
-    #             xml_data = f.read()
+    task = Task.from_orm(task)
 
-    #         if patrol_control(
-    #             robot_name=robot.name,
-    #             patrol_command=PatrolControlCommand.START.value,
-    #             xml_data=xml_data,
-    #         ):
-    #             logger.error(f"Robot '{robot.name}' start task success!")
-    #         os.remove(file_name)
-    #     except Exception as e:
-    #         print(e)
+    thread = Thread(target=monitor_sensor_data, args=(task,))
+    thread.start()
 
-    #     task = Task.from_orm(task)
+    redis_client.hdel(f"task_{task_id}", execution_time)
+    db.close()
 
-    #     thread = threading.Thread(target=monitor_sensor_data, args=(task,))
-    #     thread.start()
     return (
         f"task_id: {task_id} execution_time: "
         + datetime.now().strftime("%Y-%m-%d")

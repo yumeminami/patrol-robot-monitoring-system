@@ -12,16 +12,16 @@ class TaskType(Enum):
 
 
 class TaskBase(BaseModel):
-    name: str
-    type: int
-    robot_id: int
+    name: str = ""
+    type: int = TaskType.AUTO.value
+    robot_id: int = 0
     checkpoint_ids: List[int] = []
     start_position: float = 0
     end_position: float = 0
     velocity: float = 0
     sensors: List[SensorForTask] = []
     vision_algorithms: List[int] = []
-    execution_times: List[str]
+    execution_times: List[str] = []
 
     @root_validator(pre=True)
     def type_validator(cls, values):
@@ -31,9 +31,9 @@ class TaskBase(BaseModel):
         velocity = values.get("velocity")
         checkpoint_ids = values.get("checkpoint_ids")
 
-        if type not in range(0, 2):
-            raise ValueError("type must be auto(0) or maunal(1)")
-
+        if type not in [TaskType.AUTO.value, TaskType.MANUAL.value]:
+            raise ValueError("type must be auto or manual")
+        
         if type == TaskType.AUTO.value:
             if not start_position or not end_position:
                 raise ValueError(
@@ -72,7 +72,7 @@ class TaskBase(BaseModel):
                         )
         return v
 
-    @validator("execution_time")
+    @validator("execution_times")
     def execution_time_validator(cls, v):
         if v:
             for time in v:
@@ -115,5 +115,5 @@ class TaskCreate(TaskBase):
     pass
 
 
-class TaskUpdate(BaseModel):
+class TaskUpdate(TaskBase):
     pass

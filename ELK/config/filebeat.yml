@@ -1,0 +1,17 @@
+filebeat.inputs:
+- type: container
+  paths: 
+    - '/var/lib/docker/containers/*/*.log' 
+  exclude_files: ["1db177e16cfd062032f01db20471068d38134042e37a57c2e35eea23ea3e93a3*", "16d53b23a571fcf73dfd38882665999a53a2233c2f1b17151cd7f91efb4f5121*", "01031428ed956e156184e0610585b4277ba340b17082e3cb3069dccda0dfc562*","6a06901ed9fbd60d36b764eae5a3e90ff250a71a41cc399173baec2b26d0eea0*"]
+  fields:
+    level: debug
+
+setup.ilm.enabled: true
+setup.template.enabled: true
+setup.kibana.host: "http://kibana:5601"
+
+      
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+
+

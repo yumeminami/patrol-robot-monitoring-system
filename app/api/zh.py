@@ -217,7 +217,7 @@ def alarm_enum_to_literally(enum_key: str, value: int) -> str:
         "dust": "灰尘",
         "fireExtinguisher": "灭火器",
         "rust": "生锈",
-        "pound": "破损",
+        "pound": "垃圾",
         "animal": "动物",
         "hatPhoto": "安全帽",
         "fall": "跌落",

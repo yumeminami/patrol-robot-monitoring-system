@@ -12,7 +12,7 @@ services:
     environment:
       ROS_MASTER_URI: http://ros_core:11311 
       REDIS_PASSWORD: sample_password
-      ROS_HOSTNAME: 192.168.2.43
+      ROS_HOSTNAME: 192.168.3.98
       PYTHONPATH : /app/share/devel/lib/python3/dist-packages
       VISION_ALGORITHM_API_URL: http://192.168.2.41:5209
     ports:
@@ -56,7 +56,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - "db_data:/var/lib/mysql"
+      - "mysql_data:/var/lib/mysql"
     
   ros_core:
     build: 
@@ -83,5 +83,5 @@ services:
     
 
 volumes:
-  db_data: {}
+  mysql_data: {}
   redis_data: {}

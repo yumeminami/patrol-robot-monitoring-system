@@ -24,8 +24,6 @@ class Robot(BaseModel):
     status: int = RobotStatus.OFFLINE.value
     velocity: float = 0.0
     position: float = 0.0
-    task_id: int = 0
-    task_status: int = 0
     sensors: List[Sensor] = []
 
     class Config:

@@ -15,9 +15,9 @@ from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.ros.ros import available_ports
 from app.schemas.gimbalpoints import GimbalPointCreate
-from app.utils.log import log_queue, logger
-from app.utils.images import ROS_Image_to_cv2
 from app.settings import config
+from app.utils.images import ROS_Image_to_cv2
+from app.utils.log import log_queue, logger
 
 latest_img_queue = Queue()
 
@@ -79,7 +79,7 @@ def velocity_control(robot_name, **kwargs):
     Controls the velocity of the specified robot.
 
     :param robot_name: The name of the robot to control.
-    :return: None
+    :return: result(bool)
     """
 
     try:
@@ -116,7 +116,7 @@ def position_control(robot_name, **kwargs):
     Controls the position of the specified robot.
 
     :param robot_name: The name of the robot to control.
-    :return: None
+    :return: result(bool)
     """
 
     try:
@@ -162,7 +162,7 @@ def stop_control(robot_name, **kwargs):
     Sends a stop command to the specified robot.
 
     :param robot_name: The name of the robot to control.
-    :return: None
+    :return: result
     """
 
     try:
@@ -204,7 +204,7 @@ def take_picture(robot_name):
     Takes a picture using the specified robot's camera.
 
     :param robot_name: The name of the robot to control.
-    :return: None
+    :return: file_name
     """
 
     try:
@@ -239,7 +239,7 @@ def camera_control(robot_name, **kwargs):
     Controls the camera of the specified robot.
 
     :param robot_name: The name of the robot to control.
-    :return: None
+    :return: result(bool)
     """
 
     try:
@@ -296,7 +296,7 @@ def gimbal_control(robot_name, **kwargs):
     Set, clear or move the gimbal of the specified robot.
 
     :param robot_name: The name of the robot to control.
-    :return: None
+    :return: result(bool)
     """
 
     try:
@@ -348,7 +348,7 @@ def gimbal_motion_control(robot_name, **kwargs):
     Controls the gimbal of the specified robot.
 
     :param robot_name: The name of the robot to control.
-    :return: None
+    :return: result(bool)
     """
 
     try:
@@ -380,7 +380,12 @@ def gimbal_motion_control(robot_name, **kwargs):
 
 
 def patrol_control(robot_name, **kwargs):
-    """ """
+    """
+    Control the robot to patrol with the XML data.
+
+    :param robot_name: The name of the robot to control.
+    :return: result(bool)
+    """
     try:
         service_name = "/{robot_name}/patrol_control".format(
             robot_name=robot_name

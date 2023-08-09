@@ -10,6 +10,7 @@ class TaskType(Enum):
     AUTO = 0
     MANUAL = 1
 
+
 class TimeType(Enum):
     DAY = 0
     WEEK = 1
@@ -94,29 +95,38 @@ class TaskBase(BaseModel):
                                 "execution_time must be a valid time like 24:00"
                             )
                     elif len(time) == 3:
-                        raise ValueError("execution_time must be a valid time like 24:00")
+                        raise ValueError(
+                            "execution_time must be a valid time like 24:00"
+                        )
                 except:
-                    raise ValueError("execution_time must be a valid time like 24:00")
+                    raise ValueError(
+                        "execution_time must be a valid time like 24:00"
+                    )
         else:
             raise ValueError("execution_time must be provided")
         return v
-    
+
     @validator("execution_frequency", pre=True, always=True)
     def validate_execution_frequency(cls, v):
         parts = v.split(" ")
 
         if len(parts) != 2:
-            raise ValueError("execution_frequency should be in the format '[type] [interval]'")
+            raise ValueError(
+                "execution_frequency should be in the format '[type] [interval]'"
+            )
 
         time_type, interval = parts
         if time_type not in TimeType._member_names_:
-            raise ValueError(f"Invalid time type: {time_type}. Allowed values are: {', '.join(TimeType._member_names_)}")
+            raise ValueError(
+                f"Invalid time type: {time_type}. Allowed values are: {', '.join(TimeType._member_names_)}"
+            )
 
         if not interval.isdigit():
-            raise ValueError(f"Invalid interval: {interval}. It should be a positive integer.")
+            raise ValueError(
+                f"Invalid interval: {interval}. It should be a positive integer."
+            )
 
         return v
-
 
 
 class Task(TaskBase):

@@ -5,6 +5,7 @@ import uuid
 import xml.etree.ElementTree as ET
 from ast import literal_eval
 from datetime import datetime
+from datetime import timedelta
 
 import cv2
 import numpy as np
@@ -313,17 +314,60 @@ def image_detection(image, task_id, checkpoint_id):
 
 def fit_frequency(task):
     """
-    Fit the task frequency to the current time
-    1. Get the latest task log time
-    2. Calculate the time difference between the latest task log time and the current time is fit to the task frequency
+    Fit the task frequency to the current time.
+    1. Get the latest task log time.
+    2. Calculate if the time difference between the latest task log time and the current time fits the task frequency.
     """
+
+    mapper = {
+        "DAY": 1,
+        "WEEK": 7,
+        "MONTH": 30,  # assuming an average of 30 days in a month
+        "QUARTER": 90,  # 3 months
+        "YEAR": 365,  # not considering leap year
+    }
+
     db = SessionLocal()
-    latest_task_log = task_log_crud.get_the_latest_task_log(db, task.id)
-    logger.warning(
-        f"The task last executed at {latest_task_log.execution_date}"
-    )
-    if True:
-        logger.warning(
-            f"The time interval has not yet met the task {task.id} next execution frequency"
+    try:
+        parts = task.execution_frequency.split(" ")
+        if len(parts) != 2:
+            raise ValueError("Invalid execution_frequency format")
+
+        time_type, interval = parts
+        interval = int(interval)  # Convert the interval to integer
+        interval = interval * mapper[time_type]
+
+        latest_task_log = task_log_crud.get_the_latest_task_log(db, task.id)
+
+        if not latest_task_log:
+            return True
+
+        logger.info(
+            f"The task last executed at {latest_task_log.execution_date}"
         )
-    return True
+
+        now = datetime.now()
+        last_execute_date = datetime.strptime(
+            latest_task_log.execution_date, "%Y-%m-%d %H:%M"
+        )
+        delta = now - last_execute_date
+        current_interval = delta.days
+        logger.info(f"task settting interval: {interval} days")
+        logger.info(f"current_interval: {current_interval} days")
+
+        if current_interval < interval:
+            logger.info(
+                f"The time interval has not yet met the task {task.id} next execution frequency"
+            )
+            logger.info(
+                f"The next execution_date at {last_execute_date + timedelta(days=interval)}"
+            )
+            return False
+
+        return True
+
+    except Exception as e:
+        logger.error(f"Error checking task frequency: {e}")
+        return False
+    finally:
+        db.close()

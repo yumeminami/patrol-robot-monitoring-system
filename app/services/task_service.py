@@ -342,7 +342,7 @@ def fit_frequency(task):
         if not latest_task_log:
             return True
 
-        logger.info(
+        logger.warning(
             f"The task last executed at {latest_task_log.execution_date}"
         )
 
@@ -352,15 +352,13 @@ def fit_frequency(task):
         )
         delta = now - last_execute_date
         current_interval = delta.days
-        logger.info(f"task settting interval: {interval} days")
-        logger.info(f"current_interval: {current_interval} days")
 
         if current_interval < interval:
-            logger.info(
-                f"The time interval has not yet met the task {task.id} next execution frequency"
+            logger.error(
+                f"The time interval has not yet met the Task {task.id} next execution frequency"
             )
-            logger.info(
-                f"The next execution_date at {last_execute_date + timedelta(days=interval)}"
+            logger.error(
+                f"The Task {task.id} next execution_date at {last_execute_date + timedelta(days=interval)}"
             )
             return False
 

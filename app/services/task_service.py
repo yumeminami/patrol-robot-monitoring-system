@@ -32,8 +32,8 @@ from app.schemas.alarm_logs import (
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
 from app.schemas.patrol_images import PatrolImageCreate
-from app.schemas.tasks import Task, TaskType
 from app.schemas.task_logs import TaskLogCreate
+from app.schemas.tasks import Task, TaskType
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
 from app.utils.log import logger
@@ -154,7 +154,7 @@ def monitor_sensor_data(task: Task, execution_date: str):
         except ROSException as e:
             logger.error(e)
         except KeyError as e:
-            logger.error(f"{patrol_state} param does not exist.")
+            logger.error(f"{robot.name}/patrol_state param does not exist.")
         except Exception as e:
             logger.error(e)
 
@@ -241,7 +241,7 @@ def image_detection(image, task_id, checkpoint_id):
     _, img_encoded = cv2.imencode(".jpg", image_cv)
     image_base64 = base64.b64encode(img_encoded).decode()
     for vision_algorithm in vision_algorithms:
-        print(vision_algorithm.name)
+        logger.info(vision_algorithm.name)
         if vision_algorithm.sensitivity == 0:
             continue
         try:
@@ -322,4 +322,8 @@ def fit_frequency(task):
     logger.warning(
         f"The task last executed at {latest_task_log.execution_date}"
     )
+    if True:
+        logger.warning(
+            f"The time interval has not yet met the task {task.id} next execution frequency"
+        )
     return True

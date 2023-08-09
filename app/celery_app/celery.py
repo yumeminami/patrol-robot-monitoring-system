@@ -29,6 +29,7 @@ app = Celery(
 
 app.autodiscover_tasks(["celery.tasks"], force=True)
 app.conf.broker_transport_options = {"visibility_timeout": 60 * 60 * 24 * 2}
+app.conf.result_expires = 0
 
 app.conf.beat_schedule = {
     "update-robot-data-every-5-seconds": {
@@ -135,6 +136,9 @@ def push_task_to_celery(task):
         for celery_task_id in celery_task_info.values():
             app.control.revoke(celery_task_id, terminate=True)
         redis_client.delete(f"task_{task_id}")
+        logger.warning(
+            f"task {task_id} has been modified, all celery tasks have been revoked."
+        )
 
     for execution_time in task.execution_times:
         # If the task execution time has expired, the task will not be pushed to celery.
@@ -145,14 +149,16 @@ def push_task_to_celery(task):
         )
         now = now.replace(second=0, microsecond=0)
         if execution_time_obj < now:
-            logger.info(f"Task {task.id} has been expired at {execution_time}")
+            logger.warning(
+                f"Task {task.id} has been expired at {execution_time}"
+            )
             continue
         eta_time = parse_execution_time(execution_time)
         celery_task = start_task.apply_async(
             args=[task.id, execution_time], eta=eta_time
         )
         redis_client.hset(f"task_{task.id}", execution_time, celery_task.id)
-        logger.info(f"Task {task.id} will start at {execution_time}")
+        logger.warning(f"Task {task.id} will start at {execution_time}")
 
 
 @app.task()

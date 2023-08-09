@@ -10,6 +10,7 @@ import cv2
 import numpy as np
 import rospy
 from fastapi import HTTPException
+from rospy import ROSException
 
 from app.crud.alarm_logs import alarm_log as alarm_log_crud
 from app.crud.checkpoints import checkpoint as checkpoint_crud
@@ -128,16 +129,16 @@ def monitor_sensor_data(task: Task, execution_date: str):
     4. Monitoring stops when the task or robot status changes to 'finished'.
 
     """
-    logger.info("Sensor data monitoring initiated...")
+    logger.warning("Sensor data monitoring initiated...")
     while True:
         db = SessionLocal()
 
         robot = robot_crud.get(db, task.robot_id)
         try:
             patrol_state = rospy.get_param(f"/{robot.name}/patrol_state")
-            logger.info(f"Patrol state: {patrol_state}")
+            logger.warning(f"Patrol state: {patrol_state}")
             if patrol_state == 0:
-                logger.info(
+                logger.warning(
                     "Patrol completed, terminating sensor data monitoring..."
                 )
 
@@ -150,7 +151,10 @@ def monitor_sensor_data(task: Task, execution_date: str):
                 task_log_crud.create(db, obj_in=task_log_create)
                 db.close()
                 break
-
+        except ROSException as e:
+            logger.error(e)
+        except KeyError as e:
+            logger.error(f"{patrol_state} param does not exist.")
         except Exception as e:
             logger.error(e)
 
@@ -315,5 +319,7 @@ def fit_frequency(task):
     """
     db = SessionLocal()
     latest_task_log = task_log_crud.get_the_latest_task_log(db, task.id)
-    logger.info(f"The task last executed at {latest_task_log.execution_date}")
+    logger.warning(
+        f"The task last executed at {latest_task_log.execution_date}"
+    )
     return True

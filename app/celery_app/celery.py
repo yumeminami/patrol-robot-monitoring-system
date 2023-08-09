@@ -161,7 +161,7 @@ def push_task_to_celery(task):
         logger.warning(f"Task {task.id} will start at {execution_time}")
 
 
-@app.task()
+@app.task(ignore_result=True)
 def regular_query_tasks():
     """
     The celery task is used to tell the system when should the task start but not what the task is.

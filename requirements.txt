@@ -1,7 +1,7 @@
 fastapi == 0.90.0
 uvicorn == 0.23.1
 sqlalchemy == 2.0.19
-flake8 == 6.0.0
+flake8 == 6.1.0
 coverage == 7.2.7
 pymongo == 4.4.1
 pymysql == 1.1.0

@@ -98,7 +98,7 @@ class TaskBase(BaseModel):
                         raise ValueError(
                             "execution_time must be a valid time like 24:00"
                         )
-                except:
+                except Exception:
                     raise ValueError(
                         "execution_time must be a valid time like 24:00"
                     )

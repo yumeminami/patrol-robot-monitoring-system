@@ -25,7 +25,7 @@ class BaseModel(Base):
 class Robot(BaseModel):
     __tablename__ = "robots"
 
-    name = Column(String(50), index=True)
+    name = Column(String(50), index=True, unique=True)
     battery = Column(Integer, default=100)
     battery_status = Column(Integer, default=0)
     status = Column(Integer, default=0)
@@ -42,7 +42,7 @@ class Robot(BaseModel):
 class Task(BaseModel):
     __tablename__ = "tasks"
 
-    name = Column(String(50), index=True)
+    name = Column(String(50), index=True, unique=True)
     type = Column(Integer, default=0)
     robot_id = Column(Integer, ForeignKey("robots.id"))
     checkpoint_ids = Column(JSON, default=[])
@@ -52,6 +52,7 @@ class Task(BaseModel):
     sensors = Column(JSON, default=[])
     vision_algorithms = Column(JSON, default=[])
     execution_times = Column(JSON, default=[Time])
+    execution_frequency = Column(String(50))
 
 
 class CheckPoint(BaseModel):

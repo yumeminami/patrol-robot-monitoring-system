@@ -42,9 +42,9 @@ app.conf.beat_schedule = {
         "schedule": 5.0,
         "kwargs": {"robot_name": "zj_robot"},
     },
-    "regular-query-tasks-every-day": {
+    "regular-query-tasks-every-hours": {
         "task": "app.celery_app.celery.regular_query_tasks",
-        "schedule": 60.0 * 60.0 * 24.0,
+        "schedule": 60.0 * 60,
     },
 }
 
@@ -161,7 +161,7 @@ def push_task_to_celery(task):
         logger.warning(f"Task {task.id} will start at {execution_time}")
 
 
-@app.task()
+@app.task(ignore_result=True)
 def regular_query_tasks():
     """
     The celery task is used to tell the system when should the task start but not what the task is.

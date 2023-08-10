@@ -32,8 +32,9 @@ jobs:
 
     - name: Linting
       run: |
-        autoflake8 --in-place --remove-unused-variables --exclude "share" --recursive .
+        autoflake8 --in-place --remove-unused-variables --recursive app
+        flake8 app --ignore=E501,E402,W503
    
     - name: Format
       run: |
-        black . --line-length=79 --exclude="share"
+        black --line-length=79 app

@@ -90,7 +90,7 @@ def create_generic_router(
             try:
                 items_data = []
                 for item in items:
-                    if isinstance(item, db_model) == False:
+                    if isinstance(item, db_model) is False:
                         created_at = item.created_at
                         updated_at = item.updated_at
                         item = db_model.from_orm(item)

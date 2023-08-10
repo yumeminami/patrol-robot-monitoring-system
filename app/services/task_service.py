@@ -154,7 +154,7 @@ def monitor_sensor_data(task: Task, execution_date: str):
                 break
         except ROSException as e:
             logger.error(e)
-        except KeyError as e:
+        except KeyError:
             logger.error(f"{robot.name}/patrol_state param does not exist.")
         except Exception as e:
             logger.error(e)

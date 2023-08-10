@@ -6,7 +6,24 @@ from multiprocessing import Queue
 
 import cv2
 import rospy
-from common.srv import *
+from common.srv import (
+    VelocityControl,
+    VelocityControlRequest,
+    PositionControl,
+    PositionControlRequest,
+    StopControl,
+    StopControlRequest,
+    CameraCommand,
+    CameraCommandRequest,
+    TakePicture,
+    TakePictureRequest,
+    GimbalControl,
+    GimbalControlRequest,
+    GimbalMotionControl,
+    GimbalMotionControlRequest,
+    PatrolControl,
+    PatrolControlRequest,
+)
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
 
@@ -33,7 +50,7 @@ class StopControlType(Enum):
     FREE = 2
 
 
-class CameraCommand(Enum):
+class CameraCommandType(Enum):
     STOP = 0
     COLOR = 1
     COLORANDSAVE = 2
@@ -130,7 +147,7 @@ def position_control(robot_name, **kwargs):
         request.position_control_type = int(
             kwargs.get("position_control_type")
         )
-        # validate_enum_value(request.position_control_type, PositionControlType)
+        validate_enum_value(request.position_control_type, PositionControlType)
         request.target_position_f = float(kwargs.get("target_position_f"))
         request.velocity_f = float(kwargs.get("velocity_f"))
 
@@ -174,7 +191,7 @@ def stop_control(robot_name, **kwargs):
 
         request = StopControlRequest()
         request.stop_type = int(kwargs.get("stop_type"))
-        # validate_enum_value(request.stop_type, StopControlType)
+        validate_enum_value(request.stop_type, StopControlType)
 
         response = stop_control(request)
         if response.status_code == 0:
@@ -251,7 +268,7 @@ def camera_control(robot_name, **kwargs):
 
         request = CameraCommandRequest()
         request.camera_command = int(kwargs.get("camera_command"))
-        # validate_enum_value(request.camera_command, CameraCommandType)
+        validate_enum_value(request.camera_command, CameraCommandType)
 
         response = camera_control(request)
         if response.status_code == 0:

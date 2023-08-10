@@ -42,9 +42,9 @@ app.conf.beat_schedule = {
         "schedule": 5.0,
         "kwargs": {"robot_name": "zj_robot"},
     },
-    "regular-query-tasks-every-hours": {
+    "regular-query-tasks-every-6-hours": {
         "task": "app.celery_app.celery.regular_query_tasks",
-        "schedule": 60.0 * 60,
+        "schedule": 60.0 * 60 * 6,
     },
 }
 

@@ -1,4 +1,3 @@
-import cv2
 import logging
 import multiprocessing
 from multiprocessing import Queue
@@ -6,7 +5,6 @@ from multiprocessing import Queue
 import rospy
 from common.msg import robot_real_time_info, sensor_data
 from common.srv import PatrolPicture, PatrolPictureResponse
-from cv_bridge import CvBridge
 
 from app.crud.robots import robot as robot_crud
 from app.db.database import SessionLocal

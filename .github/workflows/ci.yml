@@ -32,5 +32,8 @@ jobs:
 
     - name: Linting
       run: |
+        autoflake8 --in-place --remove-unused-variables --exclude "share" --recursive .
+   
+    - name: Format
+      run: |
         black . --line-length=79 --exclude="share"
-        autoflake8 --in-place --remove-unused-variables --exclude "share, ros" --recursive .

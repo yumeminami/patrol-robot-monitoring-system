@@ -115,7 +115,7 @@ class TaskBase(BaseModel):
                 "execution_frequency should be in the format '[type] [interval]'"
             )
 
-        time_type, interval = parts
+        interval, time_type = parts
         if time_type not in TimeType._member_names_:
             raise ValueError(
                 f"Invalid time type: {time_type}. Allowed values are: {', '.join(TimeType._member_names_)}"

@@ -333,7 +333,7 @@ def fit_frequency(task):
         if len(parts) != 2:
             raise ValueError("Invalid execution_frequency format")
 
-        time_type, interval = parts
+        interval, time_type = parts
         interval = int(interval)  # Convert the interval to integer
         interval = interval * mapper[time_type]
 

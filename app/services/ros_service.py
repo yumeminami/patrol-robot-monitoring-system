@@ -13,8 +13,8 @@ from common.srv import (
     PositionControlRequest,
     StopControl,
     StopControlRequest,
-    CameraCommand,
-    CameraCommandRequest,
+    CameraControl,
+    CameraControlRequest,
     TakePicture,
     TakePictureRequest,
     GimbalControl,
@@ -264,9 +264,9 @@ def camera_control(robot_name, **kwargs):
             robot_name=robot_name
         )
         rospy.wait_for_service(service_name, timeout=1)
-        camera_control = rospy.ServiceProxy(service_name, CameraCommand)
+        camera_control = rospy.ServiceProxy(service_name, CameraControl)
 
-        request = CameraCommandRequest()
+        request = CameraControlRequest()
         request.camera_command = int(kwargs.get("camera_command"))
         validate_enum_value(request.camera_command, CameraCommandType)
 

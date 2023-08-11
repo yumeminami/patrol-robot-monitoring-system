@@ -13,10 +13,10 @@ class PatrolPictureRequest(genpy.Message):
   _md5sum = "da494d891b7912e64dd9f9564a5f9b00"
   _type = "common/PatrolPictureRequest"
   _has_header = False  # flag to mark the presence of a Header object
-  _full_text = """string patrol_task_name
-int32 patrol_point_index
-int32 gimbal_point_index
-sensor_msgs/Image img
+  _full_text = """string patrol_task_name     #巡检任务名称 写在patrolpoints节点的Intro
+int32 patrol_point_index    #巡检点索引
+int32 gimbal_point_index    #云台运动预制点索引
+sensor_msgs/Image img       #图片
 
 ================================================================================
 MSG: sensor_msgs/Image

@@ -83,10 +83,10 @@
   "fabfef9b528c8f61881ef7f060cb0b13")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<PatrolControl-request>)))
   "Returns full string definition for message of type '<PatrolControl-request>"
-  (cl:format cl:nil "int32 patrol_command ~%#0结束巡检节点 1开启巡检节点+更新任务xml文件~%#任务进行过程中 patrol_state为2代表巡检任务正在执行~%#               patrol_state为0代表节点处于待命状态，可以随时开启巡检~%string xml_data~%~%~%"))
+  (cl:format cl:nil "int32 patrol_command ~%#0结束正常巡检节点 1开启正常巡检节点+更新任务xml文件 2开启巡检节点，不传输xml文件 3开启连续巡检节点+更新xml文件~%#任务进行过程中 patrol_state为2代表巡检任务正在执行~%#               patrol_state为0代表节点处于待命状态，可以随时开启巡检~%string xml_data~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'PatrolControl-request)))
   "Returns full string definition for message of type 'PatrolControl-request"
-  (cl:format cl:nil "int32 patrol_command ~%#0结束巡检节点 1开启巡检节点+更新任务xml文件~%#任务进行过程中 patrol_state为2代表巡检任务正在执行~%#               patrol_state为0代表节点处于待命状态，可以随时开启巡检~%string xml_data~%~%~%"))
+  (cl:format cl:nil "int32 patrol_command ~%#0结束正常巡检节点 1开启正常巡检节点+更新任务xml文件 2开启巡检节点，不传输xml文件 3开启连续巡检节点+更新xml文件~%#任务进行过程中 patrol_state为2代表巡检任务正在执行~%#               patrol_state为0代表节点处于待命状态，可以随时开启巡检~%string xml_data~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <PatrolControl-request>))
   (cl:+ 0
      4

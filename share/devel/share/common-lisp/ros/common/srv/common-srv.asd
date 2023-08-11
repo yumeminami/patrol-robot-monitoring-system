@@ -3,10 +3,13 @@
 
 (defsystem "common-srv"
   :depends-on (:roslisp-msg-protocol :roslisp-utils :sensor_msgs-msg
+               :std_msgs-msg
 )
   :components ((:file "_package")
     (:file "CameraControl" :depends-on ("_package_CameraControl"))
     (:file "_package_CameraControl" :depends-on ("_package"))
+    (:file "ContinousXmlData" :depends-on ("_package_ContinousXmlData"))
+    (:file "_package_ContinousXmlData" :depends-on ("_package"))
     (:file "GimbalControl" :depends-on ("_package_GimbalControl"))
     (:file "_package_GimbalControl" :depends-on ("_package"))
     (:file "GimbalMotionControl" :depends-on ("_package_GimbalMotionControl"))
@@ -23,6 +26,8 @@
     (:file "_package_TakePicture" :depends-on ("_package"))
     (:file "VelocityControl" :depends-on ("_package_VelocityControl"))
     (:file "_package_VelocityControl" :depends-on ("_package"))
+    (:file "VideoData" :depends-on ("_package_VideoData"))
+    (:file "_package_VideoData" :depends-on ("_package"))
     (:file "XmlData" :depends-on ("_package_XmlData"))
     (:file "_package_XmlData" :depends-on ("_package"))
   ))

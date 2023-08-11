@@ -146,10 +146,10 @@
 (setf (get common::PatrolPictureRequest :md5sum-) "4b0c8b5f306638a944f76a5bcfd0a606")
 (setf (get common::PatrolPictureRequest :datatype-) "common/PatrolPictureRequest")
 (setf (get common::PatrolPictureRequest :definition-)
-      "string patrol_task_name
-int32 patrol_point_index
-int32 gimbal_point_index
-sensor_msgs/Image img
+      "string patrol_task_name     #巡检任务名称 写在patrolpoints节点的Intro
+int32 patrol_point_index    #巡检点索引
+int32 gimbal_point_index    #云台运动预制点索引
+sensor_msgs/Image img       #图片
 
 ================================================================================
 MSG: sensor_msgs/Image
@@ -204,10 +204,10 @@ int32 status_code #0失败 1完成
 (setf (get common::PatrolPictureResponse :md5sum-) "4b0c8b5f306638a944f76a5bcfd0a606")
 (setf (get common::PatrolPictureResponse :datatype-) "common/PatrolPictureResponse")
 (setf (get common::PatrolPictureResponse :definition-)
-      "string patrol_task_name
-int32 patrol_point_index
-int32 gimbal_point_index
-sensor_msgs/Image img
+      "string patrol_task_name     #巡检任务名称 写在patrolpoints节点的Intro
+int32 patrol_point_index    #巡检点索引
+int32 gimbal_point_index    #云台运动预制点索引
+sensor_msgs/Image img       #图片
 
 ================================================================================
 MSG: sensor_msgs/Image

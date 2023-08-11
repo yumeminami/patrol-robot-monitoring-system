@@ -153,7 +153,7 @@ struct Definition< ::common::PatrolControlRequest_<ContainerAllocator> >
   static const char* value()
   {
     return "int32 patrol_command \n"
-"#0结束巡检节点 1开启巡检节点+更新任务xml文件\n"
+"#0结束正常巡检节点 1开启正常巡检节点+更新任务xml文件 2开启巡检节点，不传输xml文件 3开启连续巡检节点+更新xml文件\n"
 "#任务进行过程中 patrol_state为2代表巡检任务正在执行\n"
 "#               patrol_state为0代表节点处于待命状态，可以随时开启巡检\n"
 "string xml_data\n"

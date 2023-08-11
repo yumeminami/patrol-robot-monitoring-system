@@ -96,6 +96,16 @@ class XMLPaser:
         return self.docElement.getAttribute("Intro")
 
 
+    #获取指定位置的patrol index
+    def getpatrolindex(self,patrolpoints,n): 
+        return float(patrolpoints[n].getAttribute("index"))
+
+    #获取指定位置的gimbal index
+    def getgimbalindex(self,patrolpoints,a,b): 
+        gp = patrolpoints[a].getElementsByTagName("gimbalpoint")
+        return int(gp[b].getAttribute("index"))
+
+
     #获取巡检点数目
     def getpatrolpositionnumber(self,patrolpoints): 
         return len(patrolpoints)
@@ -223,6 +233,14 @@ class Camera(smach.State):
         smach.State.__init__(self, outcomes=['camera_completed','camera_ing','camera_error'])
 
     def execute(self, userdata):
+
+        global patrolpointindex
+        global gimbalpointindex
+
+        xml_paser = XMLPaser()
+        patrolpoints = xml_paser.openxml(XMLPATH)
+        xml_paser.printpatrolpoints(patrolpoints)
+
         if(rospy.get_param("camera_state")==0):
             rospy.set_param("camera_state",ACTION_REQUEST)
         rospy.logdebug('Executing state camera')
@@ -231,8 +249,8 @@ class Camera(smach.State):
             client = rospy.ServiceProxy("patrol_picture",PatrolPicture)
             req = PatrolPictureRequest()
             req.patrol_task_name=rospy.get_param("patrol_task_name")
-            req.patrol_point_index=rospy.get_param("patrol_point_index")
-            req.gimbal_point_index=rospy.get_param("gimbal_point_index")
+            req.patrol_point_index=int(xml_paser.getpatrolindex(patrolpoints,patrolpointindex))
+            req.gimbal_point_index=int(xml_paser.getgimbalindex(patrolpoints,patrolpointindex,gimbalpointindex))
             #服务端发送图片
             bridge = CvBridge()
             image = cv2.imread(rospy.get_param("img_path"))

@@ -165,10 +165,10 @@ struct Definition< ::common::PatrolPictureRequest_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "string patrol_task_name\n"
-"int32 patrol_point_index\n"
-"int32 gimbal_point_index\n"
-"sensor_msgs/Image img\n"
+    return "string patrol_task_name     #巡检任务名称 写在patrolpoints节点的Intro\n"
+"int32 patrol_point_index    #巡检点索引\n"
+"int32 gimbal_point_index    #云台运动预制点索引\n"
+"sensor_msgs/Image img       #图片\n"
 "\n"
 "================================================================================\n"
 "MSG: sensor_msgs/Image\n"

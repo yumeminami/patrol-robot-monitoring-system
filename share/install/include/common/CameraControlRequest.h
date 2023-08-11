@@ -152,7 +152,9 @@ struct Definition< ::common::CameraControlRequest_<ContainerAllocator> >
 "# 1:彩色相机预览\n"
 "# 2:彩色相机预览+保存\n"
 "# 3:红外相机预览\n"
-"# 4:预览+保存\n"
+"# 4:红外相机预览+保存\n"
+"# 5:彩色相机录制\n"
+"# 6:红外相机录制\n"
 ;
   }
 

@@ -8,6 +8,8 @@ let VelocityControl = require('./VelocityControl.js')
 let CameraControl = require('./CameraControl.js')
 let PositionControl = require('./PositionControl.js')
 let PatrolPicture = require('./PatrolPicture.js')
+let VideoData = require('./VideoData.js')
+let ContinousXmlData = require('./ContinousXmlData.js')
 let GimbalControl = require('./GimbalControl.js')
 let StopControl = require('./StopControl.js')
 let PatrolControl = require('./PatrolControl.js')
@@ -20,6 +22,8 @@ module.exports = {
   CameraControl: CameraControl,
   PositionControl: PositionControl,
   PatrolPicture: PatrolPicture,
+  VideoData: VideoData,
+  ContinousXmlData: ContinousXmlData,
   GimbalControl: GimbalControl,
   StopControl: StopControl,
   PatrolControl: PatrolControl,

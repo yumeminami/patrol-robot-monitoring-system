@@ -17,7 +17,9 @@ class CameraControlRequest(genpy.Message):
 # 1:彩色相机预览
 # 2:彩色相机预览+保存
 # 3:红外相机预览
-# 4:预览+保存
+# 4:红外相机预览+保存
+# 5:彩色相机录制
+# 6:红外相机录制
 """
   __slots__ = ['camera_command']
   _slot_types = ['int32']

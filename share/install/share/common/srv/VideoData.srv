@@ -1,0 +1,6 @@
+string patrol_task_name     #连续巡检任务名称 写在patrolsections节点的Intro
+int32 patrol_section_index
+std_msgs/UInt8MultiArray video_data
+---
+int32 status_code #0失败，1完成
+

@@ -10,7 +10,7 @@ from app.crud.sensors import sensor as sensor_crud
 from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
-from app.schemas.tasks import Task,TaskStatus
+from app.schemas.tasks import Task, TaskStatus
 from app.services.ros_service import PatrolControlCommand, patrol_control
 from app.services.task_service import (
     create_task_xml,
@@ -178,7 +178,7 @@ def regular_query_tasks():
         Push all the task execution times to celery.
         At the same time, the task id and the execution time are stored in redis.
         """
-        
+
         if task.status == TaskStatus.STOPPED.value:
             continue
         if fit_frequency(task):

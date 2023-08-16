@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -6,6 +8,7 @@ class PatrolImageBase(BaseModel):
     task_id: int
     checkpoint_id: int
     uuid: str
+    alarm: bool
 
 
 class PatrolImageCreate(PatrolImageBase):
@@ -18,6 +21,7 @@ class PatrolImageUpdate(PatrolImageBase):
 
 class PatrolImage(PatrolImageBase):
     id: int
+    created_at: datetime
 
     class Config:
         orm_mode = True

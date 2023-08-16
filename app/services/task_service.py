@@ -238,6 +238,7 @@ def image_detection(image, task_id, checkpoint_id):
         task_id=task_id,
         uuid=image_id,
         checkpoint_id=checkpoint_id,
+        alarm=False,
     )
     patrol_image_crud.create(db, obj_in=patrol_image)
     cv2.imwrite(image_file_path, image_cv)
@@ -274,14 +275,10 @@ def image_detection(image, task_id, checkpoint_id):
                 detected_image_cv, (640, 480)
             )  # Resize image
             cv2.imwrite(detected_image_file_path, detected_image_cv)
-            patrol_image_detected = PatrolImageCreate(
-                image_url=os.path.relpath(detected_image_file_path, "app"),
-                task_id=task_id,
-                uuid=image_id,
-                checkpoint_id=checkpoint_id,
-            )
-            patrol_image_crud.create(db, obj_in=patrol_image_detected)
-            if (len(detected_alarms)) > 0:
+
+            alarm = False
+            if len(detected_alarms) > 0:
+                alarm = True
                 logger.error(f"Alarms detected: {detected_alarms}")
                 alarm_log = AlarmLogCreate(
                     level=AlarmLogLevel.WARNING.value,
@@ -293,6 +290,15 @@ def image_detection(image, task_id, checkpoint_id):
                     detail=f"Alarms detected: {detected_alarms}",
                 )
                 alarm_log_crud.create(db, obj_in=alarm_log)
+
+            patrol_image_detected = PatrolImageCreate(
+                image_url=os.path.relpath(detected_image_file_path, "app"),
+                task_id=task_id,
+                uuid=image_id,
+                checkpoint_id=checkpoint_id,
+                alarm=alarm,
+            )
+            patrol_image_crud.create(db, obj_in=patrol_image_detected)
         except Exception as e:
             logger.error(e)
             return
@@ -315,6 +321,7 @@ def image_detection(image, task_id, checkpoint_id):
         task_id=task_id,
         uuid=image_id,
         checkpoint_id=checkpoint_id,
+        alarm=False,
     )
     patrol_image_crud.create(db, obj_in=patrol_image_merge)
 

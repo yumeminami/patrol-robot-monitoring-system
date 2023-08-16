@@ -7,6 +7,7 @@ from sqlalchemy import (
     Integer,
     String,
     Time,
+    Boolean,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -140,6 +141,7 @@ class PatrolImage(BaseModel):
         ForeignKey("checkpoints.id", ondelete="CASCADE"),
         nullable=False,
     )
+    alarm = Column(Boolean, default=False)
 
 
 Base.metadata.create_all(bind=engine)

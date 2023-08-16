@@ -44,6 +44,7 @@ class Task(BaseModel):
 
     name = Column(String(50), index=True, unique=True)
     type = Column(Integer, default=0)
+    status = Column(Integer, default=2)
     robot_id = Column(Integer, ForeignKey("robots.id"))
     checkpoint_ids = Column(JSON, default=[])
     start_position = Column(Float, default=0)

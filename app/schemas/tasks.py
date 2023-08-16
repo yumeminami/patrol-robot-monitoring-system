@@ -19,9 +19,16 @@ class TimeType(Enum):
     YEAR = 4
 
 
+class TaskStatus(Enum):
+    IN_PROGRESS = 1
+    PENDING = 2
+    STOPPED = 3
+
+
 class TaskBase(BaseModel):
     name: str = ""
     type: int = TaskType.AUTO.value
+    status: int = TaskStatus.PENDING.value
     robot_id: int = 0
     checkpoint_ids: List[int] = []
     start_position: float = 0
@@ -69,6 +76,16 @@ class TaskBase(BaseModel):
                 )
 
         return values
+
+    @validator("status")
+    def status_validator(cls, v):
+        if v not in [
+            TaskStatus.IN_PROGRESS.value,
+            TaskStatus.PENDING.value,
+            TaskStatus.STOPPED.value,
+        ]:
+            raise ValueError("status must be in progress, pending or stopped")
+        return v
 
     @validator("sensors")
     def sensors_validator(cls, v, values):

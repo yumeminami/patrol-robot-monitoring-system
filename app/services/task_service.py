@@ -34,7 +34,7 @@ from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
 from app.schemas.patrol_images import PatrolImageCreate
 from app.schemas.task_logs import TaskLogCreate
-from app.schemas.tasks import Task, TaskType
+from app.schemas.tasks import Task, TaskType, TaskStatus
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
 from app.utils.log import logger
@@ -141,6 +141,16 @@ def monitor_sensor_data(task: Task, execution_date: str):
             if patrol_state == 0:
                 logger.warning(
                     "Patrol completed, terminating sensor data monitoring..."
+                )
+
+                task = task_crud.get(db, task.id)
+                if task is None:
+                    logger.error("Task does not exist in the database.")
+                    break
+                task_crud.update(
+                    db,
+                    db_obj=task,
+                    obj_in={"status": TaskStatus.PENDING.value},
                 )
 
                 task_log_create = TaskLogCreate(

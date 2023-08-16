@@ -10,7 +10,7 @@ from app.crud.sensors import sensor as sensor_crud
 from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
-from app.schemas.tasks import Task
+from app.schemas.tasks import Task,TaskStatus
 from app.services.ros_service import PatrolControlCommand, patrol_control
 from app.services.task_service import (
     create_task_xml,
@@ -29,7 +29,6 @@ app = Celery(
 
 app.autodiscover_tasks(["celery.tasks"], force=True)
 app.conf.broker_transport_options = {"visibility_timeout": 60 * 60 * 24 * 2}
-app.conf.result_expires = 0
 
 app.conf.beat_schedule = {
     "update-robot-data-every-5-seconds": {
@@ -176,13 +175,12 @@ def regular_query_tasks():
     for task in tasks:
         """ "
         Determine whether the task log time of the last executed task is compared with the current time to check if it meets the frequency set by the task
-        """
-        # TODO check the task log time of the last executed task
-
-        """"
         Push all the task execution times to celery.
         At the same time, the task id and the execution time are stored in redis.
         """
+        
+        if task.status == TaskStatus.STOPPED.value:
+            continue
         if fit_frequency(task):
             push_task_to_celery(task)
 
@@ -220,6 +218,11 @@ def start_task(task_id, execution_time):
     except Exception as e:
         logger.error(f"start task error: {e}")
 
+    task_crud.update(
+        db,
+        db_obj=task,
+        obj_in={"status": TaskStatus.IN_PROGRESS.value},
+    )
     task = Task.from_orm(task)
 
     execution_date = f"{datetime.now().strftime('%Y-%m-%d')} {execution_time}"

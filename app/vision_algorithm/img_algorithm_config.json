@@ -1,0 +1,196 @@
+{
+    "cable": {
+        "normals": "正常",
+        "leaks": "漏油",
+        "morphs": "变形",
+        "drops": "掉落",
+        "alarms": [
+            "leaks",
+            "morphs",
+            "drops"
+        ]
+    },
+    "gallery": {
+        "appearance_defect": "正常",
+        "crack": "裂缝",
+        "dig": "挖掘痕迹",
+        "leakage": "正常架构",
+        "arch_drop": "架构掉落",
+        "warp_frame": "变形架构",
+        "hole": "有螺栓孔、注浆孔",
+        "construction_joint": "施工缝",
+        "alarms": [
+            "appearance_defect",
+            "crack",
+            "dig",
+            "leakage",
+            "arch_drop",
+            "warp_frame",
+            "hole",
+            "construction_joint"
+        ]
+    },
+    "water": {
+        "cosmetic_damage": "水管外观损坏",
+        "leaking": "漏水水管",
+        "insulation_broken": "保温层损坏",
+        "alarms": [
+            "cosmetic_damage",
+            "leaking",
+            "insulation_broken"
+        ]
+    },
+    "vents": {
+        "vents": "正常",
+        "vents_gag": "通风口堵塞",
+        "alarms": [
+            "vents_gag"
+        ]
+    },
+    "drain": {
+        "drain_gag": "排水沟堵塞",
+        "alarms": [
+            "drain_gag"
+        ]
+    },
+    "lighting": {
+        "control_box_on": "控制箱打开",
+        "control_box_off": "控制箱关闭",
+        "emergency_device_on": "应急装置打开",
+        "emergency_device_off": "应急装置关闭",
+        "switch_box_on": "配电箱打开",
+        "switch_box_off": "配电箱关闭",
+        "lamp_on": "灯具打开",
+        "lamp_off": "灯具关闭",
+        "alarms": [
+            "control_box_on",
+            "emergency_device_on",
+            "switch_box_on",
+            "lamp_off"
+        ]
+    },
+    "dust": {
+        "dry_clean": "干燥清洁",
+        "dust": "灰尘",
+        "damp": "潮湿",
+        "alarms": [
+            "dust",
+            "damp"
+        ]
+    },
+    "fireExtinguisher": {
+        "normal": "正常",
+        "abnormal": "异常",
+        "alarms": [
+            "abnormal"
+        ]
+    },
+    "rust": {
+        "rust": "锈蚀",
+        "normal": "正常",
+        "alarms": [
+            "rust"
+        ]
+    },
+    "pound": {
+        "pound": "积水",
+        "rubbish": "垃圾",
+        "silt": "淤泥",
+        "alarms": [
+            "pound",
+            "rubbish",
+            "silt"
+        ]
+    },
+    "animal": {
+        "cat": "猫",
+        "frog": "青蛙",
+        "snake": "蛇",
+        "mouse": "老鼠",
+        "alarms": [
+            "cat",
+            "frog",
+            "snake",
+            "mouse"
+        ]
+    },
+    "hatPhoto": {
+        "hats": "佩戴安全帽的行人",
+        "persons": "未佩戴安全帽的行人",
+        "alarms": [
+            "persons"
+        ]
+    },
+    "fall": {
+        "normal": "正常的行人",
+        "fall": "跌倒的行人",
+        "alarms": [
+            "fall"
+        ]
+    },
+    "gas": {
+        "normal_gas": "正常的气体检测仪",
+        "abnormal_gas": "气体检测仪报警",
+        "alarms": [
+            "abnormal_gas"
+        ]
+    },
+    "catchment": {
+        "abnormal_level": "异常水位",
+        "normal_level": "正常水位",
+        "alarms": [
+            "abnormal_level"
+        ]
+    },
+    "ports": {
+        "escape": "逃生口",
+        "escape_gag": "逃生口堵塞",
+        "escalator": "扶梯",
+        "escalator_damaged": "扶梯异常",
+        "alarms": [
+            "escape_gag",
+            "escalator_damaged"
+        ]
+    },
+    "wire": {
+        "normal_wire": "正常的接地线",
+        "ground_wire_drop": "接地线掉落",
+        "alarms": [
+            "ground_wire_drop"
+        ]
+    },
+    "drainPound": {
+        "normal": "正常",
+        "drain_pound": "排水沟积水",
+        "alarms": [
+            "drain_pound"
+        ]
+    },
+    "smoke": {
+        "reflective_clothes": "反光衣",
+        "smoke": "抽烟",
+        "alarms": [
+            "smoke"
+        ]
+    },
+    "signage":{
+        "light": "亮灯",
+        "light_out": "灯灭",
+        "damage": "损坏",
+        "drop": "掉落",
+        "alarms": [
+            "light_out",
+            "damage",
+            "drop"
+        ]
+    },
+    "wallCasing":{
+        "leakage": "渗漏",
+        "fireproof_glue_drops": "套管周围防火密封胶的完好性",
+        "alarms": [
+            "leakage",
+            "fireproof_glue_drops"
+        ]
+    }
+
+}

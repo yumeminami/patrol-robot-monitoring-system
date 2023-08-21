@@ -5,29 +5,33 @@ import requests
 
 from app.utils.log import logger
 
-CONFIG_PATH = "app/vision_algorithm/config.json"
+IMG_ALGORITHM_CONFIG_PATH = "app/vision_algorithm/img_algorithm_config.json"
+VIDEO_ALGORITHM_CONFIG_PATH = "app/vision_algorithm/video_algorithm_config.json"
 
 
 class VisionAlgorithm:
     def __init__(self):
-        with open(CONFIG_PATH, "r") as f:
-            self.config = json.load(f)
+        with open(IMG_ALGORITHM_CONFIG_PATH, "r") as f:
+            self.img_algorithm_config = json.load(f)
+        with open(VIDEO_ALGORITHM_CONFIG_PATH, "r") as f:
+            self.video_algorithm_config = json.load(f)
+        self.vision_algorithm_api_url = os.environ.get(
+            "VISION_ALGORITHM_API_URL", None)
 
-    def detect(
+    def img_detect(
         self,
         image_id: str,
         image_base64: str,
         algorithm: str,
         sensitivity: float,
     ):
-        vision_algorithm_api_url = os.environ.get("VISION_ALGORITHM_API_URL")
-        if vision_algorithm_api_url is None:
+        if self.vision_algorithm_api_url is None:
             raise Exception("VISION_ALGORITHM_API_URL is not set")
-        if algorithm not in self.config.keys():
-            print(self.config.keys())
-            raise Exception("algorithm not found")
+        if algorithm not in self.img_algorithm_config.keys():
+            print(self.img_algorithm_config.keys())
+            raise KeyError("algorithm not found")
 
-        url = f"{vision_algorithm_api_url}/{algorithm}/"
+        url = f"{self.vision_algorithm_api_url}/{algorithm}/"
 
         params = {
             "img_id": image_id,
@@ -44,7 +48,7 @@ class VisionAlgorithm:
         print(receive_data["data"]["counts"])
         counts = receive_data["data"]["counts"]
         img = receive_data["data"]["img"]
-        alarms = self.config[algorithm]["alarms"]
+        alarms = self.img_algorithm_config[algorithm]["alarms"]
         detected_alarm = []
 
         try:
@@ -76,6 +80,32 @@ class VisionAlgorithm:
             logger.error(f"vision_algorithm merge error: {e}")
         finally:
             return image_data
+
+    def video_detect(self, video_data, algorithm, sensitivity):
+
+        if self.vision_algorithm_api_url is None:
+            raise Exception("VISION_ALGORITHM_API_URL is not set")
+        if algorithm not in self.video_algorithm_config.keys():
+            raise KeyError("algorithm not found")
+
+        url = f"{self.vision_algorithm_api_url}/{algorithm}/"
+
+        params = {
+            "sensitivity": sensitivity,
+        }
+
+        # TODO call vision_algorithm api to detect video
+        # try:
+        #     response = requests.post(url, json=params, data=video_data)
+        #     receive_data = response.json()
+        # except Exception as e:
+        #     logger.error(f"vision_algorithm detect error: {e}")
+        #     return False
+        
+        # if receive_data["code"] == 200:
+        #     return True
+        
+
 
 
 vision_algorithm = VisionAlgorithm()

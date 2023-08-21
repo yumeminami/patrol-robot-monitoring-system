@@ -4,6 +4,7 @@ from .endpoints.alarm_logs import router as alarm_logs_router
 from .endpoints.checkpoints import router as checkpoints_router
 from .endpoints.gimbalpoints import router as gimbalpoints_router
 from .endpoints.patrol_images import router as patrol_images_router
+from .endpoints.patrol_videos import router as patrol_videos_router
 from .endpoints.robot_logs import router as robot_logs_router
 from .endpoints.robots import router as robots_router
 from .endpoints.sensors import router as sensors_router
@@ -47,6 +48,12 @@ router.include_router(
     patrol_images_router,
     prefix="/patrol_images",
     tags=["patrol_images"],
+)
+
+router.include_router(
+    patrol_videos_router,
+    prefix="/patrol_videos",
+    tags=["patrol_videos"],
 )
 
 # Exporter router

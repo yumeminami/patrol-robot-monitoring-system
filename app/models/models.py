@@ -144,4 +144,17 @@ class PatrolImage(BaseModel):
     alarm = Column(Boolean, default=False)
 
 
+class PatrolVideo(BaseModel):
+    __tablename__ = "patrol_videos"
+    uuid = Column(String(50), index=True)
+    video_url = Column(String(100), default="")
+    task_id = Column(
+        Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
+    )
+    start_position = Column(Float, default=0)
+    end_position = Column(Float, default=0)
+    velocity = Column(Float, default=0)
+    alarm = Column(Boolean, default=False)
+
+
 Base.metadata.create_all(bind=engine)

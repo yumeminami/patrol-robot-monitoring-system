@@ -257,7 +257,7 @@ def image_detection(image, task_id, checkpoint_id):
         if vision_algorithm.sensitivity == 0:
             continue
         try:
-            detected_alarms, detected_image_base64 = vs.detect(
+            detected_alarms, detected_image_base64 = vs.img_detect(
                 image_id=image_id,
                 image_base64=image_base64,
                 algorithm=vision_algorithm.name,
@@ -299,9 +299,11 @@ def image_detection(image, task_id, checkpoint_id):
                 alarm=alarm,
             )
             patrol_image_crud.create(db, obj_in=patrol_image_detected)
+        except KeyError as e:
+            logger.error(e)
+
         except Exception as e:
             logger.error(e)
-            return
 
     # Merge
     merge_image_base64 = vs.merge(image_id, image_base64)
@@ -327,6 +329,51 @@ def image_detection(image, task_id, checkpoint_id):
 
     db.close()
     return
+
+
+def video_detection(task_id, video_data):
+    """
+    1. Save the video to the database.
+
+    2. Call the video detection algorithm.
+
+    :param task_id: The task id.
+
+    :param video_data: The video data.
+    """
+    db = SessionLocal()
+    task = task_crud.get(db, task_id)
+    if task is None:
+        logger.error("Task does not exist in the database.")
+        return
+
+    task = Task.from_orm(task)
+    vision_algorithm_ids = task.vision_algorithms
+    vision_algorithms = []
+    for id in vision_algorithm_ids:
+        vision_algorithms.append(vision_algorithm_crud.get(db, id))
+
+    for vision_algorithm in vision_algorithms:
+        logger.info(vision_algorithm.name)
+        if vision_algorithm.sensitivity == 0:
+            continue
+        try:
+            vs.video_detect(
+                video_data=video_data,
+                algorithm=vision_algorithm.name,
+                sensitivity=vision_algorithm.sensitivity,
+            )
+        except KeyError as e:
+            logger.error(e)
+    
+    video_id = str(uuid.uuid4())
+    video_file_path = f"{config.VIDEO_DIR}/{video_id}.avi"
+    with open(video_file_path, "wb") as f:
+        f.write(video_data)
+
+    # TODO Save the video to the database
+    
+    
 
 
 def fit_frequency(task):

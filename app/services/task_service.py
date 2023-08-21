@@ -17,6 +17,7 @@ from app.crud.alarm_logs import alarm_log as alarm_log_crud
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.crud.patrol_images import patrol_image as patrol_image_crud
+from app.crud.patrol_videos import patrol_video as patrol_video_crud
 from app.crud.robots import robot as robot_crud
 from app.crud.task_logs import task_log as task_log_crud
 from app.crud.tasks import task as task_crud
@@ -33,6 +34,7 @@ from app.schemas.alarm_logs import (
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
 from app.schemas.patrol_images import PatrolImageCreate
+from app.schemas.patrol_videos import PatrolVideoCreate
 from app.schemas.task_logs import TaskLogCreate
 from app.schemas.tasks import Task, TaskType, TaskStatus
 from app.settings import config
@@ -371,7 +373,18 @@ def video_detection(task_id, video_data):
     with open(video_file_path, "wb") as f:
         f.write(video_data)
 
-    # TODO Save the video to the database
+    patrol_video_create = PatrolVideoCreate(
+        video_url=os.path.relpath(video_file_path, "app"),
+        task_id=task_id,
+        uuid=video_id,
+        start_position=task.start_position,
+        end_position=task.end_position,
+        velocity=task.velocity,
+    )
+    patrol_video_crud.create(db, obj_in=patrol_video_create)
+
+    db.close()
+    return
 
 
 def fit_frequency(task):

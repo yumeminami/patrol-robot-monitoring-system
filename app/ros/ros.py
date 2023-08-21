@@ -4,14 +4,14 @@ from multiprocessing import Queue
 
 import rospy
 from common.msg import robot_real_time_info, sensor_data
-from common.srv import PatrolPicture, PatrolPictureResponse
+from common.srv import PatrolPicture, PatrolPictureResponse, VideoData, VideoDataResponse
 
 from app.crud.robots import robot as robot_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.robots import Robot
 from app.utils.log import log_queue, logger
-from app.services.task_service import image_detection
+from app.services.task_service import image_detection, video_detection
 
 available_ports = Queue()
 for i in range(45159, 45200):
@@ -25,6 +25,7 @@ topic_list = {
 
 service_list = {
     "patrol_picture": PatrolPicture,
+    "video_data": VideoData,
 }
 
 
@@ -186,6 +187,19 @@ class Node:
         response.status_code = 1
 
         return response
+
+    def video_data_callback(self, req):
+        task_id = int(req.patrol_task_name)
+        video_data = bytes(req.video_data.data)
+
+        video_detection(video_data, task_id)
+        response = VideoDataResponse()
+        response.status_code = 1
+
+        return response
+    
+
+
 
 
 def initialize_all_robots_corresponding_nodes():

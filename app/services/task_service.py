@@ -365,15 +365,13 @@ def video_detection(task_id, video_data):
             )
         except KeyError as e:
             logger.error(e)
-    
+
     video_id = str(uuid.uuid4())
     video_file_path = f"{config.VIDEO_DIR}/{video_id}.avi"
     with open(video_file_path, "wb") as f:
         f.write(video_data)
 
     # TODO Save the video to the database
-    
-    
 
 
 def fit_frequency(task):

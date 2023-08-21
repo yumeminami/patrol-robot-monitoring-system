@@ -6,7 +6,9 @@ import requests
 from app.utils.log import logger
 
 IMG_ALGORITHM_CONFIG_PATH = "app/vision_algorithm/img_algorithm_config.json"
-VIDEO_ALGORITHM_CONFIG_PATH = "app/vision_algorithm/video_algorithm_config.json"
+VIDEO_ALGORITHM_CONFIG_PATH = (
+    "app/vision_algorithm/video_algorithm_config.json"
+)
 
 
 class VisionAlgorithm:
@@ -16,7 +18,8 @@ class VisionAlgorithm:
         with open(VIDEO_ALGORITHM_CONFIG_PATH, "r") as f:
             self.video_algorithm_config = json.load(f)
         self.vision_algorithm_api_url = os.environ.get(
-            "VISION_ALGORITHM_API_URL", None)
+            "VISION_ALGORITHM_API_URL", None
+        )
 
     def img_detect(
         self,
@@ -82,17 +85,16 @@ class VisionAlgorithm:
             return image_data
 
     def video_detect(self, video_data, algorithm, sensitivity):
-
         if self.vision_algorithm_api_url is None:
             raise Exception("VISION_ALGORITHM_API_URL is not set")
         if algorithm not in self.video_algorithm_config.keys():
             raise KeyError("algorithm not found")
 
-        url = f"{self.vision_algorithm_api_url}/{algorithm}/"
+        # url = f"{self.vision_algorithm_api_url}/{algorithm}/"
 
-        params = {
-            "sensitivity": sensitivity,
-        }
+        # params = {
+        #     "sensitivity": sensitivity,
+        # }
 
         # TODO call vision_algorithm api to detect video
         # try:
@@ -101,11 +103,9 @@ class VisionAlgorithm:
         # except Exception as e:
         #     logger.error(f"vision_algorithm detect error: {e}")
         #     return False
-        
+
         # if receive_data["code"] == 200:
         #     return True
-        
-
 
 
 vision_algorithm = VisionAlgorithm()

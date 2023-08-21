@@ -8,7 +8,7 @@ from app.schemas.patrol_images import (
 
 
 def after_delete(id, patrol_image, db):
-    remove_file("app/"+patrol_image.image_url)
+    remove_file("app/" + patrol_image.image_url)
 
 
 patrol_images_hooks = {
@@ -16,5 +16,9 @@ patrol_images_hooks = {
 }
 
 router = create_generic_router(
-    crud, PatrolImageCreate, PatrolImageUpdate, PatrolImage, hooks=patrol_images_hooks
+    crud,
+    PatrolImageCreate,
+    PatrolImageUpdate,
+    PatrolImage,
+    hooks=patrol_images_hooks,
 )

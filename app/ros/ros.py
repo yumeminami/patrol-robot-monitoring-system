@@ -4,7 +4,12 @@ from multiprocessing import Queue
 
 import rospy
 from common.msg import robot_real_time_info, sensor_data
-from common.srv import PatrolPicture, PatrolPictureResponse, VideoData, VideoDataResponse
+from common.srv import (
+    PatrolPicture,
+    PatrolPictureResponse,
+    VideoData,
+    VideoDataResponse,
+)
 
 from app.crud.robots import robot as robot_crud
 from app.db.database import SessionLocal
@@ -197,9 +202,6 @@ class Node:
         response.status_code = 1
 
         return response
-    
-
-
 
 
 def initialize_all_robots_corresponding_nodes():

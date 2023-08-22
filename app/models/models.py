@@ -51,6 +51,7 @@ class Task(BaseModel):
     start_position = Column(Float, default=0)
     end_position = Column(Float, default=0)
     velocity = Column(Float, default=0)
+    gimbal_points = Column(JSON, default=[Integer])
     sensors = Column(JSON, default=[])
     vision_algorithms = Column(JSON, default=[])
     execution_times = Column(JSON, default=[Time])

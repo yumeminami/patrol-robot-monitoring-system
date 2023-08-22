@@ -63,62 +63,80 @@ def indent(elem, level=0):
 def create_task_xml(task, db):
     # Check the task type
     if task.type == TaskType.AUTO.value:
-        return
+        root = ET.Element("patrolsections")
+        root.set("Intro", f"{task.id}")
 
-    root = ET.Element("patrolpoints")
-    root.set("Intro", f"{task.id}")
+        patrol_section = ET.SubElement(root, "patrolsection")
+        patrol_section.set("index", "1")
+        patrol_section.set("startposition", str(task.start_position))
+        patrol_section.set("endposition", str(task.end_position))
+        patrol_section.set("velocity", str(task.velocity))
+        gimbal_point = gimbal_point_crud.get(db, task.gimbal_point)
+        if gimbal_point is None:
+            raise Exception("Gimbal point does not exist")
+        patrol_section.set("gimbalpresetpoint", str(gimbal_point.preset_index))
 
-    # Get checkpoints from task.checkpoint_ids
-    checkpoint_list = []
-    for id in task.checkpoint_ids:
-        checkpoint = checkpoint_crud.get(db, id)
-        if checkpoint is None:
-            raise HTTPException(
-                status_code=400,
-                detail="Checkpoint does not exist",
-            )
-        checkpoint = CheckPoint.from_orm(checkpoint)
-        checkpoint_list.append(checkpoint)
+        indent(root)
+        # Save the XML to the file with encoding and XML declaration
+        tree = ET.ElementTree(root)
+        file_name = "{}.xml".format(datetime.now().strftime("%Y%m%d%H%M%S"))
+        tree.write(file_name, encoding="utf-8", xml_declaration=True)
+        return file_name
+    else:
+        root = ET.Element("patrolpoints")
+        root.set("Intro", f"{task.id}")
 
-    # Add patrol points with their corresponding gimbal points and actions
-    for checkpoint in checkpoint_list:
-        # Add patrol point
-        patrolpoint = ET.SubElement(root, "patrolpoint")
-        patrolpoint.set("index", str(checkpoint.id))
-        patrolpoint.set("position", str(checkpoint.position))
-        patrolpoint.set("velocity", str(checkpoint.velocity))
-
-        # Get patrol point's corresponding gimbal points
-        gimbalpoint_list = []
-        for id in checkpoint.gimbal_points:
-            gimbal_point = gimbal_point_crud.get(db, id)
-            if gimbal_point is None:
+        # Get checkpoints from task.checkpoint_ids
+        checkpoint_list = []
+        for id in task.checkpoint_ids:
+            checkpoint = checkpoint_crud.get(db, id)
+            if checkpoint is None:
                 raise HTTPException(
                     status_code=400,
-                    detail="Gimbal point does not exist",
+                    detail="Checkpoint does not exist",
                 )
-            gimbal_point = GimbalPoint.from_orm(gimbal_point)
-            gimbalpoint_list.append(gimbal_point)
+            checkpoint = CheckPoint.from_orm(checkpoint)
+            checkpoint_list.append(checkpoint)
 
-        for gimbalpoint in gimbalpoint_list:
-            # Add gimbal point
-            gimbalpoint_ = ET.SubElement(patrolpoint, "gimbalpoint")
-            gimbalpoint_.set("index", str(gimbalpoint.id))
-            gimbalpoint_.set("presetpoint", str(gimbalpoint.preset_index))
+        # Add patrol points with their corresponding gimbal points and actions
+        for checkpoint in checkpoint_list:
+            # Add patrol point
+            patrolpoint = ET.SubElement(root, "patrolpoint")
+            patrolpoint.set("index", str(checkpoint.id))
+            patrolpoint.set("position", str(checkpoint.position))
+            patrolpoint.set("velocity", str(checkpoint.velocity))
 
-            for k, action in enumerate(
-                ["takepicture", "takevideo", "recordvoice"], start=1
-            ):
-                action_elem = ET.SubElement(gimbalpoint_, action)
-                action_elem.set("index", str(k))
-                action_elem.set("param", f"{action}param{k}")
+            # Get patrol point's corresponding gimbal points
+            gimbalpoint_list = []
+            for id in checkpoint.gimbal_points:
+                gimbal_point = gimbal_point_crud.get(db, id)
+                if gimbal_point is None:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Gimbal point does not exist",
+                    )
+                gimbal_point = GimbalPoint.from_orm(gimbal_point)
+                gimbalpoint_list.append(gimbal_point)
 
-    indent(root)
-    # Save the XML to the file with encoding and XML declaration
-    tree = ET.ElementTree(root)
-    file_name = "{}.xml".format(datetime.now().strftime("%Y%m%d%H%M%S"))
-    tree.write(file_name, encoding="utf-8", xml_declaration=True)
-    return file_name
+            for gimbalpoint in gimbalpoint_list:
+                # Add gimbal point
+                gimbalpoint_ = ET.SubElement(patrolpoint, "gimbalpoint")
+                gimbalpoint_.set("index", str(gimbalpoint.id))
+                gimbalpoint_.set("presetpoint", str(gimbalpoint.preset_index))
+
+                for k, action in enumerate(
+                    ["takepicture", "takevideo", "recordvoice"], start=1
+                ):
+                    action_elem = ET.SubElement(gimbalpoint_, action)
+                    action_elem.set("index", str(k))
+                    action_elem.set("param", f"{action}param{k}")
+
+        indent(root)
+        # Save the XML to the file with encoding and XML declaration
+        tree = ET.ElementTree(root)
+        file_name = "{}.xml".format(datetime.now().strftime("%Y%m%d%H%M%S"))
+        tree.write(file_name, encoding="utf-8", xml_declaration=True)
+        return file_name
 
 
 def monitor_sensor_data(task: Task, execution_date: str):

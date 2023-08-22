@@ -34,7 +34,7 @@ class TaskBase(BaseModel):
     start_position: float = 0
     end_position: float = 0
     velocity: float = 0
-    gimbal_points: List[int] = []
+    gimbal_point: int = 0
     sensors: List[SensorForTask] = []
     vision_algorithms: List[int] = []
     execution_times: List[str] = []
@@ -46,7 +46,7 @@ class TaskBase(BaseModel):
         start_position = values.get("start_position")
         end_position = values.get("end_position")
         velocity = values.get("velocity")
-        gimbal_points = values.get("gimbal_points")
+        gimbal_point = values.get("gimbal_point")
         checkpoint_ids = values.get("checkpoint_ids")
 
         if type not in [TaskType.AUTO.value, TaskType.MANUAL.value]:
@@ -67,9 +67,9 @@ class TaskBase(BaseModel):
                 )
             if velocity == 0:
                 raise ValueError("velocity must be provided when type is auto")
-            if not gimbal_points:
+            if gimbal_point == 0:
                 raise ValueError(
-                    "gimbal_points must be provided when type is auto"
+                    "gimbal_point must be provided when type is auto"
                 )
             if checkpoint_ids:
                 raise ValueError(

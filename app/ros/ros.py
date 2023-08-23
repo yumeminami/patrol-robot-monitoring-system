@@ -216,7 +216,7 @@ def initialize_all_robots_corresponding_nodes():
 
     logger.info("Initializing ROS node...")
     db = SessionLocal()
-    robots = robot_crud.get_multi(db)
+    robots = robot_crud.get_all(db)
     db.close()
     process_list = []
     for robot in robots:

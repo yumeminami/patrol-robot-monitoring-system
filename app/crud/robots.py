@@ -25,4 +25,5 @@ class CRUDRobot(CRUDBase[Robot, RobotCreate, RobotUpdate]):
     def get_all(self, db: Session) -> List[Robot]:
         return db.query(self.model).all()
 
+
 robot = CRUDRobot(Robot)

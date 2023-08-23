@@ -1,11 +1,7 @@
-import asyncio
-from multiprocessing import Process
-
-import cv2
 from fastapi import Depends
 from fastapi.background import BackgroundTasks
 from fastapi.exceptions import HTTPException
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.api.api import create_generic_router, remove_file
@@ -17,14 +13,10 @@ from app.services.ros_service import gimbal_control as gimbal_control_ros
 from app.services.ros_service import (
     gimbal_motion_control as gimbal_motion_control_ros,
 )
-from app.services.ros_service import latest_img_queue
 from app.services.ros_service import position_control as position_control_ros
 from app.services.ros_service import stop_control as stop_control_ros
 from app.services.ros_service import take_picture as take_picture_ros
 from app.services.ros_service import velocity_control as velocity_control_ros
-from app.services.ros_service import video_streamer
-
-video_processes = {}
 
 
 def get_db():
@@ -127,41 +119,6 @@ def camera_control(
         return {"message": "Camera control success"}
     else:
         raise HTTPException(status_code=400, detail="Camera control failed")
-
-
-async def generate_frames():
-    while True:
-        if not latest_img_queue.empty():
-            img = latest_img_queue.get()
-            resized_img = cv2.resize(img, (640, 480))
-            _, img_encoded = cv2.imencode(
-                ".jpg", resized_img, [cv2.IMWRITE_JPEG_QUALITY, 80]
-            )
-            frame_bytes = img_encoded.tobytes()
-            yield (
-                b"--frame\r\n"
-                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
-            )
-        else:
-            await asyncio.sleep(0.1)
-
-
-@router.get("/{id}/video")
-async def stream_video(id: int, db: Session = Depends(get_db)):
-    robot = crud.get(db, id)
-    if robot is None:
-        raise HTTPException(status_code=404, detail="Robot not found")
-    robot_name = robot.name
-
-    if robot_name not in video_processes:
-        video_process = Process(target=video_streamer, args=(robot_name,))
-        video_process.start()
-        video_processes[robot_name] = video_process
-
-    return StreamingResponse(
-        generate_frames(),
-        media_type="multipart/x-mixed-replace; boundary=frame",
-    )
 
 
 @router.post("/{id}/gimbal_control")

@@ -1,8 +1,6 @@
-import logging
 from ast import literal_eval
 from datetime import datetime
 from enum import Enum
-from multiprocessing import Queue
 
 import cv2
 import rospy
@@ -24,19 +22,14 @@ from common.srv import (
     PatrolControl,
     PatrolControlRequest,
 )
-from cv_bridge import CvBridge
-from sensor_msgs.msg import Image
 
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
-from app.ros.ros import available_ports
 from app.schemas.gimbalpoints import GimbalPointCreate
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
-from app.utils.log import log_queue, logger
-
-latest_img_queue = Queue()
+from app.utils.log import logger
 
 
 class PositionControlType(Enum):
@@ -283,29 +276,6 @@ def camera_control(robot_name, **kwargs):
     except Exception as e:
         logger.error(f"Error: {e}")
         return False
-
-
-def video_streamer(robot_name):
-    def callback(data):
-        bridge = CvBridge()
-        img = bridge.imgmsg_to_cv2(data, desired_encoding="bgr8")
-        latest_img_queue.put(img)
-
-    handler = logging.handlers.QueueHandler(log_queue)
-    logger.addHandler(handler)
-    xmlrpc_port = available_ports.get()
-    tcpros_port = available_ports.get()
-    logger.info(f"xmlrpc_port: {xmlrpc_port}")
-    logger.info(f"tcpros_port: {tcpros_port}")
-    rospy.init_node(
-        f"{robot_name}_video_stream_subscriber",
-        xmlrpc_port=xmlrpc_port,
-        tcpros_port=tcpros_port,
-    )
-    topic_name = f"/{robot_name}/video_stream"
-    rospy.Subscriber(topic_name, Image, callback)
-    while not rospy.is_shutdown():
-        rospy.spin()
 
 
 def gimbal_control(robot_name, **kwargs):

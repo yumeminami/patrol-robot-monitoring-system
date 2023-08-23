@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class CheckPointBase(BaseModel):
     name: str
+    robot_id: int
     position: int = 0
     velocity: int = 0
     gimbal_points: List[int] = []
@@ -18,10 +19,7 @@ class CheckPointCreate(CheckPointBase):
 
 
 class CheckPointUpdate(BaseModel):
-    name: str = ""
-    position: int = 0
-    velocity: int = 0
-    gimbal_points: List[int] = []
+    pass
 
 
 class CheckPoint(CheckPointBase):

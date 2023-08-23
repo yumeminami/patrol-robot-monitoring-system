@@ -62,6 +62,7 @@ class CheckPoint(BaseModel):
     __tablename__ = "checkpoints"
 
     name = Column(String(50), index=True)
+    robot_id = Column(Integer, ForeignKey("robots.id"))
     position = Column(Integer, default=0)
     velocity = Column(Integer, default=0)
     gimbal_points = Column(JSON, default=[Integer])

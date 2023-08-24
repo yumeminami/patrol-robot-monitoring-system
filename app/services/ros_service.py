@@ -107,8 +107,8 @@ def velocity_control(robot_name, **kwargs):
 
         response = velocity_control(request)
         if response.status_code == 0:
-            logger.info("velocity control failed")
-            return False
+            logger.info(f"velocity control failed: {response.err_msg}")
+            return False, response.err_msg
 
         # Update the velocity to redis manually(FOR TEST ONLY)
         info = redis_client.hget(robot_name, "robot_real_time_info")
@@ -116,12 +116,10 @@ def velocity_control(robot_name, **kwargs):
         redis_client.hset(robot_name, "robot_real_time_info", str(info))
 
         return True
-    except rospy.ROSException as e:
-        logger.error(f"Error: {e}")
-        return False
+
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False
+        return False, f"Error: {e}"
 
 
 def position_control(robot_name, **kwargs):
@@ -149,8 +147,8 @@ def position_control(robot_name, **kwargs):
 
         response = position_control(request)
         if response.status_code == 0:
-            logger.error(response.err_msg)
-            return False
+            logger.error(f"position control failed: {response.err_msg}")
+            return False, response.err_msg
 
         # Update the velocity to redis manually(FOR TEST ONLY)
         info = redis_client.hget(robot_name, "robot_real_time_info")
@@ -159,15 +157,10 @@ def position_control(robot_name, **kwargs):
         redis_client.hset(robot_name, "robot_real_time_info", str(info))
 
         return True
-    except rospy.ROSException as e:
-        logger.error(f"Error: {e}")
-        return False
-    except ValueError as e:
-        logger.error(f"Error: {e}")
-        return False
+
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False
+        return False, f"Error: {e}"
 
 
 def stop_control(robot_name, **kwargs):
@@ -191,8 +184,8 @@ def stop_control(robot_name, **kwargs):
 
         response = stop_control(request)
         if response.status_code == 0:
-            logger.error(response.err_msg)
-            return False
+            logger.error(f"stop control failed: {response.err_msg}")
+            return False, response.err_msg
 
         # Update the velocity to redis manually(FOR TEST ONLY)
         info = redis_client.hget(robot_name, "robot_real_time_info")
@@ -201,15 +194,10 @@ def stop_control(robot_name, **kwargs):
         redis_client.hset(robot_name, "robot_real_time_info", str(info))
 
         return True
-    except rospy.ROSException as e:
-        logger.error(f"Error: {e}")
-        return False
-    except ValueError as e:
-        logger.error(f"Error: {e}")
-        return False
+
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False
+        return False, f"Error: {e}"
 
 
 def take_picture(robot_name):
@@ -231,19 +219,17 @@ def take_picture(robot_name):
 
         response = take_picture(request)
         if response.status_code == 0 and response.img is not None:
-            logger.error(response.err_msg)
-            return False
+            logger.error(f"take picture failed: {response.err_msg}")
+            return False, response.err_msg
         file_name = datetime.now().strftime("%Y%m%d%H%M%S") + ".jpg"
         file_path = config.IMAGE_DIR + file_name
         img = ROS_Image_to_cv2(response.img)
         cv2.imwrite(file_path, img)
         return file_name
-    except rospy.ROSException as e:
-        logger.error(f"Error: {e}")
-        return False
+
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False
+        return False, f"Error: {e}"
 
 
 # camera control
@@ -268,17 +254,12 @@ def camera_control(robot_name, **kwargs):
 
         response = camera_control(request)
         if response.status_code == 0:
-            return False
+            return False, "camera control failed"
         return True
-    except rospy.ROSException as e:
-        logger.error(f"Error: {e}")
-        return False
-    except ValueError as e:
-        logger.error(f"Error: {e}")
-        return False
+
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False
+        return False, f"Error: {e}"
 
 
 def gimbal_control(robot_name, **kwargs):
@@ -304,7 +285,7 @@ def gimbal_control(robot_name, **kwargs):
 
         response = gimbal_control(request)
         if response.status_code == 0:
-            return False, "Robot Gimbal control failed"
+            return False, "gimbal control failed"
 
         db = SessionLocal()
         if request.command == GimbalControlCommand.SET.value:
@@ -345,12 +326,7 @@ def gimbal_control(robot_name, **kwargs):
             )
 
         return True
-    except rospy.ROSException as e:
-        logger.error(f"Error: {e}")
-        return False, f"Error: {e}"
-    except ValueError as e:
-        logger.error(f"Error: {e}")
-        return False, f"Error: {e}"
+
     except Exception as e:
         logger.error(f"Error: {e}")
         return False, f"Error: {e}"
@@ -379,17 +355,12 @@ def gimbal_motion_control(robot_name, **kwargs):
 
         response = gimbal_motion_control(request)
         if response.status_code == 0:
-            return False
+            return False, "gimbal motion control failed"
         return True
-    except rospy.ROSException as e:
-        logger.error(f"Error: {e}")
-        return False
-    except ValueError as e:
-        logger.error(f"Error: {e}")
-        return False
+
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False
+        return False, f"Error: {e}"
 
 
 def patrol_control(robot_name, **kwargs):
@@ -418,12 +389,6 @@ def patrol_control(robot_name, **kwargs):
             return False
         return True
 
-    except rospy.ROSException as e:
-        logger.error(f"Error: {e}")
-        return False
-    except ValueError as e:
-        logger.error(f"Error: {e}")
-        return False
     except Exception as e:
         logger.error(f"Error: {e}")
         return False

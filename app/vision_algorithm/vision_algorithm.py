@@ -84,28 +84,27 @@ class VisionAlgorithm:
         finally:
             return image_data
 
-    def video_detect(self, video_data, algorithm, sensitivity):
+    def video_detect(self, video_id, video_data, algorithm, sensitivity):
         if self.vision_algorithm_api_url is None:
             raise Exception("VISION_ALGORITHM_API_URL is not set")
         if algorithm not in self.video_algorithm_config.keys():
             raise KeyError("algorithm not found")
 
-        # url = f"{self.vision_algorithm_api_url}/{algorithm}/"
 
-        # params = {
-        #     "sensitivity": sensitivity,
-        # }
+        url = f"{self.vision_algorithm_api_url}/video/{algorithm}/{video_id}/{sensitivity}"
 
-        # TODO call vision_algorithm api to detect video
-        # try:
-        #     response = requests.post(url, json=params, data=video_data)
-        #     receive_data = response.json()
-        # except Exception as e:
-        #     logger.error(f"vision_algorithm detect error: {e}")
-        #     return False
-
-        # if receive_data["code"] == 200:
-        #     return True
-
+        try:
+            r = requests.post(url, files={'file': video_data})  # post传递数据
+            print(r.status_code)
+            vid = r.headers.get('x-video-metadata')
+            if vid == '' or vid is None:
+                logger.error(f"vision_algorithm detect error: {r.text}")
+            with open(f"{vid}_detected.mp4", "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+        except Exception as e:
+            logger.error(f"vision_algorithm detect error: {e}")
+            return False
 
 vision_algorithm = VisionAlgorithm()

@@ -140,69 +140,73 @@ def create_generic_router(
             return after_read(db_item)
         return db_item
 
-    @router.post("", response_model=db_model)
-    def create_item(
-        item: create_schema,
-        db: Session = Depends(get_db),
-        token: str = Depends(oauth2_scheme),
-    ):
-        """
-        Create item
+    if create_schema is not None:
 
-        :param item: item
-        :param db: database session
-        :param token: token
+        @router.post("", response_model=db_model)
+        def create_item(
+            item: create_schema,
+            db: Session = Depends(get_db),
+            token: str = Depends(oauth2_scheme),
+        ):
+            """
+            Create item
 
-        :return: created item
-        """
-        before_created = hooks.get("before_created")
-        if before_created:
-            before_created(item, db)
+            :param item: item
+            :param db: database session
+            :param token: token
 
-        try:
-            created_item = crud.create(db=db, obj_in=item)
-        except Exception as e:
-            return HTTPException(status_code=400, detail=e.__str__())
-        after_created = hooks.get("after_created")
-        if after_created:
-            after_created(created_item, db)
+            :return: created item
+            """
+            before_created = hooks.get("before_created")
+            if before_created:
+                before_created(item, db)
 
-        return created_item
+            try:
+                created_item = crud.create(db=db, obj_in=item)
+            except Exception as e:
+                return HTTPException(status_code=400, detail=e.__str__())
+            after_created = hooks.get("after_created")
+            if after_created:
+                after_created(created_item, db)
 
-    @router.put("/{item_id}", response_model=db_model)
-    def update_item(
-        item_id: int,
-        item: update_schema,
-        db: Session = Depends(get_db),
-        token: str = Depends(oauth2_scheme),
-    ):
-        """
-        Update item
+            return created_item
 
-        :param item_id: item id
-        :param item: item
-        :param db: database session
-        :param token: token
+    if update_schema is not None:
 
-        :return: updated item
-        """
-        before_updated = hooks.get("before_update")
-        if before_updated:
-            before_updated(item_id, item, db)
+        @router.put("/{item_id}", response_model=db_model)
+        def update_item(
+            item_id: int,
+            item: update_schema,
+            db: Session = Depends(get_db),
+            token: str = Depends(oauth2_scheme),
+        ):
+            """
+            Update item
 
-        db_item = crud.get(db=db, id=item_id)
-        if db_item is None:
-            return JSONResponse(status_code=404, content="Item not found")
+            :param item_id: item id
+            :param item: item
+            :param db: database session
+            :param token: token
 
-        try:
-            updated_item = crud.update(db=db, db_obj=db_item, obj_in=item)
-        except Exception as e:
-            return HTTPException(status_code=400, detail=e.__str__())
+            :return: updated item
+            """
+            before_updated = hooks.get("before_update")
+            if before_updated:
+                before_updated(item_id, item, db)
 
-        after_update = hooks.get("after_update")
-        if after_update:
-            after_update(item_id, updated_item, db)
-        return updated_item
+            db_item = crud.get(db=db, id=item_id)
+            if db_item is None:
+                return JSONResponse(status_code=404, content="Item not found")
+
+            try:
+                updated_item = crud.update(db=db, db_obj=db_item, obj_in=item)
+            except Exception as e:
+                return HTTPException(status_code=400, detail=e.__str__())
+
+            after_update = hooks.get("after_update")
+            if after_update:
+                after_update(item_id, updated_item, db)
+            return updated_item
 
     @router.delete("/{item_id}", response_model=db_model)
     def delete_item(

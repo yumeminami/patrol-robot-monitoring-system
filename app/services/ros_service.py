@@ -24,6 +24,7 @@ from common.srv import (
 )
 
 from app.crud.tasks import task as task_crud
+from app.crud.robots import robot as robot_crud
 from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.db.database import SessionLocal
@@ -311,8 +312,9 @@ def gimbal_control(robot_name, **kwargs):
                         db=db, preset_index=request.preset_index
                     )
                 ) is None:
+                    robot = robot_crud.get_by_name(db=db, name=robot_name)
                     gimbal_point = GimbalPointCreate(
-                        preset_index=request.preset_index
+                        robot_id=robot.id, preset_index=request.preset_index
                     )
                     gimbal_point_crud.create(db=db, obj_in=gimbal_point)
                 result = True

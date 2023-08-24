@@ -128,6 +128,7 @@ class VisionAlgorithm(BaseModel):
 
 class GimbalPoint(BaseModel):
     __tablename__ = "gimbal_points"
+    robot_id = Column(Integer, ForeignKey("robots.id"))
     preset_index = Column(Integer, nullable=False, unique=True)
 
 

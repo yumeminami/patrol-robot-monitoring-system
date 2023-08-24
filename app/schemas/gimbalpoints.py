@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class GimbalPointBase(BaseModel):
+    robot_id: int
     preset_index: int = 0
 
     class Config:

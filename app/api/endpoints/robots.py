@@ -1,3 +1,5 @@
+from typing import Callable
+
 from fastapi import Depends
 from fastapi.background import BackgroundTasks
 from fastapi.exceptions import HTTPException
@@ -34,22 +36,32 @@ router = create_generic_router(
 )
 
 
-# velocity control
-@router.post("/{id}/velocity_control")
-def velocity_control(
-    id: int, db: Session = Depends(get_db), velocity_f: float = 0.0
+def control_robot(
+    id: int,
+    db: Session = Depends(get_db),
+    control_func: Callable = None,
+    **kwargs,
 ):
     robot = crud.get(db, id)
     if robot is None:
         raise HTTPException(status_code=404, detail="Robot not found")
+    if control_func:
+        result, err_msg = control_func(robot_name=robot.name, **kwargs)
+        if result:
+            return {"message": f"{control_func.__name__} success"}
+        else:
+            raise HTTPException(status_code=400, detail=str(err_msg))
 
-    if velocity_control_ros(robot_name=robot.name, velocity_f=velocity_f):
-        return {"message": "Velocity control success"}
-    else:
-        raise HTTPException(status_code=400, detail="Velocity control failed")
+
+@router.post("/{id}/velocity_control")
+def velocity_control(
+    id: int, db: Session = Depends(get_db), velocity_f: float = 0.0
+):
+    return control_robot(
+        id=id, db=db, control_func=velocity_control_ros, velocity_f=velocity_f
+    )
 
 
-# position control
 @router.post("/{id}/position_control")
 def position_control(
     id: int,
@@ -58,35 +70,23 @@ def position_control(
     target_position_f: float = 0.0,
     velocity_f: float = 0.0,
 ):
-    robot = crud.get(db, id)
-    if robot is None:
-        raise HTTPException(status_code=404, detail="Robot not found")
-
-    if position_control_ros(
-        robot_name=robot.name,
+    return control_robot(
+        id=id,
+        db=db,
+        control_func=position_control_ros,
         position_control_type=position_control_type,
         target_position_f=target_position_f,
         velocity_f=velocity_f,
-    ):
-        return {"message": "Position control success"}
-    else:
-        raise HTTPException(status_code=400, detail="Position control failed")
+    )
 
 
-# stop control
 @router.post("/{id}/stop_control")
 def stop_control(id: int, db: Session = Depends(get_db), stop_type: int = 0):
-    robot = crud.get(db, id)
-    if robot is None:
-        raise HTTPException(status_code=404, detail="Robot not found")
-
-    if stop_control_ros(robot_name=robot.name, stop_type=stop_type):
-        return {"message": "Stop control success"}
-    else:
-        raise HTTPException(status_code=400, detail="Stop control failed")
+    return control_robot(
+        id=id, db=db, control_func=stop_control_ros, stop_type=stop_type
+    )
 
 
-# take photo
 @router.get("/{id}/photo")
 def take_photo(
     background_tasks: BackgroundTasks, id: int, db: Session = Depends(get_db)
@@ -95,30 +95,24 @@ def take_photo(
     if robot is None:
         raise HTTPException(status_code=404, detail="Robot not found")
 
-    file_name = take_picture_ros(robot_name=robot.name)
-    if file_name:
-        file_name = "app/images/" + file_name
-        background_tasks.add_task(remove_file, file_name)
-        return FileResponse(file_name)
+    file_path = take_picture_ros(robot_name=robot.name)
+    if file_path:
+        background_tasks.add_task(remove_file, file_path)
+        return FileResponse(file_path)
     else:
         raise HTTPException(status_code=400, detail="Take photo failed")
 
 
-# camera control
 @router.post("/{id}/camera_control")
 def camera_control(
     id: int, db: Session = Depends(get_db), camera_command: int = 0
 ):
-    robot = crud.get(db, id)
-    if robot is None:
-        raise HTTPException(status_code=404, detail="Robot not found")
-
-    if camera_control_ros(
-        robot_name=robot.name, camera_command=camera_command
-    ):
-        return {"message": "Camera control success"}
-    else:
-        raise HTTPException(status_code=400, detail="Camera control failed")
+    return control_robot(
+        id=id,
+        db=db,
+        control_func=camera_control_ros,
+        camera_command=camera_command,
+    )
 
 
 @router.post("/{id}/gimbal_control")
@@ -128,17 +122,13 @@ def gimbal_control(
     preset_index: int,
     db: Session = Depends(get_db),
 ):
-    robot = crud.get(db, id)
-    if robot is None:
-        raise HTTPException(status_code=404, detail="Robot not found")
-    robot_name = robot.name
-
-    if gimbal_control_ros(
-        robot_name=robot_name, command=command, preset_index=preset_index
-    ):
-        return {"message": "Gimbal control success"}
-    else:
-        raise HTTPException(status_code=400, detail="Gimbal control failed")
+    return control_robot(
+        id=id,
+        db=db,
+        control_func=gimbal_control_ros,
+        command=command,
+        preset_index=preset_index,
+    )
 
 
 @router.post("/{id}/gimbal_motion_control")
@@ -147,14 +137,146 @@ def gimbal_motion_control(
     command: int,
     db: Session = Depends(get_db),
 ):
-    robot = crud.get(db, id)
-    if robot is None:
-        raise HTTPException(status_code=404, detail="Robot not found")
-    robot_name = robot.name
+    return control_robot(
+        id=id, db=db, control_func=gimbal_motion_control_ros, command=command
+    )
 
-    if gimbal_motion_control_ros(robot_name=robot_name, command=command):
-        return {"message": "Gimbal motion control success"}
-    else:
-        raise HTTPException(
-            status_code=400, detail="Gimbal motion control failed"
-        )
+
+# ... similarly create endpoints for other control types
+
+
+# # velocity control
+# @router.post("/{id}/velocity_control")
+# def velocity_control(
+#     id: int, db: Session = Depends(get_db), velocity_f: float = 0.0
+# ):
+#     robot = crud.get(db, id)
+#     if robot is None:
+#         raise HTTPException(status_code=404, detail="Robot not found")
+
+#     result, err_msg = velocity_control_ros(
+#         robot_name=robot.name, velocity_f=velocity_f
+#     )
+#     if result:
+#         return {"message": "Velocity control success"}
+#     else:
+#         raise HTTPException(status_code=400, detail=err_msg)
+
+
+# # position control
+# @router.post("/{id}/position_control")
+# def position_control(
+#     id: int,
+#     db: Session = Depends(get_db),
+#     position_control_type: int = 0,
+#     target_position_f: float = 0.0,
+#     velocity_f: float = 0.0,
+# ):
+#     robot = crud.get(db, id)
+#     if robot is None:
+#         raise HTTPException(status_code=404, detail="Robot not found")
+
+#     result, err_msg = position_control_ros(
+#         robot_name=robot.name,
+#         position_control_type=position_control_type,
+#         target_position_f=target_position_f,
+#         velocity_f=velocity_f,
+#     )
+
+#     if result:
+#         return {"message": "Position control success"}
+#     else:
+#         raise HTTPException(status_code=400, detail=err_msg)
+
+
+# # stop control
+# @router.post("/{id}/stop_control")
+# def stop_control(id: int, db: Session = Depends(get_db), stop_type: int = 0):
+#     robot = crud.get(db, id)
+#     if robot is None:
+#         raise HTTPException(status_code=404, detail="Robot not found")
+
+#     result, err_msg = stop_control_ros(
+#         robot_name=robot.name, stop_type=stop_type
+#     )
+#     if result:
+#         return {"message": "Stop control success"}
+#     else:
+#         raise HTTPException(status_code=400, detail=err_msg)
+
+
+# # take photo
+# @router.get("/{id}/photo")
+# def take_photo(
+#     background_tasks: BackgroundTasks, id: int, db: Session = Depends(get_db)
+# ):
+#     robot = crud.get(db, id)
+#     if robot is None:
+#         raise HTTPException(status_code=404, detail="Robot not found")
+
+#     file_name, err_msg = take_picture_ros(robot_name=robot.name)
+#     if file_name:
+#         file_name = "app/images/" + file_name
+#         background_tasks.add_task(remove_file, file_name)
+#         return FileResponse(file_name)
+#     else:
+#         raise HTTPException(status_code=400, detail=err_msg)
+
+
+# # camera control
+# @router.post("/{id}/camera_control")
+# def camera_control(
+#     id: int, db: Session = Depends(get_db), camera_command: int = 0
+# ):
+#     robot = crud.get(db, id)
+#     if robot is None:
+#         raise HTTPException(status_code=404, detail="Robot not found")
+
+#     result, err_msg = camera_control_ros(
+#         robot_name=robot.name, camera_command=camera_command
+#     )
+#     if result:
+#         return {"message": "Camera control success"}
+#     else:
+#         raise HTTPException(status_code=400, detail=err_msg)
+
+
+# @router.post("/{id}/gimbal_control")
+# def gimbal_control(
+#     id: int,
+#     command: int,
+#     preset_index: int,
+#     db: Session = Depends(get_db),
+# ):
+#     robot = crud.get(db, id)
+#     if robot is None:
+#         raise HTTPException(status_code=404, detail="Robot not found")
+#     robot_name = robot.name
+
+#     result, err_msg = gimbal_control_ros(
+#         robot_name=robot_name, command=command, preset_index=preset_index
+#     )
+#     if result:
+#         return {"message": "Gimbal control success"}
+#     else:
+#         raise HTTPException(status_code=400, detail=err_msg)
+
+
+# @router.post("/{id}/gimbal_motion_control")
+# def gimbal_motion_control(
+#     id: int,
+#     command: int,
+#     db: Session = Depends(get_db),
+# ):
+#     robot = crud.get(db, id)
+#     if robot is None:
+#         raise HTTPException(status_code=404, detail="Robot not found")
+#     robot_name = robot.name
+
+#     result, err_msg = gimbal_motion_control_ros(
+#         robot_name=robot_name, command=command
+#     )
+#     if result:
+#         return {"message": "Gimbal motion control success"}
+#     else:
+#         raise HTTPException(status_code=400, detail=err_msg)

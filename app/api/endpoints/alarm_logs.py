@@ -7,5 +7,4 @@ router = create_generic_router(
     create_schema=None,
     update_schema=AlarmLogUpdate,
     db_model=AlarmLog,
-    db_model=AlarmLog,
 )

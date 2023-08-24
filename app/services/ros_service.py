@@ -96,6 +96,8 @@ def velocity_control(robot_name, **kwargs):
     """
 
     try:
+        result = False
+        err_msg = ""
         service_name = "/{robot_name}/velocity_command".format(
             robot_name=robot_name
         )
@@ -108,18 +110,20 @@ def velocity_control(robot_name, **kwargs):
         response = velocity_control(request)
         if response.status_code == 0:
             logger.info(f"velocity control failed: {response.err_msg}")
-            return False, response.err_msg
+            err_msg = response.err_msg
+        else:
+            info = redis_client.hget(robot_name, "robot_real_time_info")
+            info = literal_eval(info)
+            info["velocity"] = request.velocity_f
+            redis_client.hset(robot_name, "robot_real_time_info", str(info))
 
-        # Update the velocity to redis manually(FOR TEST ONLY)
-        info = redis_client.hget(robot_name, "robot_real_time_info")
-        info["velocity"] = request.velocity_f
-        redis_client.hset(robot_name, "robot_real_time_info", str(info))
-
-        return True
+            result = True
 
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False, f"Error: {e}"
+        err_msg = f"Error: {e}"
+
+    return result, err_msg
 
 
 def position_control(robot_name, **kwargs):
@@ -131,6 +135,8 @@ def position_control(robot_name, **kwargs):
     """
 
     try:
+        result = False
+        err_msg = ""
         service_name = "/{robot_name}/position_command".format(
             robot_name=robot_name
         )
@@ -148,19 +154,20 @@ def position_control(robot_name, **kwargs):
         response = position_control(request)
         if response.status_code == 0:
             logger.error(f"position control failed: {response.err_msg}")
-            return False, response.err_msg
+            err_msg = response.err_msg
+        else:
+            info = redis_client.hget(robot_name, "robot_real_time_info")
+            info = literal_eval(info)
+            info["velocity"] = request.velocity_f
+            redis_client.hset(robot_name, "robot_real_time_info", str(info))
 
-        # Update the velocity to redis manually(FOR TEST ONLY)
-        info = redis_client.hget(robot_name, "robot_real_time_info")
-        info = literal_eval(info)
-        info["velocity"] = request.velocity_f
-        redis_client.hset(robot_name, "robot_real_time_info", str(info))
-
-        return True
+            result = True
 
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False, f"Error: {e}"
+        err_msg = f"Error: {e}"
+
+    return result, err_msg
 
 
 def stop_control(robot_name, **kwargs):
@@ -172,6 +179,8 @@ def stop_control(robot_name, **kwargs):
     """
 
     try:
+        result = False
+        err_msg = ""
         service_name = "/{robot_name}/stop_command".format(
             robot_name=robot_name
         )
@@ -185,19 +194,20 @@ def stop_control(robot_name, **kwargs):
         response = stop_control(request)
         if response.status_code == 0:
             logger.error(f"stop control failed: {response.err_msg}")
-            return False, response.err_msg
+            err_msg = response.err_msg
+        else:
+            info = redis_client.hget(robot_name, "robot_real_time_info")
+            info = literal_eval(info)
+            info["velocity"] = 0
+            redis_client.hset(robot_name, "robot_real_time_info", str(info))
 
-        # Update the velocity to redis manually(FOR TEST ONLY)
-        info = redis_client.hget(robot_name, "robot_real_time_info")
-        info = literal_eval(info)
-        info["velocity"] = 0
-        redis_client.hset(robot_name, "robot_real_time_info", str(info))
-
-        return True
+            result = True
 
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False, f"Error: {e}"
+        err_msg = f"Error: {e}"
+
+    return result, err_msg
 
 
 def take_picture(robot_name):
@@ -225,11 +235,11 @@ def take_picture(robot_name):
         file_path = config.IMAGE_DIR + file_name
         img = ROS_Image_to_cv2(response.img)
         cv2.imwrite(file_path, img)
-        return file_name
+        return file_path
 
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False, f"Error: {e}"
+        return False
 
 
 # camera control
@@ -242,6 +252,8 @@ def camera_control(robot_name, **kwargs):
     """
 
     try:
+        result = False
+        err_msg = ""
         service_name = "/{robot_name}/camera_command".format(
             robot_name=robot_name
         )
@@ -254,12 +266,15 @@ def camera_control(robot_name, **kwargs):
 
         response = camera_control(request)
         if response.status_code == 0:
-            return False, "camera control failed"
-        return True
+            err_msg = "camera control failed"
+        else:
+            result = True
 
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False, f"Error: {e}"
+        err_msg = f"Error: {e}"
+
+    return result, err_msg
 
 
 def gimbal_control(robot_name, **kwargs):
@@ -272,6 +287,8 @@ def gimbal_control(robot_name, **kwargs):
     """
 
     try:
+        result = False
+        err_msg = ""
         service_name = "/{robot_name}/gimbal_control".format(
             robot_name=robot_name
         )
@@ -285,51 +302,54 @@ def gimbal_control(robot_name, **kwargs):
 
         response = gimbal_control(request)
         if response.status_code == 0:
-            return False, "gimbal control failed"
-
-        db = SessionLocal()
-        if request.command == GimbalControlCommand.SET.value:
-            if (
-                gimbal_point_crud.get_by_preset_index(
+            err_msg = "gimbal control failed"
+        else:
+            db = SessionLocal()
+            if request.command == GimbalControlCommand.SET.value:
+                if (
+                    gimbal_point_crud.get_by_preset_index(
+                        db=db, preset_index=request.preset_index
+                    )
+                ) is None:
+                    gimbal_point = GimbalPointCreate(
+                        preset_index=request.preset_index
+                    )
+                    gimbal_point_crud.create(db=db, obj_in=gimbal_point)
+                result = True
+            elif request.command == GimbalControlCommand.CLEAR.value:
+                gimbal_point = gimbal_point_crud.get_by_preset_index(
                     db=db, preset_index=request.preset_index
                 )
-            ) is None:
-                gimbal_point = GimbalPointCreate(
-                    preset_index=request.preset_index
+                if gimbal_point is None:
+                    return True, err_msg
+
+                checkpoints = checkpoint_crud.get_multi(
+                    db=db, gimbal_points__any=gimbal_point.id
                 )
-                gimbal_point_crud.create(db=db, obj_in=gimbal_point)
-        elif request.command == GimbalControlCommand.CLEAR.value:
-            gimbal_point = gimbal_point_crud.get_by_preset_index(
-                db=db, preset_index=request.preset_index
-            )
-            if gimbal_point is not None:
-                return True
-
-            checkpoints = checkpoint_crud.get_multi(
-                db=db, gimbal_points__any=gimbal_point.id
-            )
-            if checkpoints is not None:
-                for checkpoint in checkpoints:
-                    tasks = task_crud.get_multi(
-                        db=db,
-                        checkpoint_ids__any=checkpoint.id,
-                        status__not=TaskStatus.STOPPED.value,
-                    )
-                    if tasks is not None:
-                        return (
-                            False,
-                            "This gimbal point is being used by a task",
+                if checkpoints is not None:
+                    for checkpoint in checkpoints:
+                        tasks = task_crud.get_multi(
+                            db=db,
+                            checkpoint_ids__any=checkpoint.id,
+                            status__not=TaskStatus.STOPPED.value,
                         )
-
-            gimbal_point_crud.remove_by_preset_index(
-                db=db, preset_index=request.preset_index
-            )
-
-        return True
+                        if tasks is not None:
+                            err_msg = (
+                                "This gimbal point is being used by a task",
+                            )
+                            return result, err_msg
+                gimbal_point_crud.remove_by_preset_index(
+                    db=db, preset_index=request.preset_index
+                )
+                result = True
+            elif request.command == GimbalControlCommand.GOTO.value:
+                result = True
 
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False, f"Error: {e}"
+        err_msg = f"Error: {e}"
+
+    return result, err_msg
 
 
 def gimbal_motion_control(robot_name, **kwargs):
@@ -341,6 +361,8 @@ def gimbal_motion_control(robot_name, **kwargs):
     """
 
     try:
+        result = False
+        err_msg = ""
         service_name = "/{robot_name}/gimbal_motion_control".format(
             robot_name=robot_name
         )
@@ -355,12 +377,15 @@ def gimbal_motion_control(robot_name, **kwargs):
 
         response = gimbal_motion_control(request)
         if response.status_code == 0:
-            return False, "gimbal motion control failed"
-        return True
+            err_msg = "gimbal motion control failed"
+        else:
+            result = True
 
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False, f"Error: {e}"
+        err_msg = f"Error: {e}"
+
+    return result, err_msg
 
 
 def patrol_control(robot_name, **kwargs):

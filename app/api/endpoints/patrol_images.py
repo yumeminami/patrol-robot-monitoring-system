@@ -2,7 +2,6 @@ from app.api.api import create_generic_router, remove_file
 from app.crud.patrol_images import patrol_image as crud
 from app.schemas.patrol_images import (
     PatrolImage,
-    PatrolImageCreate,
     PatrolImageUpdate,
 )
 
@@ -16,9 +15,9 @@ patrol_images_hooks = {
 }
 
 router = create_generic_router(
-    crud,
-    PatrolImageCreate,
-    PatrolImageUpdate,
-    PatrolImage,
+    crud=crud,
+    create_schema=None,
+    update_schema=PatrolImageUpdate,
+    db_model=PatrolImage,
     hooks=patrol_images_hooks,
 )

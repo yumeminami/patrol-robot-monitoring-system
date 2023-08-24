@@ -2,7 +2,6 @@ from app.api.api import create_generic_router, remove_file
 from app.crud.patrol_videos import patrol_video as crud
 from app.schemas.patrol_videos import (
     PatrolVideo,
-    PatrolVideoCreate,
     PatrolVideoUpdate,
 )
 
@@ -16,9 +15,9 @@ patrol_videos_hooks = {
 }
 
 router = create_generic_router(
-    crud,
-    PatrolVideo,
-    PatrolVideoCreate,
-    PatrolVideoUpdate,
+    crud=crud,
+    create_schema=None,
+    update_schema=PatrolVideoUpdate,
+    db_model=PatrolVideo,
     hooks=patrol_videos_hooks,
 )

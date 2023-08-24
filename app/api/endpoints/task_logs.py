@@ -1,5 +1,10 @@
 from app.api.api import create_generic_router
 from app.crud.task_logs import task_log as crud
-from app.schemas.task_logs import TaskLog, TaskLogCreate, TaskLogUpdate
+from app.schemas.task_logs import TaskLog, TaskLogUpdate
 
-router = create_generic_router(crud, TaskLogCreate, TaskLogUpdate, TaskLog)
+router = create_generic_router(
+    crud=crud,
+    create_schema=None,
+    update_schema=TaskLogUpdate,
+    db_model=TaskLog,
+)

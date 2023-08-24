@@ -1,8 +1,17 @@
+from enum import Enum
+
 from pydantic import BaseModel
+
+
+class VisionAlgorithmType(Enum):
+    IMAGE_DETECTION = 0
+    VIDEO_DETECTION = 1
+    VOICE_DETECTION = 2
 
 
 class VisionAlgorithmBase(BaseModel):
     name: str = ""
+    type: int = VisionAlgorithmType.IMAGE_DETECTION.value
     sensitivity: float = 0.5
 
 

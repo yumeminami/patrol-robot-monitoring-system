@@ -90,14 +90,13 @@ class VisionAlgorithm:
         if algorithm not in self.video_algorithm_config.keys():
             raise KeyError("algorithm not found")
 
-
         url = f"{self.vision_algorithm_api_url}/video/{algorithm}/{video_id}/{sensitivity}"
 
         try:
-            r = requests.post(url, files={'file': video_data})  # post传递数据
+            r = requests.post(url, files={"file": video_data})  # post传递数据
             print(r.status_code)
-            vid = r.headers.get('x-video-metadata')
-            if vid == '' or vid is None:
+            vid = r.headers.get("x-video-metadata")
+            if vid == "" or vid is None:
                 logger.error(f"vision_algorithm detect error: {r.text}")
             with open(f"{vid}_detected.mp4", "wb") as f:
                 for chunk in r.iter_content(chunk_size=1024):
@@ -106,5 +105,6 @@ class VisionAlgorithm:
         except Exception as e:
             logger.error(f"vision_algorithm detect error: {e}")
             return False
+
 
 vision_algorithm = VisionAlgorithm()

@@ -23,9 +23,12 @@ from common.srv import (
     PatrolControlRequest,
 )
 
+from app.crud.tasks import task as task_crud
+from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
+from app.schemas.tasks import TaskStatus
 from app.schemas.gimbalpoints import GimbalPointCreate
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
@@ -281,6 +284,7 @@ def camera_control(robot_name, **kwargs):
 def gimbal_control(robot_name, **kwargs):
     """
     Set, clear or move the gimbal of the specified robot.
+    If the operation is CLEAR, we need to check if the gimbal point is being used by a task. If so, we cannot clear it.
 
     :param robot_name: The name of the robot to control.
     :return: result(bool)
@@ -300,7 +304,7 @@ def gimbal_control(robot_name, **kwargs):
 
         response = gimbal_control(request)
         if response.status_code == 0:
-            return False
+            return False, "Robot Gimbal control failed"
 
         db = SessionLocal()
         if request.command == GimbalControlCommand.SET.value:
@@ -314,6 +318,28 @@ def gimbal_control(robot_name, **kwargs):
                 )
                 gimbal_point_crud.create(db=db, obj_in=gimbal_point)
         elif request.command == GimbalControlCommand.CLEAR.value:
+            gimbal_point = gimbal_point_crud.get_by_preset_index(
+                db=db, preset_index=request.preset_index
+            )
+            if gimbal_point is not None:
+                return True
+
+            checkpoints = checkpoint_crud.get_multi(
+                db=db, gimbal_points__any=gimbal_point.id
+            )
+            if checkpoints is not None:
+                for checkpoint in checkpoints:
+                    tasks = task_crud.get_multi(
+                        db=db,
+                        checkpoint_ids__any=checkpoint.id,
+                        status__not=TaskStatus.STOPPED.value,
+                    )
+                    if tasks is not None:
+                        return (
+                            False,
+                            "This gimbal point is being used by a task",
+                        )
+
             gimbal_point_crud.remove_by_preset_index(
                 db=db, preset_index=request.preset_index
             )
@@ -321,13 +347,13 @@ def gimbal_control(robot_name, **kwargs):
         return True
     except rospy.ROSException as e:
         logger.error(f"Error: {e}")
-        return False
+        return False, f"Error: {e}"
     except ValueError as e:
         logger.error(f"Error: {e}")
-        return False
+        return False, f"Error: {e}"
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False
+        return False, f"Error: {e}"
 
 
 def gimbal_motion_control(robot_name, **kwargs):

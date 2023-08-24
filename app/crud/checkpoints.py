@@ -19,5 +19,16 @@ class CRUDCheckPoint(CRUDBase[CheckPoint, CheckPointCreate, CheckPointUpdate]):
             .all()
         )
 
+    def get_all_by_gimbal_id(
+        self, db: Session, *, gimbal_id: int, skip: int = 0, limit: int = 100
+    ) -> List[CheckPoint]:
+        return (
+            db.query(self.model)
+            .filter(CheckPoint.gimbal_points.contains([gimbal_id]))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
 
 checkpoint = CRUDCheckPoint(CheckPoint)

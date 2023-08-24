@@ -93,13 +93,13 @@ class VisionAlgorithm:
         url = f"{self.vision_algorithm_api_url}/video/{algorithm}/{video_id}/{sensitivity}"
 
         try:
-            r = requests.post(url, files={"file": video_data})  # post传递数据
-            print(r.status_code)
-            vid = r.headers.get("x-video-metadata")
+            response = requests.post(url, files={"file": video_data})  
+            print(response.status_code)
+            vid = response.headers.get("x-video-metadata")
             if vid == "" or vid is None:
-                logger.error(f"vision_algorithm detect error: {r.text}")
+                logger.error(f"vision_algorithm detect error: {response.text}")
             with open(f"{vid}_detected.mp4", "wb") as f:
-                for chunk in r.iter_content(chunk_size=1024):
+                for chunk in response.iter_content(chunk_size=1024):
                     if chunk:
                         f.write(chunk)
         except Exception as e:

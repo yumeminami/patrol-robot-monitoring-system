@@ -135,3 +135,6 @@ sql_app.db
 
 app/static/images/*.jpg
 app/static/images/*.png
+
+app/static/videos/*.mp4
+app/static/videos/*.avi

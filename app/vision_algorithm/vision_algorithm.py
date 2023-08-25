@@ -1,3 +1,4 @@
+import io
 import json
 import os
 
@@ -98,13 +99,15 @@ class VisionAlgorithm:
             vid = response.headers.get("x-video-metadata")
             if vid == "" or vid is None:
                 logger.error(f"vision_algorithm detect error: {response.text}")
-            with open(f"{vid}_detected.mp4", "wb") as f:
-                for chunk in response.iter_content(chunk_size=1024):
-                    if chunk:
-                        f.write(chunk)
+
+            detected_video_data = io.BytesIO()
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    detected_video_data.write(chunk)
+            return detected_video_data.getvalue()
+
         except Exception as e:
-            logger.error(f"vision_algorithm detect error: {e}")
-            return False
+            raise e
 
 
 vision_algorithm = VisionAlgorithm()

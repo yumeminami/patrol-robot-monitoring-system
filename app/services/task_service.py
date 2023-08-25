@@ -373,19 +373,6 @@ def video_detection(task_id, video_data):
     for id in vision_algorithm_ids:
         vision_algorithms.append(vision_algorithm_crud.get(db, id))
 
-    for vision_algorithm in vision_algorithms:
-        logger.info(vision_algorithm.name)
-        if vision_algorithm.sensitivity == 0:
-            continue
-        try:
-            vs.video_detect(
-                video_data=video_data,
-                algorithm=vision_algorithm.name,
-                sensitivity=vision_algorithm.sensitivity,
-            )
-        except KeyError as e:
-            logger.error(e)
-
     video_id = str(uuid.uuid4())
     video_file_path = f"{config.VIDEO_DIR}/{video_id}.avi"
     with open(video_file_path, "wb") as f:
@@ -400,6 +387,38 @@ def video_detection(task_id, video_data):
         velocity=task.velocity,
     )
     patrol_video_crud.create(db, obj_in=patrol_video_create)
+
+    for vision_algorithm in vision_algorithms:
+        logger.info(vision_algorithm.name)
+        if vision_algorithm.sensitivity == 0:
+            continue
+        try:
+            deteced_video_data = vs.video_detect(
+                video_id=video_id,
+                video_data=video_data,
+                algorithm=vision_algorithm.name,
+                sensitivity=vision_algorithm.sensitivity,
+            )
+            if deteced_video_data is None:
+                logger.error("Detection error.")
+
+            detected_video_file_path = f"{config.VIDEO_DIR}/{video_id}_{vision_algorithm.name}.avi"
+            with open(detected_video_file_path, "wb") as f:
+                f.write(deteced_video_data)
+
+            patrol_video_detected = PatrolVideoCreate(
+                video_url=os.path.relpath(detected_video_file_path, "app"),
+                task_id=task_id,
+                uuid=video_id,
+                start_position=task.start_position,
+                end_position=task.end_position,
+                velocity=task.velocity,
+            )
+
+            patrol_video_crud.create(db, obj_in=patrol_video_detected)
+        except KeyError as e:
+            logger.error(e)
+
 
     db.close()
     return

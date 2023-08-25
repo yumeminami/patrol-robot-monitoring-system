@@ -197,7 +197,7 @@ class Node:
         task_id = int(req.patrol_task_name)
         video_data = bytes(req.video_data.data)
 
-        video_detection(video_data, task_id)
+        video_detection(task_id=task_id,video_data=video_data)
         response = VideoDataResponse()
         response.status_code = 1
 

@@ -204,13 +204,14 @@ def start_task(task_id, execution_time):
     robot = robot_crud.get(db, task.robot_id)
 
     try:
-        file_name = create_task_xml(task, db)
+        file_name, patrol_command = create_task_xml(task, db)
         xml_data = None
         with open(file_name, "r") as f:
             xml_data = f.read()
+        logger.error(f"Patrol Command: {patrol_command}")
         if patrol_control(
             robot_name=robot.name,
-            patrol_command=PatrolControlCommand.START.value,
+            patrol_command=patrol_command,
             xml_data=xml_data,
         ):
             logger.error(f"Robot '{robot.name}' start task success!")

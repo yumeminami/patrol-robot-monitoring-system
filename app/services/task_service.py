@@ -41,6 +41,7 @@ from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
 from app.utils.log import logger
 from app.vision_algorithm.vision_algorithm import vision_algorithm as vs
+from app.services.ros_service import PatrolControlCommand
 
 
 def indent(elem, level=0):
@@ -81,7 +82,7 @@ def create_task_xml(task, db):
         tree = ET.ElementTree(root)
         file_name = "{}.xml".format(datetime.now().strftime("%Y%m%d%H%M%S"))
         tree.write(file_name, encoding="utf-8", xml_declaration=True)
-        return file_name
+        return file_name, PatrolControlCommand.AUTO_TYPE.value
     else:
         root = ET.Element("patrolpoints")
         root.set("Intro", f"{task.id}")
@@ -136,7 +137,7 @@ def create_task_xml(task, db):
         tree = ET.ElementTree(root)
         file_name = "{}.xml".format(datetime.now().strftime("%Y%m%d%H%M%S"))
         tree.write(file_name, encoding="utf-8", xml_declaration=True)
-        return file_name
+        return file_name, PatrolControlCommand.NORMAL_TYPE.value
 
 
 def monitor_sensor_data(task: Task, execution_date: str):

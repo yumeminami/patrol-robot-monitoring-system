@@ -74,7 +74,8 @@ class GimbalMotionControlCommand(Enum):
 
 class PatrolControlCommand(Enum):
     STOP = 0
-    START = 1
+    NORMAL_TYPE = 1
+    AUTO_TYPE = 3
 
 
 def validate_enum_value(value, enum_type):
@@ -408,7 +409,10 @@ def patrol_control(robot_name, **kwargs):
         request.patrol_command = int(kwargs.get("patrol_command"))
         validate_enum_value(request.patrol_command, PatrolControlCommand)
 
-        if request.patrol_command == PatrolControlCommand.START.value:
+        if (
+            request.patrol_command == PatrolControlCommand.NORMAL_TYPE.value
+            or request.patrol_command == PatrolControlCommand.AUTO_TYPE.value
+        ):
             request.xml_data = kwargs.get("xml_data")
 
         response = patrol_control(request)

@@ -60,11 +60,19 @@ if __name__ == "__main__":
             exit(1)
         with open(args["video"], "rb") as f:
             video_data = f.read()
-        vs.video_detect(
+        detected_video_data = vs.video_detect(
             video_id=id,
             video_data=video_data,
             algorithm=args["algorithm"],
             sensitivity=args["sensitivity"],
         )
 
-    
+        if detected_video_data is None:
+            print("video detect error")
+            exit(1)
+
+        with open(
+            f"{id}_detected.mp4",
+            "wb",
+        ) as f:
+            f.write(detected_video_data)

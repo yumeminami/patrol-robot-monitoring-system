@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import threading
 from multiprocessing import Queue
 
 import rospy
@@ -15,8 +16,8 @@ from app.crud.robots import robot as robot_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.robots import Robot
-from app.utils.log import log_queue, logger
 from app.services.task_service import image_detection, video_detection
+from app.utils.log import log_queue, logger
 
 available_ports = Queue()
 for i in range(45159, 45200):
@@ -187,7 +188,11 @@ class Node:
         checkpoint_id = req.patrol_point_index
         image = req.img
 
-        image_detection(image, task_id, checkpoint_id)
+        thread = threading.Thread(
+            target=image_detection, args=(image, task_id, checkpoint_id)
+        )
+        thread.start()
+
         response = PatrolPictureResponse()
         response.status_code = 1
 
@@ -197,7 +202,11 @@ class Node:
         task_id = int(req.patrol_task_name)
         video_data = bytes(req.video_data.data)
 
-        video_detection(task_id=task_id,video_data=video_data)
+        thread = threading.Thread(
+            target=video_detection, args=(task_id, video_data)
+        )
+        thread.start()
+
         response = VideoDataResponse()
         response.status_code = 1
 

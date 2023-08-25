@@ -11,7 +11,7 @@ def video_client():
 
         req = VideoDataRequest()
 
-        path = "/app/hat.mp4"
+        path = "/app/tests/vision_algorithm_test/hat.mp4"
 
         with open(path, "rb") as f:
             vide_data = f.read()

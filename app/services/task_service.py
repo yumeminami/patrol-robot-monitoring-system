@@ -402,7 +402,9 @@ def video_detection(task_id, video_data):
             if deteced_video_data is None:
                 logger.error("Detection error.")
 
-            detected_video_file_path = f"{config.VIDEO_DIR}/{video_id}_{vision_algorithm.name}.avi"
+            detected_video_file_path = (
+                f"{config.VIDEO_DIR}/{video_id}_{vision_algorithm.name}.avi"
+            )
             with open(detected_video_file_path, "wb") as f:
                 f.write(deteced_video_data)
 
@@ -418,7 +420,6 @@ def video_detection(task_id, video_data):
             patrol_video_crud.create(db, obj_in=patrol_video_detected)
         except KeyError as e:
             logger.error(e)
-
 
     db.close()
     return

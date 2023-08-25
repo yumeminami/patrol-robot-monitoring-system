@@ -94,7 +94,7 @@ class VisionAlgorithm:
         url = f"{self.vision_algorithm_api_url}/video/{algorithm}/{video_id}/{sensitivity}"
 
         try:
-            response = requests.post(url, files={"file": video_data})  
+            response = requests.post(url, files={"file": video_data})
             print(response.status_code)
             vid = response.headers.get("x-video-metadata")
             if vid == "" or vid is None:

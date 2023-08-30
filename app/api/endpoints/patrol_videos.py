@@ -31,7 +31,7 @@ router = create_generic_router(
 )
 
 
-@router.post("/{video_id}/{algorithm}/{sensitivity}")
+@router.post("/{video_id}/{algorithm}")
 async def accept_detected_video(
     video_id: str,
     algorithm: str,

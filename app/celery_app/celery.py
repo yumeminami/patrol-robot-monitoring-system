@@ -11,7 +11,7 @@ from app.crud.tasks import task as task_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.tasks import Task, TaskStatus
-from app.services.ros_service import PatrolControlCommand, patrol_control
+from app.services.ros_service import patrol_control
 from app.services.task_service import (
     create_task_xml,
     monitor_sensor_data,

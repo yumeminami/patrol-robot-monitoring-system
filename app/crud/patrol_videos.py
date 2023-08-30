@@ -13,5 +13,8 @@ class CRUDPatrolVideo(
             db.query(self.model).filter(PatrolVideo.task_id == task_id).first()
         )
 
+    def get_by_uuid(self, db: Session, *, uuid: str) -> PatrolVideo:
+        return db.query(self.model).filter(PatrolVideo.uuid == uuid).first()
+
 
 patrol_video = CRUDPatrolVideo(PatrolVideo)

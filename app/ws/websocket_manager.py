@@ -1,6 +1,8 @@
 from fastapi import WebSocket, APIRouter
 from starlette.websockets import WebSocketDisconnect
 from typing import List
+import asyncio
+
 
 router = APIRouter()
 
@@ -47,7 +49,10 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         await websocket.send_json({"message": "Hello WebSocket"})
         while True:
-            data = await websocket.receive_text()
-            await manager.send_signal_data(data, websocket)
+            await websocket.send_json({"message": "Hello WebSocket"})
+            # print(video_data["zj_robot"].get())
+            # await websocket.send_bytes(video_data.get())
+            # await websocket.send_bytes(video_data.get())
+            await asyncio.sleep(3)  # 适当的间隔，避免过多的数据传输
     except WebSocketDisconnect:
         manager.disconnect(websocket)

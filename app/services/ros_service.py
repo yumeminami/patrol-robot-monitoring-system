@@ -256,7 +256,7 @@ def camera_control(robot_name, **kwargs):
     try:
         result = False
         err_msg = ""
-        service_name = "/{robot_name}/camera_command".format(
+        service_name = "/{robot_name}/camera_control".format(
             robot_name=robot_name
         )
         rospy.wait_for_service(service_name, timeout=1)
@@ -338,7 +338,7 @@ def gimbal_control(robot_name, **kwargs):
                         )
                         if tasks is not None:
                             err_msg = (
-                                "This gimbal point is being used by a task",
+                                "This gimbal point is being used by a task"
                             )
                             return result, err_msg
                 gimbal_point_crud.remove_by_preset_index(

@@ -3,7 +3,11 @@ import multiprocessing
 import threading
 from multiprocessing import Queue
 
+import cv2
+from cv_bridge import CvBridge
+
 import rospy
+from sensor_msgs.msg import Image
 from common.msg import robot_real_time_info, sensor_data
 from common.srv import (
     PatrolPicture,
@@ -24,9 +28,12 @@ for i in range(45159, 45200):
     available_ports.put(i)
 
 
+video_data = Queue()
+
 topic_list = {
     "robot_real_time_info": robot_real_time_info,
     "sensor_data": sensor_data,
+    "video_stream": Image,
 }
 
 service_list = {
@@ -182,6 +189,16 @@ class Node:
 
         except Exception as e:
             logger.error(f"Error occurred while processing sensor data: {e}")
+
+    def video_stream_callback(self, message, args):
+        bridge = CvBridge()
+        img = bridge.imgmsg_to_cv2(message, desired_encoding="bgr8")
+        resized_img = cv2.resize(img, (640, 480))
+        _, img_encoded = cv2.imencode(
+            ".jpg", resized_img, [cv2.IMWRITE_JPEG_QUALITY, 80]
+        )
+        frame_bytes = img_encoded.tobytes()
+        video_data.put(frame_bytes)
 
     def patrol_picture_callback(self, req):
         task_id = int(req.patrol_task_name)

@@ -1,9 +1,10 @@
 from typing import Callable
+import asyncio
 
 from fastapi import Depends
 from fastapi.background import BackgroundTasks
 from fastapi.exceptions import HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.api.api import create_generic_router, remove_file
@@ -19,6 +20,7 @@ from app.services.ros_service import position_control as position_control_ros
 from app.services.ros_service import stop_control as stop_control_ros
 from app.services.ros_service import take_picture as take_picture_ros
 from app.services.ros_service import velocity_control as velocity_control_ros
+from app.ros.ros import video_data
 
 
 def get_db():
@@ -139,4 +141,29 @@ def gimbal_motion_control(
 ):
     return control_robot(
         id=id, db=db, control_func=gimbal_motion_control_ros, command=command
+    )
+
+
+async def generate_frames():
+    while True:
+        if not video_data.empty():
+            frame_bytes = video_data.get()
+            yield (
+                b"--frame\r\n"
+                b"Content-Type: image/jpeg\r\n\r\n" + frame_bytes + b"\r\n"
+            )
+        else:
+            await asyncio.sleep(0.01)
+
+
+@router.get("/{id}/video")
+async def stream_video(id: int, db: Session = Depends(get_db)):
+    robot = crud.get(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+    robot.name
+
+    return StreamingResponse(
+        generate_frames(),
+        media_type="multipart/x-mixed-replace; boundary=frame",
     )

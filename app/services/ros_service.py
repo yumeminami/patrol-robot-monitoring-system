@@ -334,7 +334,6 @@ def gimbal_control(robot_name, **kwargs):
                         tasks = task_crud.get_multi(
                             db=db,
                             checkpoint_ids__any=checkpoint.id,
-                            status__not=TaskStatus.STOPPED.value,
                         )
                         if tasks is not None:
                             err_msg = (

@@ -143,6 +143,11 @@ class Node:
         """
         try:
             robot_name = args.get("robot_name")
+            init_state = rospy.get_param(f"/{robot_name}/init")
+            if init_state:
+                logger.info(f"Robot {robot_name} is initializing")
+                return
+
             if not robot_name:
                 logger.error("Robot name not found in callback arguments.")
                 return

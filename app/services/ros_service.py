@@ -29,7 +29,6 @@ from app.crud.checkpoints import checkpoint as checkpoint_crud
 from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
-from app.schemas.tasks import TaskStatus
 from app.schemas.gimbalpoints import GimbalPointCreate
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
@@ -419,6 +418,15 @@ def patrol_control(robot_name, **kwargs):
             return False
         return True
 
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        return False
+
+
+def init_robot(robot_name):
+    try:
+        rospy.set_param(f"/{robot_name}/init", 1)
+        return True
     except Exception as e:
         logger.error(f"Error: {e}")
         return False

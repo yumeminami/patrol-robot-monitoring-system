@@ -1,7 +1,13 @@
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel
+
+
+class TaskLogStatus(Enum):
+    FINISHED = 0
+    STOPPED = 1
 
 
 class TaskLogBase(BaseModel):
@@ -9,6 +15,7 @@ class TaskLogBase(BaseModel):
     robot_id: Optional[int] = None
     execution_date: Optional[str] = None
     type: int
+    status: int = TaskLogStatus.FINISHED.value
 
 
 class TaskLogCreate(TaskLogBase):
@@ -20,6 +27,7 @@ class TaskLogUpdate(BaseModel):
     robot_id: Optional[int] = None
     execution_date: Optional[str] = None
     type: int = 0
+    status: int = TaskLogStatus.FINISHED.value
 
 
 class TaskLog(TaskLogBase):

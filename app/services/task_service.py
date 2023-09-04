@@ -35,7 +35,7 @@ from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
 from app.schemas.patrol_images import PatrolImageCreate
 from app.schemas.patrol_videos import PatrolVideoCreate
-from app.schemas.task_logs import TaskLogCreate
+from app.schemas.task_logs import TaskLogCreate, TaskLogStatus
 from app.schemas.tasks import Task, TaskType, TaskStatus
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
@@ -179,6 +179,7 @@ def monitor_sensor_data(task: Task, execution_date: str):
                     robot_id=task.robot_id,
                     execution_date=execution_date,
                     type=task.type,
+                    status=TaskLogStatus.FINISHED.value,
                 )
                 task_log_crud.create(db, obj_in=task_log_create)
                 db.close()

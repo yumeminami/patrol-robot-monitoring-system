@@ -114,10 +114,9 @@ def task_zh_key(key: str) -> str:
 
 def task_enum_to_literally(enum_key: str, value: int) -> str:
     task_status_mapping = {
-        0: "未执行",
         1: "执行中",
         2: "待执行",
-        3: "已完成",
+        3: "已暂停",
     }
 
     task_type_mapping = {

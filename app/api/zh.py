@@ -92,17 +92,19 @@ async def get_robots(token: str = Depends(oauth2_scheme)):
 
 def task_zh_key(key: str) -> str:
     translation_mapping = {
+        "name": "任务名称",
         "type": "任务类型",
         "status": "任务状态",
         "robot_id": "机器人ID",
         "checkpoint_ids": "检查点ID列表",
         "start_position": "起始位置",
         "end_position": "结束位置",
+        "gimbal_point": "云台位置",
         "velocity": "速度",
         "sensors": "传感器列表",
         "vision_algorithms": "视觉算法列表",
-        "execution_time": "执行时间列表",
-        "is_everyday": "每天执行",
+        "execution_times": "执行时间列表",
+        "execution_frequency": "执行频率",
         "id": "任务ID",
     }
     # Return the translated key if found in the mapping, otherwise return the original key
@@ -183,6 +185,7 @@ def alarm_zh_key(key: str) -> str:
         "video_url": "视频URL",
         "id": "告警日志ID",
         "time": "时间",
+        "detail": "详情",
     }
     # Return the translated key if found in the mapping, otherwise return the original key
     return translation_mapping.get(key, key)

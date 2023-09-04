@@ -53,7 +53,7 @@ def robot_enum_to_literally(enum_key: str, value: int) -> str:
 
 @router.get("/robots")
 async def get_robots(token: str = Depends(oauth2_scheme)):
-    url = "http://localhost:8000/api/robots"
+    url = "http://localhost:8000/api/robots?skip=0&limit=10000"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290IiwiZXhwIjoxNjg1MTI1MjIyfQ.Hkt-ptLsKkRrZ8UdT6AoVAf0gPaUuHA24OjqDH4QzRc"
     }
@@ -105,7 +105,9 @@ def task_zh_key(key: str) -> str:
         "vision_algorithms": "视觉算法列表",
         "execution_times": "执行时间列表",
         "execution_frequency": "执行频率",
-        "id": "任务ID",
+        "id": "ID",
+        "task_id": "任务ID",
+        "execution_date": "执行时间",
     }
     # Return the translated key if found in the mapping, otherwise return the original key
     return translation_mapping.get(key, key)
@@ -136,7 +138,7 @@ def task_enum_to_literally(enum_key: str, value: int) -> str:
 
 @router.get("/tasks")
 async def get_tasks(token: str = Depends(oauth2_scheme)):
-    url = "http://localhost:8000/api/tasks"
+    url = "http://localhost:8000/api/tasks?skip=0&limit=10000"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290IiwiZXhwIjoxNjg1MTI1MjIyfQ.Hkt-ptLsKkRrZ8UdT6AoVAf0gPaUuHA24OjqDH4QzRc"
     }
@@ -161,6 +163,66 @@ async def get_tasks(token: str = Depends(oauth2_scheme)):
                         "status",
                     ]:
                         translated_value = task_enum_to_literally(key, value)
+
+                    translated_item[translated_key] = translated_value
+
+                translated_data.append(translated_item)
+
+            return translated_data
+        except httpx.HTTPError as e:
+            return JSONResponse(
+                status_code=e.response.status_code, content=str(e)
+            )
+
+
+def task_log_enum_to_literally(enum_key: str, value: int) -> str:
+    task_status_mapping = {0: "完成", 1: "终止"}
+
+    task_type_mapping = {
+        0: "自动巡检",
+        1: "常规巡检",
+    }
+
+    # Check if the enum key exists in the translation mapping and return the translated value
+    if enum_key == "status" and value in task_status_mapping:
+        return task_status_mapping[value]
+
+    if enum_key == "type" and value in task_type_mapping:
+        return task_type_mapping[value]
+
+    # Return the original value if no translation is found
+    return str(value)
+
+
+@router.get("/task_logs")
+async def get_task_logs(token: str = Depends(oauth2_scheme)):
+    url = "http://localhost:8000/api/task_logs?skip=0&limit=10000&export=false"
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290IiwiZXhwIjoxNjg1MTI1MjIyfQ.Hkt-ptLsKkRrZ8UdT6AoVAf0gPaUuHA24OjqDH4QzRc"
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+
+            # Convert keys and enum types to Chinese
+            translated_data = []
+            for item in data:
+                translated_item = {}
+                for key, value in item.items():
+                    translated_key = task_zh_key(key)
+                    translated_value = value
+
+                    # Convert enum values to literal meanings
+                    if isinstance(value, int) and key in [
+                        "type",
+                        "status",
+                    ]:
+                        translated_value = task_log_enum_to_literally(
+                            key, value
+                        )
 
                     translated_item[translated_key] = translated_value
 
@@ -248,7 +310,7 @@ def alarm_enum_to_literally(enum_key: str, value: int) -> str:
 
 @router.get("/alarm_logs")
 async def get_alarm_logs(token: str = Depends(oauth2_scheme)):
-    url = "http://localhost:8000/api/alarm_logs"
+    url = "http://localhost:8000/api/alarm_logs?skip=0&limit=10000"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290IiwiZXhwIjoxNjg1MTI1MjIyfQ.Hkt-ptLsKkRrZ8UdT6AoVAf0gPaUuHA24OjqDH4QzRc"
     }

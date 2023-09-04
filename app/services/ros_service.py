@@ -72,11 +72,12 @@ class GimbalMotionControlCommand(Enum):
 
 
 class PatrolControlCommand(Enum):
-    STOP = 0
+    STOP_NORMAL = 0
     NORMAL_TYPE = 1
     RESUME_NORMAL = 2
     AUTO_TYPE = 3
     RESUM_AUTO = 4
+    STOP_AUTO = 5
 
 
 def validate_enum_value(value, enum_type):

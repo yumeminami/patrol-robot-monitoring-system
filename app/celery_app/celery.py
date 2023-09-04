@@ -131,7 +131,6 @@ def push_task_to_celery(task):
     task_id = task.id
     celery_task_info = redis_client.hgetall(f"task_{task_id}")
     if celery_task_info:
-        # If the task has been modified, the old task will be revoked.
         for celery_task_id in celery_task_info.values():
             app.control.revoke(celery_task_id, terminate=True)
         redis_client.delete(f"task_{task_id}")
@@ -139,8 +138,11 @@ def push_task_to_celery(task):
             f"task {task_id} has been modified, all celery tasks have been revoked."
         )
 
+    if task.status == TaskStatus.STOPPED.value:
+        logger.info(f"Task:{task_id} has been stopped.")
+        return
+
     for execution_time in task.execution_times:
-        # If the task execution time has expired, the task will not be pushed to celery.
         now = datetime.now()
         hour, minute = map(int, execution_time.split(":"))
         execution_time_obj = now.replace(

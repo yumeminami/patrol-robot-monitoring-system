@@ -424,12 +424,3 @@ def patrol_control(robot_name, **kwargs):
     except Exception as e:
         logger.error(f"Error: {e}")
         return False
-
-
-def init_robot(robot_name):
-    try:
-        rospy.set_param(f"/{robot_name}/init", 1)
-        return True
-    except Exception as e:
-        logger.error(f"Error: {e}")
-        return False

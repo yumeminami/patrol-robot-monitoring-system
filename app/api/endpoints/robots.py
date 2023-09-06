@@ -20,7 +20,6 @@ from app.services.ros_service import position_control as position_control_ros
 from app.services.ros_service import stop_control as stop_control_ros
 from app.services.ros_service import take_picture as take_picture_ros
 from app.services.ros_service import velocity_control as velocity_control_ros
-from app.services.ros_service import init_robot as init_robot_ros
 from app.ros.ros import video_data
 
 
@@ -168,12 +167,3 @@ async def stream_video(id: int, db: Session = Depends(get_db)):
         generate_frames(),
         media_type="multipart/x-mixed-replace; boundary=frame",
     )
-
-
-@router.post("/{id}/init")
-def init_robot(id: int, db: Session = Depends(get_db)):
-    robot = crud.get(db, id)
-    if robot is None:
-        raise HTTPException(status_code=404, detail="Robot not found")
-    init_robot_ros(robot_name=robot.name)
-    return {"message": "init success"}

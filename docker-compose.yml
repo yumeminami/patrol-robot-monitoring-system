@@ -20,8 +20,8 @@ services:
       - "45150-45200:45150-45200"
     volumes:
       - ./:/app
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      - ./app/time_setting/timezone:/etc/timezone:ro
+      - ./app/time_setting/localtime:/etc/localtime:ro
     depends_on:
       - db
       - redis

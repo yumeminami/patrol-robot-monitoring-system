@@ -9,7 +9,7 @@ from uuid import uuid4
 os.environ.setdefault(
     "PYTHONPATH", "/home/ubuntu/patrol-robot-monitoring-system"
 )
-os.environ.setdefault("VISION_ALGORITHM_API_URL", "http://192.168.2.41:5209")
+os.environ.setdefault("VISION_ALGORITHM_API_URL", "http://192.168.3.98:5209")
 # print(os.environ.get("PYTHONPATH"))
 # print(os.environ.get("VISION_ALGORITHM_API_URL"))
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
             image_data = f.read()
         image_base64 = base64.b64encode(image_data).decode()
         print(
-            vs.detect(
+            vs.img_detect(
                 image_id, image_base64, args["algorithm"], args["sensitivity"]
             )
         )

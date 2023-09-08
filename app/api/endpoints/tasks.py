@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-
 from app.api.api import create_generic_router
 from app.celery_app.celery import push_task_to_celery
 from app.crud.tasks import task as crud

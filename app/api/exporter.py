@@ -34,7 +34,7 @@ async def export_tasks():
 
 
 @router.get("/task_logs")
-async def export_tasks():
+async def export_task_logs():
     url = "http://localhost:8000/api/zh/task_logs"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJyb290IiwiZXhwIjoxNjg1MTI1MjIyfQ.Hkt-ptLsKkRrZ8UdT6AoVAf0gPaUuHA24OjqDH4QzRc"

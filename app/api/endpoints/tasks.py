@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from app.api.api import create_generic_router
 from app.celery_app.celery import push_task_to_celery
 from app.crud.tasks import task as crud
@@ -12,11 +13,24 @@ from app.schemas.tasks import (
 from app.services.ros_service import PatrolControlCommand, patrol_control
 
 
-def after_created(updated_task, db):
+def before_created(task, db):
+    """
+    Before task created, push it to celery
+    """
+    task_name = task.name
+    tasks = crud.get_multi_by_name(db=db, name=task_name)
+    if tasks:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Task name already exists",
+        )
+
+
+def after_created(created_task, db):
     """
     After task created, push it to celery
     """
-    push_task_to_celery(updated_task)
+    push_task_to_celery(created_task)
 
 
 def before_update(task_id, update_task, db):
@@ -52,6 +66,7 @@ def after_update(task_id, updated_task, db):
 
 
 hooks = {
+    "before_created": before_created,
     "after_created": after_created,
     "before_update": before_update,
     "after_update": after_update,

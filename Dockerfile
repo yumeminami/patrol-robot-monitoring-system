@@ -22,7 +22,7 @@ RUN echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal main restricted universe 
 RUN apt-get update && apt-get install -y python3-pip
 
 # # Install python dependencies
-RUN pip3 install -r requirements.txt
+RUN pip3 install -i http://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
 
 
 # Expose port

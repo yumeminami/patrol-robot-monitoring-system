@@ -1,7 +1,7 @@
 from typing import Callable
 import asyncio
 
-from fastapi import Depends
+from fastapi import Depends, File, UploadFile
 from fastapi.background import BackgroundTasks
 from fastapi.exceptions import HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
@@ -20,6 +20,7 @@ from app.services.ros_service import position_control as position_control_ros
 from app.services.ros_service import stop_control as stop_control_ros
 from app.services.ros_service import take_picture as take_picture_ros
 from app.services.ros_service import velocity_control as velocity_control_ros
+from app.services.ros_service import upgrade_robot as upgrade_robot_ros
 from app.ros.ros import video_data
 
 
@@ -166,4 +167,18 @@ async def stream_video(id: int, db: Session = Depends(get_db)):
     return StreamingResponse(
         generate_frames(),
         media_type="multipart/x-mixed-replace; boundary=frame",
+    )
+
+
+@router.post("/{id}/upgrade")
+async def upgrade_robot(
+    id: int,
+    db: Session = Depends(get_db),
+    upgrade_file: UploadFile = File(...),
+):
+    return control_robot(
+        id=id,
+        db=db,
+        control_func=upgrade_robot_ros,
+        upgrade_file=upgrade_file,
     )

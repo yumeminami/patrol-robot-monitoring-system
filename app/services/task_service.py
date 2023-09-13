@@ -461,13 +461,16 @@ def fit_frequency(task):
             f"The task last executed at {latest_task_log.execution_date}"
         )
 
-        now = datetime.now()
+        now = datetime.now().date()
         last_execute_date = datetime.strptime(
             latest_task_log.execution_date, "%Y-%m-%d %H:%M"
-        )
+        ).date()
         delta = now - last_execute_date
         current_interval = delta.days
 
+        logger.info("now: %s", now)
+        logger.info("last_execute_date: %s", last_execute_date)
+        logger.info("delta: %s", delta)
         if current_interval < interval:
             logger.error(
                 f"The time interval has not yet met the Task {task.id} next execution frequency"

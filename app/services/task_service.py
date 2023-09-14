@@ -252,7 +252,6 @@ def image_detection(image, task_id, checkpoint_id):
 
     image_id = str(uuid.uuid4())
     image_cv = ROS_Image_to_cv2(image)
-    image_cv = cv2.resize(image_cv, (640, 480))  # Resize image
     image_file_path = f"{config.IMAGE_DIR}/{image_id}.jpg"
 
     patrol_image = PatrolImageCreate(
@@ -293,9 +292,6 @@ def image_detection(image, task_id, checkpoint_id):
                 np.fromstring(detected_image_data, dtype=np.uint8),
                 cv2.IMREAD_COLOR,
             )
-            detected_image_cv = cv2.resize(
-                detected_image_cv, (640, 480)
-            )  # Resize image
             cv2.imwrite(detected_image_file_path, detected_image_cv)
 
             alarm = False
@@ -338,7 +334,6 @@ def image_detection(image, task_id, checkpoint_id):
     merge_image_cv = cv2.imdecode(
         np.fromstring(merge_image_data, dtype=np.uint8), cv2.IMREAD_COLOR
     )
-    merge_image_cv = cv2.resize(merge_image_cv, (640, 480))  # Resize image
     cv2.imwrite(merge_image_file_path, merge_image_cv)
     patrol_image_merge = PatrolImageCreate(
         image_url=os.path.relpath(merge_image_file_path, "app"),

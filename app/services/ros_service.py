@@ -401,14 +401,12 @@ def upgrade_robot(robot_name, **kwargs):
 
     try:
         err_msg = ""
-        service_name = "/{robot_name}/upgrade".format(
-            robot_name=robot_name
-        )
+        service_name = "/{robot_name}/upgrade".format(robot_name=robot_name)
         rospy.wait_for_service(service_name, timeout=1)
         upgrade = rospy.ServiceProxy(service_name, Upgrade)
 
         request = UpgradeRequest()
-        request.upgrade_file.data=list(bytes(kwargs.get("data")))
+        request.upgrade_file.data = list(bytes(kwargs.get("data")))
         request.board_type = int(kwargs.get("board_type"))
 
         response = upgrade(request)

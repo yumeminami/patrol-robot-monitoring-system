@@ -15,7 +15,7 @@ from datetime import  datetime
 
 camera_cmd = multiprocessing.Manager().Value(ctypes.c_int, 0)
 camera_cmd_2 = multiprocessing.Manager().Value(ctypes.c_int, 0)
-camera_cmd.value=0
+camera_cmd.value=1
 camera_cmd_2.value=0
 
 # # 自定义无缓存读视频类
@@ -114,14 +114,13 @@ def camera_realplay_process_func(camera_cmd,img_pub):
                     # # 显示处理后的视频帧
                     bridge = CvBridge()
                     img_msg=bridge.cv2_to_imgmsg(image_new,"bgr8")
-                    num+=1
-                    if num % 10 ==0:
-                        img_pub.publish(img_msg)
-                        # cv2.imshow("img", image_new)
-                        num=0
-                    # if chr(cv2.waitKey(1)&255) == 'q':
-                    #     cap.terminate()
-                    #     break
+
+                    # num+=1
+                    # if num % 2 ==0:
+                    #     img_pub.publish(img_msg)
+                    #     num=0
+
+                    img_pub.publish(img_msg)
 
                     if camera_cmd.value==0:
                         cap.release()

@@ -15,6 +15,8 @@ import time
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
+sys.path.append('/home/zj/Project/zj-robot/src/zjrobot/scripts')
+from motion import move_to_target_position,move
 
 import xml.dom.minidom
 
@@ -61,9 +63,38 @@ XMLPATH = "/home/zj/Project/zj-robot/src/zjrobot/test02.xml"
 
 def clearparam(): 
     rospy.set_param("continuous_patrol_state",0)
+    rospy.set_param("patrol_section_index",0)
     rospy.set_param("charge_state",0)
     rospy.set_param("target_position",0)
     rospy.set_param("target_velocity",0)
+    rospy.set_param("continuous_patrol_end",0)
+    rospy.set_param("is_robot_continuous_patroling",0)
+
+
+
+# # 机器人运动直到结束
+# def move_to_target_position(control_type,target_position,target_velocity):
+#     pos_ctrl_cli = rospy.ServiceProxy('position_command', PositionControl)
+#     resp1 = pos_ctrl_cli(control_type,target_position,target_velocity)
+#     current_position=rospy.get_param("current_position")#防止机器人静止的问题
+#     position_error=current_position-target_position
+#     print("position_error:",position_error)
+#     while(rospy.get_param("position_control_state")==1):
+#         current_position=rospy.get_param("current_position")
+#         position_error=current_position-target_position
+#         print("机器刚启动")
+#         print("position_error:",abs(position_error))
+#         if abs(position_error)<20:
+#             break
+#         time.sleep(0.5)
+#
+#     while(rospy.get_param("position_control_state")==0):
+#         print("机器运动中")
+#         time.sleep(0.5)
+#
+#     print("机器运动结束")
+
+
 
 # 定义xml paser类
 class XMLPaser:
@@ -138,9 +169,36 @@ class Initial(smach.State):
         smach.State.__init__(self, outcomes=['initial_completed','initial_standby'])
     def execute(self, userdata):
         time.sleep(0.5)
+        global patrol_section_index
+        try:
+            rospy.get_param("continuous_patrol_state")
+            rospy.get_param("continuous_patrol_end")
+            rospy.get_param("patrol_section_index")
+            rospy.get_param("continuous_camera_task")#标志相机启动和关闭 1启动，0关闭
+        except Exception:
+            rospy.set_param("continuous_patrol_state",0)
+            rospy.set_param("continuous_patrol_end",0)
+            rospy.set_param("patrol_section_index",0)
+            rospy.get_param("continuous_camera_task",0)
+
         if rospy.get_param("continuous_patrol_state") == PATROL_REQUEST:
             rospy.set_param("continuous_patrol_state",PATROLING)
+            patrol_section_index=0
+            rospy.set_param("patrol_section_index",patrol_section_index)
             return 'initial_completed'
+        elif rospy.get_param("continuous_patrol_state") == PATROLING:
+            if rospy.get_param("continuous_patrol_end")==1:#巡检结束回去中
+                print("巡检结束回去中")
+                clearparam()
+                # move_to_target_position(0,0,200)
+                move(0,200)
+                return 'initial_standby'
+            else:
+                # 判断为上次巡检未完成，继续上次巡检
+                print("判断为上次巡检未完成，继续上次巡检")
+                patrol_section_index=rospy.get_param("patrol_section_index")
+                return 'initial_completed'
+
         else:
             return 'initial_standby'
 
@@ -158,9 +216,6 @@ class Preparation(smach.State):
         patrolpoints = xml_paser.openxml(XMLPATH)
         xml_paser.printpatrolpoints(patrolpoints)
         rospy.set_param("continuous_patrol_task_name",xml_paser.get_patrol_task_name())
-
-        global patrol_section_index
-        patrol_section_index=0
         return 'preparation_completed'
 
 
@@ -200,20 +255,10 @@ class Motion_start(smach.State):
         patrolpoints = xml_paser.openxml(XMLPATH)
         xml_paser.printpatrolpoints(patrolpoints)
         rospy.set_param("continuous_patrol_task_name",xml_paser.get_patrol_task_name())
-        rospy.set_param("target_position",xml_paser.get_patrol_start_position(patrolpoints,patrol_section_index))
-        # rospy.set_param("target_gimbal_position",xml_paser.getgimbalposition(patrolpoints,patrolpointindex,gimbalpointindex))
-        rospy.set_param("target_velocity",xml_paser.get_patrol_velocity(patrolpoints,patrol_section_index))
-
-
-        if(rospy.get_param("motion_state")==0):
-            rospy.set_param("motion_state",ACTION_REQUEST)
-        rospy.sleep(1)
-        rospy.logdebug('Executing state motion')
-        if rospy.get_param("motion_state") == ACTION_COMPLETED:    
-            rospy.set_param("motion_state",ACTION_STANDBY)
-            return 'motion_start_completed'
-        else:
-            return 'motion_start_ing'
+        target_position=xml_paser.get_patrol_start_position(patrolpoints,patrol_section_index)
+        target_velocity=xml_paser.get_patrol_velocity(patrolpoints,patrol_section_index)
+        move_to_target_position(0,target_position,target_velocity)
+        return 'motion_start_completed'
 
 
 # 定义state camera start
@@ -222,6 +267,7 @@ class Camera_start(smach.State):
         smach.State.__init__(self, outcomes=['camera_start_completed'])
 
     def execute(self, userdata):
+        rospy.set_param("continuous_camera_task",1)
         global patrolpointindex
 
         xml_paser = XMLPaser()
@@ -234,6 +280,8 @@ class Camera_start(smach.State):
         resp=client.call(req)
         rospy.loginfo("相机服务调用结果:%d",resp.status_code)
         time.sleep(5)
+
+        rospy.set_param("continuous_camera_task",0)
         return 'camera_start_completed'
 
 
@@ -248,21 +296,11 @@ class Motion_end(smach.State):
         patrolpoints = xml_paser.openxml(XMLPATH)
         xml_paser.printpatrolpoints(patrolpoints)
         rospy.set_param("continuous_patrol_task_name",xml_paser.get_patrol_task_name())
-        rospy.set_param("target_position",xml_paser.get_patrol_end_position(patrolpoints,patrol_section_index))
-        # rospy.set_param("target_gimbal_position",xml_paser.getgimbalposition(patrolpoints,patrolpointindex,gimbalpointindex))
-        rospy.set_param("target_velocity",xml_paser.get_patrol_velocity(patrolpoints,patrol_section_index))
-
-        if(rospy.get_param("motion_state")==0):
-            rospy.set_param("motion_state",ACTION_REQUEST)
-
-
-        rospy.sleep(1)
-        rospy.logdebug('Executing state motion')
-        if rospy.get_param("motion_state") == ACTION_COMPLETED:    
-            rospy.set_param("motion_state",ACTION_STANDBY)
-            return 'motion_end_completed'
-        else:
-            return 'motion_end_ing'
+        target_position=xml_paser.get_patrol_end_position(patrolpoints,patrol_section_index)
+        target_velocity=xml_paser.get_patrol_velocity(patrolpoints,patrol_section_index)
+        # move_to_target_position(0,target_position,target_velocity)
+        move(target_position,target_velocity)
+        return 'motion_end_completed'
 
 
 
@@ -272,6 +310,7 @@ class Camera_end(smach.State):
         smach.State.__init__(self, outcomes=['camera_end_completed'])
 
     def execute(self, userdata):
+        rospy.set_param("continuous_camera_task",1)
         time.sleep(4)
         global patrolpointindex
 
@@ -307,6 +346,7 @@ class Camera_end(smach.State):
         except rospy.ServiceException:
             print("视频发送失败")
 
+        rospy.set_param("continuous_camera_task",0)
         return 'camera_end_completed'
 
 
@@ -325,6 +365,7 @@ class Transition(smach.State):
 
         if patrol_section_index < len(patrolpoints)-1:
             patrol_section_index = patrol_section_index + 1
+            rospy.set_param("patrol_section_index",patrol_section_index)
             return 'more_patrol_section'
         elif patrol_section_index == len(patrolpoints)-1:
             return 'nomore_patrol_section'
@@ -338,26 +379,13 @@ class PatrolCompleted(smach.State):
 
     def execute(self, userdata):
         #给运动节点发布消息让机器人回到初始位置
+        # rospy.set_param("continuous_patrol_end",1)
+        # move_to_target_position(0,0,200)
+        # position_reached=rospy.get_param("position_reached")#1到位，0没到位
+        # if position_reached==1:
+        #     clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
 
-        server = rospy.ServiceProxy('position_command', PositionControl)
-
-        # resp1 = server(1,500,100)
-        resp1 = server(0,0,200)
-        print("resp1.status_code")
-        print(resp1.status_code)
-
-        while(rospy.get_param("position_control_state")==1):
-            print("机器刚启动")
-            time.sleep(0.5)
-
-        while(rospy.get_param("position_control_state")==0):
-            print("机器运动中")
-            time.sleep(0.5)
-
-
-        clearparam()
-
-        rospy.logdebug('Executing state patrol_completed')
+        clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
         return 'patrol_completed'
 
 
@@ -393,8 +421,6 @@ def receive_data(req):
 
 
 def main():
-    clearparam()
-
     rospy.loginfo("continuous patrol state machine start")
     # 创建一个状态机
     sm = smach.StateMachine(outcomes=['end','patrol_request','patrol_error'])
@@ -411,7 +437,7 @@ def main():
         smach.StateMachine.add('MOTION_END', Motion_end(), transitions={'motion_end_completed':'CAMERA_END','motion_end_ing':'MOTION_END','motion_end_error':'MOTION_END'})
 
         smach.StateMachine.add('CAMERA_END', Camera_end(), transitions={'camera_end_completed':'TRANSITION'})
-        smach.StateMachine.add('TRANSITION', Transition(), transitions={'more_patrol_section':'MOTION_START','nomore_patrol_section':'PATROL_COMPLETED'})
+        smach.StateMachine.add('TRANSITION', Transition(), transitions={'more_patrol_section':'GIMBAL','nomore_patrol_section':'PATROL_COMPLETED'})
         smach.StateMachine.add('PATROL_COMPLETED', PatrolCompleted(), transitions={'patrol_completed':'CONTINUOUS_INITIAL'})
 
     # 创建一个状态机的协调者
@@ -425,25 +451,13 @@ def main():
 
 if __name__ == "__main__":
     rospy.init_node('continuous_patrol_state_machine')
+    rospy.set_param("continuous_camera_task",0)
 
     xml_paser = XMLPaser()
     patrolpoints = xml_paser.openxml(XMLPATH)
     xml_paser.printpatrolpoints(patrolpoints)
 
     server = rospy.Service("continuous_xml_data",ContinousXmlData,receive_data)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     ros_spin = threading.Thread(target=ros_spin_process)
     ros_spin.start() #启动线程

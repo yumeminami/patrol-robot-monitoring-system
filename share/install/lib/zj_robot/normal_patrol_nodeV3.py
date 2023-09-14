@@ -12,6 +12,7 @@ import rospy
 import sys
 from rospy.core import rospydebug
 sys.path.append('../../../devel/lib/python3/dist-packages/')
+sys.path.append('/home/zj/Project/zj-robot/src/zjrobot/scripts')
 import smach
 import smach_ros
 from common.msg import position_control
@@ -21,8 +22,8 @@ import time
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
-
 import xml.dom.minidom
+from motion import move_to_target_position,move
 
 # 定义全局变量
 global xml_paser 
@@ -53,6 +54,32 @@ def clearparam():
     rospy.set_param("target_gimbal_position",0)
     rospy.set_param("gimbal_point_index",0)
     rospy.set_param("patrol_point_index",0)
+    rospy.set_param("patrol_end",0)#标志巡检结束过程 1表示巡检结束回去中，0表示不在回去中
+    rospy.set_param("is_robot_normal_patroling",0)
+
+
+# # 机器人运动直到结束
+# def move_to_target_position(control_type,target_position,target_velocity):
+#     pos_ctrl_cli = rospy.ServiceProxy('position_command', PositionControl)
+#     resp1 = pos_ctrl_cli(control_type,target_position,target_velocity)
+#     current_position=rospy.get_param("current_position")#防止机器人静止的问题
+#     position_error=current_position-target_position
+#     print("position_error:",position_error)
+#     while(rospy.get_param("position_control_state")==1):
+#         current_position=rospy.get_param("current_position")
+#         position_error=current_position-target_position
+#         print("机器刚启动")
+#         print("position_error:",abs(position_error))
+#         if abs(position_error)<20:
+#             break
+#         time.sleep(0.5)
+#
+#     while(rospy.get_param("position_control_state")==0):
+#         print("机器运动中")
+#         time.sleep(0.5)
+#
+#     print("机器运动结束")
+
 
 # 定义xml paser类
 class XMLPaser:
@@ -161,13 +188,23 @@ class Initial(smach.State):
             rospy.logdebug("gimbalpointindex is %d" % gimbalpointindex)
             return 'initial_completed'
         elif rospy.get_param("patrol_state") == PATROLING:
-            # 判断为上次巡检未完成，继续上次巡检
-            rospy.logdebug("Continue last patrol")
-            patrolpointindex = rospy.get_param("patrol_point_index")
-            gimbalpointindex = rospy.get_param("gimbal_point_index")
-            rospy.logdebug("patrolpointindex is %d" % patrolpointindex)
-            rospy.logdebug("gimbalpointindex is %d" % gimbalpointindex)
-            return 'initial_completed'
+            if rospy.get_param("patrol_end")==1:#巡检结束回去中
+                print("巡检结束回去中")
+                clearparam()
+                # move_to_target_position(0,0,200)
+                move(0,200)
+                clearparam()
+                return 'initial_standby'
+
+            else:
+                # 判断为上次巡检未完成，继续上次巡检
+                print("判断为上次巡检未完成，继续上次巡检")
+                rospy.logdebug("Continue last patrol")
+                patrolpointindex = rospy.get_param("patrol_point_index")
+                gimbalpointindex = rospy.get_param("gimbal_point_index")
+                rospy.logdebug("patrolpointindex is %d" % patrolpointindex)
+                rospy.logdebug("gimbalpointindex is %d" % gimbalpointindex)
+                return 'initial_completed'
         # elif rospy.get_param("patrol_state") == PATROL_STANDBY:
         else:
             return 'initial_standby'
@@ -202,15 +239,20 @@ class Motion(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['motion_completed','motion_ing','motion_error'])
     def execute(self, userdata):
-        if(rospy.get_param("motion_state")==0):
-            rospy.set_param("motion_state",ACTION_REQUEST)
-        rospy.sleep(1)
-        rospy.logdebug('Executing state motion')
-        if rospy.get_param("motion_state") == ACTION_COMPLETED:    
-            rospy.set_param("motion_state",ACTION_STANDBY)
-            return 'motion_completed'
-        else:
-            return 'motion_ing'
+        # if(rospy.get_param("motion_state")==0):
+        #     rospy.set_param("motion_state",ACTION_REQUEST)
+        # rospy.sleep(1)
+        # rospy.logdebug('Executing state motion')
+        # if rospy.get_param("motion_state") == ACTION_COMPLETED:    
+        #     rospy.set_param("motion_state",ACTION_STANDBY)
+        #     return 'motion_completed'
+        # else:
+        #     return 'motion_ing'
+        target_position=rospy.get_param("target_position")
+        target_velocity=rospy.get_param("target_velocity")
+        move(target_position,target_velocity)
+        return 'motion_completed'
+
 
 # 定义state gimbal
 class Gimbal(smach.State):
@@ -328,15 +370,14 @@ class PatrolCompleted(smach.State):
 
     def execute(self, userdata):
         #给运动节点发布消息让机器人回到初始位置
-        pub = rospy.Publisher("position_command",position_control,queue_size=10)
-        p = position_control()
-        p.position_control_type = 0
-        p.target_position_f = 0
-        p.velocity_f = 300
-        pub.publish(p)
-        rospy.sleep(1)
-        pub.publish(p)
-        clearparam()
+
+        # rospy.set_param("patrol_end",1)
+        # move_to_target_position(0,0,200)
+        # position_reached=rospy.get_param("position_reached")#1到位，0没到位
+        # if position_reached==1:
+        #     clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
+
+        clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
 
         rospy.logdebug('Executing state patrol_completed')
         return 'patrol_completed'

@@ -8,6 +8,8 @@ import rospy
 import sys
 from rospy.core import rospydebug
 sys.path.append('../../../devel/lib/python3/dist-packages/')
+sys.path.append('/home/zj/Project/zj-robot/src/zjrobot/scripts')
+
 import smach
 import smach_ros
 from common.msg import *
@@ -17,13 +19,18 @@ import time
 from sensor_msgs.msg import Image
 import xml.dom.minidom
 
+
+from motion import move_to_target_position,move
+
+
 # 定义全局变量
 global xml_paser 
+
 global goal_position
 global docking_position
 global current_position
 
-docking_position=[0]
+docking_position=[2859]
 
 xml_paser=None
 
@@ -43,8 +50,30 @@ XMLPATH = "/home/zj/Project/zj-robot/src/zjrobot/test01.xml"
 
 def clearparam(): 
     rospy.set_param("charge_state",0)
-    rospy.set_param("target_position",0)
-    rospy.set_param("target_velocity",0)
+
+
+# # 机器人运动直到结束
+# def move_to_target_position(control_type,target_position,target_velocity):
+#     pos_ctrl_cli = rospy.ServiceProxy('position_command', PositionControl)
+#     resp1 = pos_ctrl_cli(control_type,target_position,target_velocity)
+#     current_pos=rospy.get_param("current_position")#防止机器人静止的问题
+#     position_error=current_pos-target_position
+#     print("position_error:",position_error)
+#     while(rospy.get_param("position_control_state")==1):
+#         current_pos=rospy.get_param("current_position")
+#         position_error=current_pos-target_position
+#         print("机器刚启动")
+#         print("position_error:",abs(position_error))
+#         if abs(position_error)<20:
+#             break
+#         time.sleep(0.5)
+#
+#     while(rospy.get_param("position_control_state")==0):
+#         print("机器运动中")
+#         time.sleep(0.5)
+#
+#     print("机器运动结束")
+#
 
 
 # 定义state Initial
@@ -65,6 +94,14 @@ class ChargePreparation(smach.State):
             req = PatrolControlRequest()
             req.patrol_command=0
             resp = client.call(req)
+
+
+            #关闭连续巡检节点
+            client = rospy.ServiceProxy("patrol_control",PatrolControl)
+            req = PatrolControlRequest()
+            req.patrol_command=5
+            resp = client.call(req)
+
             return 'charge_preparation_completed'
         else:
             return 'charge_preparation_standby'
@@ -74,7 +111,7 @@ class SearchDockingPosition(smach.State):
         smach.State.__init__(self, outcomes=['search_completed'])
     def execute(self, userdata):
         global goal_position
-        goal_position=docking_position[0]-200
+        goal_position=docking_position[0]-100
         return 'search_completed'
 
 
@@ -87,18 +124,23 @@ class MoveToDockingPosition(smach.State):
             # rospy.set_param("target_position",goal_position)
             # rospy.set_param("target_velocity",200)
             # rospy.set_param("motion_state",ACTION_REQUEST)
-        pos_ctrl_cli = rospy.ServiceProxy('position_command', PositionControl)
-        resp1 = pos_ctrl_cli(0,goal_position,200)
-        while(rospy.get_param("position_control_state")==1):
-            print("机器刚启动")
-            time.sleep(0.5)
 
-        while(rospy.get_param("position_control_state")==0):
-            print("机器运动中")
-            time.sleep(0.5)
 
-        print("机器运动结束")
+        # move_to_target_position(0,goal_position,200)
 
+        move(goal_position,200)
+        # pos_ctrl_cli = rospy.ServiceProxy('position_command', PositionControl)
+        # resp1 = pos_ctrl_cli(0,goal_position,200)
+        #
+        # while(rospy.get_param("position_control_state")==1):
+        #     print("机器刚启动")
+        #     time.sleep(0.5)
+        #
+        # while(rospy.get_param("position_control_state")==0):
+        #     print("机器运动中")
+        #     time.sleep(0.5)
+        #
+        # print("机器运动结束")
         return 'move_to_docking_position_completed'
 
 
@@ -157,7 +199,7 @@ class StartCharging(smach.State):
         charge_pub.publish(msg)
         print("启动充电")
         time.sleep(1)
-        while True:
+        while not rospy.is_shutdown():
             #检测中
             print("检测中")
             battery_state=rospy.get_param("battery_state")
@@ -165,7 +207,7 @@ class StartCharging(smach.State):
                 print("确定启动充电")
                 return "start_charging_completed"
             charge_pub.publish(msg)
-            time.sleep(1)
+            time.sleep(10)
 
 
 
@@ -198,10 +240,32 @@ class WaitForCharging(smach.State):
         smach.State.__init__(self, outcomes=['wait_for_charging_completed'])
     def execute(self, userdata):
         print("等待充电")
-        for i in range(10):
+        for i in range(20):
             print("充电秒数:",i)
             time.sleep(1)
         rospy.set_param("charge_state",CHARGE_STANDBY)
+
+        #充电结束按钮
+
+        charge_pub = rospy.Publisher("charge_command",charge_control,queue_size=10)
+        msg = charge_control()  #创建 msg 对象
+        # # #
+        msg.charge_command=2
+        charge_pub.publish(msg)
+        print("关闭充电")
+        time.sleep(1)
+        while not rospy.is_shutdown():
+            #检测中
+            print("检测中")
+            battery_state=rospy.get_param("/zj_robot/battery_state")
+            print(battery_state)
+            if battery_state==1:
+                print("确定关闭充电")
+                break
+            time.sleep(20)
+            charge_pub.publish(msg)
+        
+        time.sleep(1)#必须加一秒，不然运动会失败
 
         return "wait_for_charging_completed"
 
@@ -210,26 +274,37 @@ class BackToWork(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['back_to_work_completed'])
     def execute(self, userdata):
-
-
         global current_position
-        pos_ctrl_cli = rospy.ServiceProxy('position_command', PositionControl)
-        resp1 = pos_ctrl_cli(0,current_position,200)
-        while(rospy.get_param("position_control_state")==1):
-            print("机器刚启动")
-            time.sleep(0.5)
+        target_position=0
+        if rospy.get_param("patrol_state")==0 and rospy.get_param("continuous_patrol_state")==0:
+            print("回到原点待命")
+            target_position=0
+        else:
+            print("回到工作位置")
+            target_position=current_position
 
-        while(rospy.get_param("position_control_state")==0):
-            print("机器运动中")
-            time.sleep(0.5)
-
-
-        print("启动巡检节点")
-        #启动巡检节点
+        move(target_position,200)
+        print("回到工作位置")
+        time.sleep(2)
+        #恢复连续巡检节点
         client = rospy.ServiceProxy("patrol_control",PatrolControl)
         req = PatrolControlRequest()
-        req.patrol_command=2#只开启巡检节点，不更新文件
+        req.patrol_command=4
         resp = client.call(req)
+        #恢复正常巡检节点
+        client = rospy.ServiceProxy("patrol_control",PatrolControl)
+        req = PatrolControlRequest()
+        req.patrol_command=2
+        resp = client.call(req)
+
+        time.sleep(5)
+        print("重启结束")
+        print("重启结束")
+        print("重启结束")
+        print("重启结束")
+        print("重启结束")
+        print("重启结束")
+        print("重启结束")
         clearparam()
         return "back_to_work_completed"
 

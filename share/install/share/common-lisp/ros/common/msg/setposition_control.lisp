@@ -58,10 +58,10 @@
   "f2e6bf020ed2049abd8afb50018d662c")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<setposition_control>)))
   "Returns full string definition for message of type '<setposition_control>"
-  (cl:format cl:nil "# 设置位置~%float32 target_position_f #目标位置 单位：mm~%~%"))
+  (cl:format cl:nil "# 设置位置~%float32 target_position_f #目标位置 单位：mm~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'setposition_control)))
   "Returns full string definition for message of type 'setposition_control"
-  (cl:format cl:nil "# 设置位置~%float32 target_position_f #目标位置 单位：mm~%~%"))
+  (cl:format cl:nil "# 设置位置~%float32 target_position_f #目标位置 单位：mm~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <setposition_control>))
   (cl:+ 0
      4

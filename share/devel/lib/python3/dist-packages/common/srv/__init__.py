@@ -1,5 +1,7 @@
 from ._CameraControl import *
 from ._ContinousXmlData import *
+from ._FireDoorControl import *
+from ._FirmwareUpdate import *
 from ._GimbalControl import *
 from ._GimbalMotionControl import *
 from ._PatrolControl import *
@@ -7,6 +9,7 @@ from ._PatrolPicture import *
 from ._PositionControl import *
 from ._StopControl import *
 from ._TakePicture import *
+from ._Upgrade import *
 from ._VelocityControl import *
 from ._VideoData import *
 from ._XmlData import *

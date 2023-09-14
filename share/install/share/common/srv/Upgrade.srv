@@ -1,0 +1,8 @@
+int32 board_type
+#0运动控制板
+#1传感器板
+std_msgs/UInt8MultiArray upgrade_file
+---
+int32 status_code #0失败，1完成
+
+

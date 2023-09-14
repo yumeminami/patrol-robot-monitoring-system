@@ -146,7 +146,12 @@ struct Definition< ::common::PatrolControlResponse_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "int32 status_code #0失败，1完成\n"
+    return "int32 status_code\n"
+"#0失败，1完成\n"
+"#2低电量充电中 无法执行任务\n"
+"#3已有巡检任务执行中，无法执行任务\n"
+"\n"
+"\n"
 "\n"
 "\n"
 "\n"

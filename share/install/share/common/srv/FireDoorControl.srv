@@ -1,0 +1,8 @@
+int32 command 
+# 0关闭 1开启
+---
+int32 status_code #0失败，1完成
+
+
+
+

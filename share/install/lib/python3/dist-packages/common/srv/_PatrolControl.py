@@ -161,7 +161,12 @@ class PatrolControlResponse(genpy.Message):
   _md5sum = "7714e81371f09d2d15e163f37002ef48"
   _type = "common/PatrolControlResponse"
   _has_header = False  # flag to mark the presence of a Header object
-  _full_text = """int32 status_code #0失败，1完成
+  _full_text = """int32 status_code
+#0失败，1完成
+#2低电量充电中 无法执行任务
+#3已有巡检任务执行中，无法执行任务
+
+
 
 
 

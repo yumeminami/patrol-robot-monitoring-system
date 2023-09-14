@@ -12,7 +12,8 @@ class setposition_control(genpy.Message):
   _type = "common/setposition_control"
   _has_header = False  # flag to mark the presence of a Header object
   _full_text = """# 设置位置
-float32 target_position_f #目标位置 单位：mm"""
+float32 target_position_f #目标位置 单位：mm
+"""
   __slots__ = ['target_position_f']
   _slot_types = ['float32']
 

@@ -124,7 +124,12 @@
 #               patrol_state为0代表节点处于待命状态，可以随时开启巡检
 string xml_data
 ---
-int32 status_code #0失败，1完成
+int32 status_code
+#0失败，1完成
+#2低电量充电中 无法执行任务
+#3已有巡检任务执行中，无法执行任务
+
+
 
 
 
@@ -139,7 +144,12 @@ int32 status_code #0失败，1完成
 #               patrol_state为0代表节点处于待命状态，可以随时开启巡检
 string xml_data
 ---
-int32 status_code #0失败，1完成
+int32 status_code
+#0失败，1完成
+#2低电量充电中 无法执行任务
+#3已有巡检任务执行中，无法执行任务
+
+
 
 
 

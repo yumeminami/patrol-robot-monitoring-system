@@ -173,6 +173,7 @@ async def stream_video(id: int, db: Session = Depends(get_db)):
 @router.post("/{id}/upgrade")
 async def upgrade_robot(
     id: int,
+    board_type: int,
     db: Session = Depends(get_db),
     upgrade_file: UploadFile = File(...),
 ):
@@ -180,5 +181,6 @@ async def upgrade_robot(
         id=id,
         db=db,
         control_func=upgrade_robot_ros,
+        board_type=board_type,
         upgrade_file=upgrade_file,
     )

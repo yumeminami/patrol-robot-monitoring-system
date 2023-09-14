@@ -21,6 +21,8 @@ from common.srv import (
     GimbalMotionControlRequest,
     PatrolControl,
     PatrolControlRequest,
+    Upgrade,
+    UpgradeRequest,
 )
 
 from app.crud.tasks import task as task_crud
@@ -399,27 +401,27 @@ def upgrade_robot(robot_name, **kwargs):
 
     try:
         err_msg = ""
-        # service_name = "/{robot_name}/upgrade_file".format(
-        #     robot_name=robot_name
-        # )
-        # rospy.wait_for_service(service_name, timeout=1)
-        # upgrade_file = rospy.ServiceProxy(service_name, UpgradeFile)
+        service_name = "/{robot_name}/upgrade".format(
+            robot_name=robot_name
+        )
+        rospy.wait_for_service(service_name, timeout=1)
+        upgrade = rospy.ServiceProxy(service_name, Upgrade)
 
-        # request = UpgradeFileRequest()
-        # request.data = bytes(kwargs.get("data"))
+        request = UpgradeRequest()
+        request.upgrade_file.data=list(bytes(kwargs.get("data")))
+        request.board_type = int(kwargs.get("board_type"))
 
-        # response = upgrade_file(request)
-        # if response.status_code == 0:
-        #     err_msg = "upgrade file failed"
-        # else:
-        #     result = True
+        response = upgrade(request)
+        if response.status_code == 0:
+            err_msg = "upgrade file failed"
+        else:
+            result = True
 
     except Exception as e:
         logger.error(f"Error: {e}")
         err_msg = f"Error: {e}"
 
-    # return result, err_msg
-    return True, err_msg
+    return result, err_msg
 
 
 def patrol_control(robot_name, **kwargs):

@@ -400,6 +400,7 @@ def upgrade_robot(robot_name, **kwargs):
     """
 
     try:
+        result = False
         err_msg = ""
         service_name = "/{robot_name}/upgrade".format(robot_name=robot_name)
         rospy.wait_for_service(service_name, timeout=1)

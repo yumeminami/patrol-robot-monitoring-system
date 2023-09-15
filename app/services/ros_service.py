@@ -407,7 +407,7 @@ def upgrade_robot(robot_name, **kwargs):
         upgrade = rospy.ServiceProxy(service_name, Upgrade)
 
         request = UpgradeRequest()
-        request.upgrade_file.data = list(bytes(kwargs.get("data")))
+        request.upgrade_file.data = list(kwargs.get("upgrade_data"))
         request.board_type = int(kwargs.get("board_type"))
 
         response = upgrade(request)

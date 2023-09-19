@@ -1,0 +1,2 @@
+1.0 version                                10 Sep 2023
+    *) The first public version.

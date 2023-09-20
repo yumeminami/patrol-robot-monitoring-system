@@ -1,6 +1,6 @@
 import os
 
-from fastapi import File, UploadFile
+from fastapi import File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 
 from app.api.api import create_generic_router, remove_file
@@ -68,6 +68,10 @@ async def accept_detected_video(
             )
 
             crud.create(db, obj_in=patrol_video_detected)
+        else:
+            raise HTTPException(
+                status_code=404, detail="original video not found"
+            )
 
         if alarm:
             alarm_create = AlarmLogCreate(

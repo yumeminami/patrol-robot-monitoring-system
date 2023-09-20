@@ -5,11 +5,17 @@ from fastapi.responses import JSONResponse
 
 from app.api.api import create_generic_router, remove_file
 from app.crud.patrol_videos import patrol_video as crud
+from app.crud.alarm_logs import alarm_log as crud_alarm_log
 from app.db.database import SessionLocal
 from app.schemas.patrol_videos import (
     PatrolVideo,
     PatrolVideoCreate,
     PatrolVideoUpdate,
+)
+from app.schemas.alarm_logs import (
+    AlarmLogCreate,
+    AlarmLogLevel,
+    AlarmLogStatus,
 )
 from app.settings import config
 
@@ -35,6 +41,7 @@ router = create_generic_router(
 async def accept_detected_video(
     video_id: str,
     algorithm: str,
+    alarm: bool,
     video_file: UploadFile = File(...),
 ):
     try:
@@ -57,9 +64,22 @@ async def accept_detected_video(
                 start_position=patrol_video.start_position,
                 end_position=patrol_video.end_position,
                 velocity=patrol_video.velocity,
+                alarm=alarm,
             )
 
             crud.create(db, obj_in=patrol_video_detected)
+
+        if alarm:
+            alarm_create = AlarmLogCreate(
+                level=AlarmLogLevel.WARNING.value,
+                task_id=patrol_video.task_id,
+                status=AlarmLogStatus.UNPROCESSED.value,
+                location=patrol_video.start_position,
+                type=algorithm,
+                video_url=os.path.relpath(detected_video_file_path, "app"),
+                detail=f"Alarms detected: {algorithm}",
+            )
+            crud_alarm_log.create(db, obj_in=alarm_create)
 
         return JSONResponse(content={"message": "OK"})
 

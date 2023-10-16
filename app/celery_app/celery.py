@@ -31,14 +31,14 @@ app.autodiscover_tasks(["celery.tasks"], force=True)
 app.conf.broker_transport_options = {"visibility_timeout": 60 * 60 * 24 * 2}
 
 app.conf.beat_schedule = {
-    "update-robot-data-every-5-seconds": {
+    "update-robot-data-every-seconds": {
         "task": "app.celery_app.celery.update_robot_data",
-        "schedule": 5.0,
+        "schedule": 1.0,
         "kwargs": {"robot_name": "zj_robot"},
     },
-    "update-sensor-data-every-5-seconds": {
+    "update-sensor-data-every-seconds": {
         "task": "app.celery_app.celery.update_sensor_data",
-        "schedule": 5.0,
+        "schedule": 1.0,
         "kwargs": {"robot_name": "zj_robot"},
     },
     "regular-query-tasks-every-6-hours": {
@@ -210,16 +210,24 @@ def start_task(task_id, execution_time):
         xml_data = None
         with open(file_name, "r") as f:
             xml_data = f.read()
+        os.remove(file_name)
         logger.error(f"Patrol Command: {patrol_command}")
         if patrol_control(
             robot_name=robot.name,
             patrol_command=patrol_command,
             xml_data=xml_data,
         ):
-            logger.error(f"Robot '{robot.name}' start task success!")
-        os.remove(file_name)
+            logger.error(
+                f"Robot '{robot.name}' start task id {task.id} success!"
+            )
+        else:
+            logger.error(
+                f"Robot '{robot.name}' start task id {task.id} failed!"
+            )
+            return f"Robot '{robot.name}' start task id {task.id} failed!"
     except Exception as e:
         logger.error(f"start task error: {e}")
+        return f"start task error: {e}"
 
     task_crud.update(
         db,

@@ -21,8 +21,10 @@ from app.settings import config
 
 
 def after_delete(id, patrol_video, db):
-    remove_file("app/" + patrol_video.video_url)
-
+    try:
+        remove_file("app/" + patrol_video.video_url)
+    except FileNotFoundError:
+        pass
 
 patrol_videos_hooks = {
     "after_delete": after_delete,

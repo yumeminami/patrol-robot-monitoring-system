@@ -7,8 +7,10 @@ from app.schemas.patrol_images import (
 
 
 def after_delete(id, patrol_image, db):
-    remove_file("app/" + patrol_image.image_url)
-
+    try:
+        remove_file("app/" + patrol_image.image_url)
+    except FileNotFoundError:
+        pass
 
 patrol_images_hooks = {
     "after_delete": after_delete,

@@ -26,6 +26,10 @@ services:
       - db
       - redis
       - ros_core
+    logging:
+      driver: "json-file"
+      options:
+          max-size: "1g"
     command: python3 app/main.py
   
   celery-worker:
@@ -46,6 +50,10 @@ services:
     depends_on:
       - db
       - redis
+    logging:
+      driver: "json-file"
+      options:
+          max-size: "1g"
 
   
   db:
@@ -81,7 +89,7 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes --requirepass "sample_password"
+    command: redis-server --appendonly no --requirepass "sample_password"
     
 
 volumes:

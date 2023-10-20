@@ -12,6 +12,7 @@ def after_delete(id, patrol_image, db):
     except FileNotFoundError:
         pass
 
+
 patrol_images_hooks = {
     "after_delete": after_delete,
 }

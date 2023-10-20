@@ -59,6 +59,7 @@ def create_generic_router(
         background_tasks: BackgroundTasks,
         skip: int = 0,
         limit: int = 100,
+        all: bool = False,
         export: bool = False,
         db: Session = Depends(get_db),
         token: str = Depends(oauth2_scheme),
@@ -78,7 +79,10 @@ def create_generic_router(
 
 
         """
-        items = crud.get_multi(db=db, skip=skip, limit=limit)
+        if all:
+            items = crud.get_all(db=db)
+        else:
+            items = crud.get_multi(db=db, skip=skip, limit=limit)
         if items is None:
             return JSONResponse(status_code=404, content="Item not found")
         after_read = hooks.get("after_read")

@@ -26,6 +26,7 @@ def after_delete(id, patrol_video, db):
     except FileNotFoundError:
         pass
 
+
 patrol_videos_hooks = {
     "after_delete": after_delete,
 }

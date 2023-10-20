@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from app.api.api import create_generic_router
 from app.celery_app.celery import push_task_to_celery
@@ -17,16 +17,15 @@ from app.services.ros_service import PatrolControlCommand, patrol_control
 
 def before_created(task, db):
     """
-    Check if the task is valid
+    Before task created, push it to celery
     """
-
-    if task.type == TaskType.AUTO.value:
-        gimbalpoint = gimbal_point_crud.get(db=db, id=task.gimbal_point)
-        if gimbalpoint.robot_id != task.robot_id:
-            raise HTTPException(
-                status_code=400,
-                detail="The gimbal point does not belong to the robot assigned to the task",
-            )
+    task_name = task.name
+    tasks = crud.get_multi_by_name(db=db, name=task_name)
+    if tasks:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Task name already exists",
+        )
 
 
 def after_created(created_task, db):

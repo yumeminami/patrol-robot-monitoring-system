@@ -58,6 +58,7 @@ services:
   
   db:
     image: "mysql:8.0"
+    container_name: db
     environment:
       MYSQL_DATABASE: "sample_db"
       MYSQL_USER: "sample_user"

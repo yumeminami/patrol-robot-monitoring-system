@@ -1,0 +1,5 @@
+string reset_map
+---
+int32 status_code #0失败，1完成
+
+

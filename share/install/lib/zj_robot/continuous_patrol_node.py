@@ -19,6 +19,7 @@ sys.path.append('/home/zj/Project/zj-robot/src/zjrobot/scripts')
 from motion import move_to_target_position,move
 
 import xml.dom.minidom
+import os
 
 
 xml_str="""
@@ -276,12 +277,13 @@ class Camera_start(smach.State):
         client = rospy.ServiceProxy("camera_control",CameraControl)
         req = CameraControlRequest()
         req.camera_command=5# 2:彩色相机预览+保存
-
+        os.system('mpg123 /home/zj/Project/zj-robot/audio/开始录制.mp3')
         resp=client.call(req)
         rospy.loginfo("相机服务调用结果:%d",resp.status_code)
         time.sleep(5)
 
         rospy.set_param("continuous_camera_task",0)
+
         return 'camera_start_completed'
 
 
@@ -325,6 +327,7 @@ class Camera_end(smach.State):
         resp=client.call(req)
         rospy.loginfo("相机服务调用结果:%d",resp.status_code)
 
+        os.system('mpg123 /home/zj/Project/zj-robot/audio/结束录制.mp3')
 
 
         #发送视频给后台
@@ -385,7 +388,9 @@ class PatrolCompleted(smach.State):
         # if position_reached==1:
         #     clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
 
+        os.system('mpg123 /home/zj/Project/zj-robot/audio/任务完成.mp3')
         clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
+        os.system("roslaunch zj_robot  auto_charge.launch &")#重启自动充电节点
         return 'patrol_completed'
 
 

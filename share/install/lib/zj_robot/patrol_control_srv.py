@@ -9,9 +9,42 @@ import numpy as np
 from common.srv import *
 from common.msg import *
 import time
+import subprocess
 ns=""
 launch_flag=0
 continuous_launch_flag=0
+import os
+
+def getCmdOutput(cmd):
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    output_list = []
+    for line in out.splitlines():
+        output_list.append(line.decode('utf-8'))
+    res = ""
+    return output_list
+
+#解决自动充电无法正常重启的问题
+def restar_auto_charge_node():
+    while not rospy.is_shutdown():
+        os.system("roslaunch zj_robot  auto_charge.launch &")
+        i=0
+        flag=0
+        #如果在7秒之内重启了
+        while not rospy.is_shutdown() and i<7:
+            i+=1
+            rosnode_list=getCmdOutput("rosnode list")
+            for rosnode in rosnode_list:
+                if rosnode.endswith("auto_charge_node"):
+                    flag=1
+            if flag==1:
+                break
+        if flag==1:
+            print("启动auto_charge_node成功")
+            break
+        else:
+            print("重启auto_charge_node失败")
+
 
 def patrol_control_callback(req):
     global ns,launch_flag,continuous_launch_flag
@@ -44,6 +77,7 @@ def patrol_control_callback(req):
         resp.status_code=1
 
     elif req.patrol_command==1:
+        os.system('mpg123 /home/zj/Project/zj-robot/audio/接收到新的常规巡检任务，开始执行.mp3 &')
         if rospy.get_param("charge_state")==2 or rospy.get_param("charge_state")==1:#充电中
             if rospy.get_param("is_robot_low_power"):
                 #如果是低电量引起，则不执行任务，返回2
@@ -51,6 +85,16 @@ def patrol_control_callback(req):
             elif rospy.get_param("is_robot_idle"):#机器人是空闲中
                 #打断自动充电节点
                 #-----------------------------------
+                #如果通过防火门中，则等待
+                while(rospy.get_param("if_passing_fire_door")==1):
+                    pass
+
+                time.sleep(1)
+                #机器人停止
+                server = rospy.ServiceProxy('stop_command', StopControl)
+                r = server(1)#锁死
+                #杀死自动充电节点
+                os.system("rosnode kill "+ns+"auto_charge_node")
                 #如果在充电，就结束充电
                 if rospy.get_param("battery_state")==0:
                     charge_pub = rospy.Publisher("charge_command",charge_control,queue_size=10)
@@ -68,15 +112,7 @@ def patrol_control_callback(req):
                             break
                         charge_pub.publish(msg)
                         time.sleep(10)
-                time.sleep(1)
-                #如果通过防火门中，则等待
-                while(rospy.get_param("if_passing_fire_door")==1):
-                    pass
-                #机器人停止
-                server = rospy.ServiceProxy('stop_command', StopControl)
-                r = server(1)#锁死
-                #杀死自动充电节点
-                os.system("rosnode kill "+ns+"auto_charge_node")
+
                 time.sleep(5)
                 #-----------------------------------
 
@@ -117,7 +153,8 @@ def patrol_control_callback(req):
                 rospy.set_param("charge_state",0)
                 #重启自动充电节点
                 time.sleep(3)
-                os.system("roslaunch zj_robot  auto_charge.launch &")
+                # os.system("roslaunch zj_robot  auto_charge.launch &")
+                # restar_auto_charge_node()
 
 
 
@@ -182,6 +219,7 @@ def patrol_control_callback(req):
         resp.status_code=1
 
     elif req.patrol_command==3:
+        os.system('mpg123 /home/zj/Project/zj-robot/audio/接收到新的连续巡检任务，开始执行.mp3 &')
         if rospy.get_param("charge_state")==2 or rospy.get_param("charge_state")==1:#如果充电中
             if rospy.get_param("is_robot_low_power"):
                 #如果是低电量引起，则不执行任务，返回2
@@ -189,6 +227,16 @@ def patrol_control_callback(req):
             elif rospy.get_param("is_robot_idle"):#机器人是空闲中
                 #打断自动充电节点
                 #-----------------------------------
+                #如果通过防火门中，则等待
+                while(rospy.get_param("if_passing_fire_door")==1):
+                    pass
+
+                time.sleep(1)
+                #机器人停止
+                server = rospy.ServiceProxy('stop_command', StopControl)
+                r = server(1)#锁死
+                #杀死自动充电节点
+                os.system("rosnode kill "+ns+"auto_charge_node")
                 #如果在充电，就结束充电
                 if rospy.get_param("battery_state")==0:
                     charge_pub = rospy.Publisher("charge_command",charge_control,queue_size=10)
@@ -207,15 +255,6 @@ def patrol_control_callback(req):
                         charge_pub.publish(msg)
                         time.sleep(10)
 
-                time.sleep(1)
-                #如果通过防火门中，则等待
-                while(rospy.get_param("if_passing_fire_door")==1):
-                    pass
-                #机器人停止
-                server = rospy.ServiceProxy('stop_command', StopControl)
-                r = server(1)#锁死
-                #杀死自动充电节点
-                os.system("rosnode kill "+ns+"auto_charge_node")
                 time.sleep(5)
                 #-----------------------------------
 
@@ -253,7 +292,8 @@ def patrol_control_callback(req):
                 rospy.set_param("charge_state",0)
                 #重启自动充电节点
                 time.sleep(3)
-                os.system("roslaunch zj_robot  auto_charge.launch &")
+                # os.system("roslaunch zj_robot  auto_charge.launch &")
+                # restar_auto_charge_node()
 
             else:#高电量，但是正在执行任务
                 #不执行任务，返回3
@@ -356,7 +396,7 @@ if __name__ == "__main__":
     server = rospy.Service("patrol_control",PatrolControl,patrol_control_callback)
     os.system("roslaunch zj_robot  normal_patrol.launch &")#正常巡检
     os.system("roslaunch zj_robot  continuous_patrol.launch &")#连续巡检
-    os.system("roslaunch zj_robot  auto_charge.launch &")#自动充电
+    # os.system("roslaunch zj_robot  auto_charge.launch &")#自动充电
 
 
     rospy.set_param("is_robot_normal_patroling",0)#是否巡检中

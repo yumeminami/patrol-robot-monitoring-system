@@ -141,10 +141,10 @@
   "d1a7d02d9af64b80a87fb39b34004f24")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<Upgrade-response>)))
   "Returns full string definition for message of type '<Upgrade-response>"
-  (cl:format cl:nil "int32 status_code #0失败，1完成~%~%~%~%~%~%"))
+  (cl:format cl:nil "int32 status_code #0失败，1完成~%~%~%~%~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'Upgrade-response)))
   "Returns full string definition for message of type 'Upgrade-response"
-  (cl:format cl:nil "int32 status_code #0失败，1完成~%~%~%~%~%~%"))
+  (cl:format cl:nil "int32 status_code #0失败，1完成~%~%~%~%~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <Upgrade-response>))
   (cl:+ 0
      4

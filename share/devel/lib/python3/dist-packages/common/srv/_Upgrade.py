@@ -286,6 +286,7 @@ class UpgradeResponse(genpy.Message):
 
 
 
+
 """
   __slots__ = ['status_code']
   _slot_types = ['int32']

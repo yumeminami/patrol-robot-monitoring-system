@@ -18,9 +18,11 @@ import threading
 import time
 from sensor_msgs.msg import Image
 import xml.dom.minidom
+import os
 
 
 from motion import move_to_target_position,move
+from motion import *
 
 
 # 定义全局变量
@@ -89,6 +91,7 @@ class ChargePreparation(smach.State):
         time.sleep(0.5)
         if rospy.get_param("charge_state") == CHARGE_REQUEST:
             rospy.set_param("charge_state",CHARGEING)
+            os.system('mpg123 /home/zj/Project/zj-robot/audio/进入自动充电模式.mp3')
             #关闭状态机节点
             client = rospy.ServiceProxy("patrol_control",PatrolControl)
             req = PatrolControlRequest()
@@ -165,6 +168,7 @@ class Dock(smach.State):
                 print("停止")
                 stop_ctrl_cli = rospy.ServiceProxy('stop_command', StopControl)
                 resp = stop_ctrl_cli(2)
+                os.system('mpg123 /home/zj/Project/zj-robot/audio/检测到金属传感器.mp3')
                 return 'dock_completed'
 
         print("往后走")
@@ -184,30 +188,87 @@ class Dock(smach.State):
                 print("停止")
                 stop_ctrl_cli = rospy.ServiceProxy('stop_command', StopControl)
                 resp = stop_ctrl_cli(2)
+                os.system('mpg123 /home/zj/Project/zj-robot/audio/检测到金属传感器.mp3')
                 return 'dock_completed'
         else:
             return 'dock_ing'
+
+def charge_control_func(cmd):#1开启充电，0关闭充电
+    charge_pub = rospy.Publisher("charge_command",charge_control,queue_size=10)
+    msg = charge_control()  #创建 msg 对象
+    num=0
+    if cmd==1:
+        msg.charge_command=1
+        charge_pub.publish(msg)
+        print("启动充电")
+        time.sleep(1)
+        while not rospy.is_shutdown() and num<10:
+            num+=1
+            #检测中
+            print("检测中")
+            battery_state=rospy.get_param("battery_state")
+            if battery_state==0:
+                print("确定启动充电")
+                os.system('mpg123 /home/zj/Project/zj-robot/audio/开始充电.mp3')
+                break
+            charge_pub.publish(msg)
+            time.sleep(10)
+        if num==10:
+            return False
+        else:
+            return True
+    else:
+        msg.charge_command=2
+        charge_pub.publish(msg)
+        print("关闭充电")
+        time.sleep(1)
+        while not rospy.is_shutdown() and num<10:
+            num+=1
+            #检测中
+            print("检测中")
+            battery_state=rospy.get_param("/zj_robot/battery_state")
+            print(battery_state)
+
+            if battery_state==1:
+                print("确定关闭充电")
+                os.system('mpg123 /home/zj/Project/zj-robot/audio/结束充电.mp3')
+                break
+            time.sleep(20)
+            charge_pub.publish(msg)
+        if num==10:
+            return False
+        else:
+            return True
+        
+
 
 class StartCharging(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['start_charging_completed'])
 
     def execute(self, userdata):
-        charge_pub = rospy.Publisher("charge_command",charge_control,queue_size=10)
-        msg = charge_control()  #创建 msg 对象
-        msg.charge_command=1
-        charge_pub.publish(msg)
-        print("启动充电")
-        time.sleep(1)
-        while not rospy.is_shutdown():
-            #检测中
-            print("检测中")
-            battery_state=rospy.get_param("battery_state")
-            if battery_state==0:
-                print("确定启动充电")
-                return "start_charging_completed"
-            charge_pub.publish(msg)
-            time.sleep(10)
+
+        # charge_pub = rospy.Publisher("charge_command",charge_control,queue_size=10)
+        # msg = charge_control()  #创建 msg 对象
+        # msg.charge_command=1
+        # charge_pub.publish(msg)
+        # print("启动充电")
+        # time.sleep(1)
+        # while not rospy.is_shutdown():
+        #     #检测中
+        #     print("检测中")
+        #     battery_state=rospy.get_param("battery_state")
+        #     if battery_state==0:
+        #         print("确定启动充电")
+        #         os.system('mpg123 /home/zj/Project/zj-robot/audio/开始充电.mp3')
+        #         return "start_charging_completed"
+        #     charge_pub.publish(msg)
+        #     time.sleep(10)
+        #
+        r=retry_and_report_error(charge_control_func,(1,),1,5,"无法开启充电","/home/zj/Project/zj-robot/audio/故障警报，无法开启充电.mp3")
+        while r==False:
+            r=retry_and_report_error(charge_control_func,(1,),1,5,"无法开启充电","/home/zj/Project/zj-robot/audio/故障警报，无法开启充电.mp3")
+        return "start_charging_completed"
 
 
 
@@ -240,30 +301,37 @@ class WaitForCharging(smach.State):
         smach.State.__init__(self, outcomes=['wait_for_charging_completed'])
     def execute(self, userdata):
         print("等待充电")
-        for i in range(20):
+        for i in range(60):
             print("充电秒数:",i)
             time.sleep(1)
+            if rospy.is_shutdown():
+                break
         rospy.set_param("charge_state",CHARGE_STANDBY)
 
         #充电结束按钮
 
-        charge_pub = rospy.Publisher("charge_command",charge_control,queue_size=10)
-        msg = charge_control()  #创建 msg 对象
-        # # #
-        msg.charge_command=2
-        charge_pub.publish(msg)
-        print("关闭充电")
-        time.sleep(1)
-        while not rospy.is_shutdown():
-            #检测中
-            print("检测中")
-            battery_state=rospy.get_param("/zj_robot/battery_state")
-            print(battery_state)
-            if battery_state==1:
-                print("确定关闭充电")
-                break
-            time.sleep(20)
-            charge_pub.publish(msg)
+        # charge_pub = rospy.Publisher("charge_command",charge_control,queue_size=10)
+        # msg = charge_control()  #创建 msg 对象
+        # # # #
+        # msg.charge_command=2
+        # charge_pub.publish(msg)
+        # print("关闭充电")
+        # time.sleep(1)
+        # while not rospy.is_shutdown():
+        #     #检测中
+        #     print("检测中")
+        #     battery_state=rospy.get_param("/zj_robot/battery_state")
+        #     print(battery_state)
+        #
+        #     if battery_state==1:
+        #         print("确定关闭充电")
+        #         os.system('mpg123 /home/zj/Project/zj-robot/audio/结束充电.mp3')
+        #         break
+        #     time.sleep(20)
+        #     charge_pub.publish(msg)
+        r=retry_and_report_error(charge_control_func,(0,),1,6,"无法关闭充电","/home/zj/Project/zj-robot/audio/故障警报，无法关闭充电.mp3")
+        while r==False:
+            r=retry_and_report_error(charge_control_func,(0,),1,6,"无法关闭充电","/home/zj/Project/zj-robot/audio/故障警报，无法关闭充电.mp3")
         
         time.sleep(1)#必须加一秒，不然运动会失败
 

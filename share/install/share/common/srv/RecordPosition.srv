@@ -1,0 +1,5 @@
+int32[] robot_state
+float32[] time
+float32[] position
+---
+int32 status_code #0失败，1完成

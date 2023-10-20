@@ -6,7 +6,9 @@ sys.path.append('../../../devel/lib/python3/dist-packages/')
 from common.srv import *
 import subprocess
 import time
+import os
 
+ns=""
 
 def SentFileToSTM32(serial_port,file_path):
     cmd="/home/zj/depends/SerialPortYmodem_V2/build-SerialPortYmodem-Desktop-Debug/SerialPortYmodem {0} {1}".format(serial_port,file_path)
@@ -41,17 +43,23 @@ def upgrade_file_callback(req):
 
     serial_port=""
     topic_name=""
+    node_name=""
+    launch_cmd=""
     if req.board_type==0:
         #运动控制板
         print("运动控制板")
         serial_port="/dev/ttyS0"
         topic_name="firmware_update_motion"
+        node_name="motion_control_node"
+        launch_cmd="roslaunch zj_robot  motion.launch &"
 
     else:
         #传感器板
         print("传感器板")
         serial_port="/dev/ttyS1"
         topic_name="firmware_update_sensor"
+        node_name="sensor_node"
+        launch_cmd="roslaunch zj_robot  sensor.launch &"
 
 
     firmware_update_client = rospy.ServiceProxy(topic_name, FirmwareUpdate)
@@ -61,8 +69,13 @@ def upgrade_file_callback(req):
     time.sleep(2)
     if r.status_code==1:
         if SentFileToSTM32(serial_port,file_path)==1:
-            resp.status_code=1
             print("固件更新成功")
+            print("重启节点中")
+            os.system("rosnode kill "+ns+node_name)
+            time.sleep(5)
+            os.system(launch_cmd)
+            resp.status_code=1
+
         else:
             resp.status_code=0
             print("固件更新失败")
@@ -76,6 +89,7 @@ def upgrade_file_callback(req):
 
 if __name__ == '__main__':
     rospy.init_node("firmware_update_srv")
-    server = rospy.Service("Upgrade",Upgrade,upgrade_file_callback)
+    ns=rospy.get_namespace()
+    server = rospy.Service("upgrade",Upgrade,upgrade_file_callback)
     rospy.spin()
 

@@ -150,6 +150,7 @@ struct Definition< ::common::UpgradeResponse_<ContainerAllocator> >
 "\n"
 "\n"
 "\n"
+"\n"
 ;
   }
 

@@ -24,6 +24,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import xml.dom.minidom
 from motion import move_to_target_position,move
+import os
 
 # 定义全局变量
 global xml_paser 
@@ -297,6 +298,7 @@ class Camera(smach.State):
             bridge = CvBridge()
             image = cv2.imread(rospy.get_param("img_path"))
             req.img=bridge.cv2_to_imgmsg(image,"bgr8")
+            os.system('mpg123 /home/zj/Project/zj-robot/audio/开始拍照.mp3')
             try:
                 resp=client.call(req)
                 rospy.loginfo("拍照服务调用结果:%d",resp.status_code)
@@ -377,9 +379,12 @@ class PatrolCompleted(smach.State):
         # if position_reached==1:
         #     clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
 
+        os.system('mpg123 /home/zj/Project/zj-robot/audio/任务完成.mp3')
         clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
 
         rospy.logdebug('Executing state patrol_completed')
+        os.system("roslaunch zj_robot  auto_charge.launch &")#重启自动充电节点
+        
         return 'patrol_completed'
 
 def main():

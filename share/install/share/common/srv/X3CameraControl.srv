@@ -1,0 +1,7 @@
+int32 camera_command
+# 相机命令：
+# 0:停止录制
+# 1:开始录制
+---
+int32 status_code #0失败，1完成
+

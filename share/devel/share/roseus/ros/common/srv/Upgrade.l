@@ -176,6 +176,7 @@ int32 status_code #0失败，1完成
 
 
 
+
 ")
 
 (setf (get common::UpgradeResponse :md5sum-) "d1a7d02d9af64b80a87fb39b34004f24")
@@ -230,6 +231,7 @@ string label   # label of given dimension
 uint32 size    # size of given dimension (in type units)
 ---
 int32 status_code #0失败，1完成
+
 
 
 

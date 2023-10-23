@@ -255,6 +255,11 @@ def image_detection(image, task_id, checkpoint_id):
         logger.error("Task does not exist in the database.")
         return
 
+    task_log = task_log_crud.get_the_latest_task_log(db, task_id)
+    if task_log is None:
+        logger.error("Task log does not exist in the database.")
+        return
+
     checkpoint = checkpoint_crud.get(db, checkpoint_id)
     if checkpoint is None:
         logger.error("Checkpoint does not exist in the database.")
@@ -311,6 +316,7 @@ def image_detection(image, task_id, checkpoint_id):
                 alarm_log = AlarmLogCreate(
                     level=AlarmLogLevel.WARNING.value,
                     task_id=task_id,
+                    task_log_id=task_log.id,
                     status=AlarmLogStatus.UNPROCESSED.value,
                     location=checkpoint.position,
                     type=vision_algorithm.name,

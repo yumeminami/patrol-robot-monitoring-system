@@ -176,7 +176,7 @@ async def get_tasks(token: str = Depends(oauth2_scheme)):
 
 
 def task_log_enum_to_literally(enum_key: str, value: int) -> str:
-    task_status_mapping = {0: "完成", 1: "终止"}
+    task_status_mapping = {0: "完成", 1: "终止", 2: "失败"}
 
     task_type_mapping = {
         0: "自动巡检",

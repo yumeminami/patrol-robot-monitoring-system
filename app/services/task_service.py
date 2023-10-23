@@ -216,7 +216,7 @@ def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
                     f"Sensor: {sensor_name}, Lower Limit: {sensor.lower_limit}, Upper Limit: {sensor.upper_limit}, Current Value: {sensor_data[sensor_name]}"
                 )
                 alarm_log = AlarmLogCreate(
-                    level=AlarmLogLevel.FATAL.value,
+                    level=AlarmLogLevel.WARNING.value,
                     task_id=task.id,
                     task_log_id=task_log.id,
                     status=AlarmLogStatus.UNPROCESSED.value,
@@ -312,7 +312,7 @@ def image_detection(image, task_id, checkpoint_id):
                 alarm = True
                 logger.error(f"Alarms detected: {detected_alarms}")
                 alarm_log = AlarmLogCreate(
-                    level=AlarmLogLevel.WARNING.value,
+                    level=AlarmLogLevel.FATAL.value,
                     task_id=task_id,
                     task_log_id=task_log.id,
                     status=AlarmLogStatus.UNPROCESSED.value,

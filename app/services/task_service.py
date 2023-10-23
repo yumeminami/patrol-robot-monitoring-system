@@ -174,7 +174,8 @@ def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
                     obj_in={"status": TaskStatus.PENDING.value},
                 )
 
-                task_log = task_log_crud.update(
+                task_log = task_log_crud.get(db, task_log.id)
+                task_log_crud.update(
                     db,
                     db_obj=task_log,
                     obj_in={"status": TaskLogStatus.FINISHED.value},
@@ -208,7 +209,11 @@ def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
                     )
                 )
                 if alarm_logs:
+                    logger.warning(
+                        f"Alarm already exists for sensor {sensor_name}"
+                    )
                     continue
+
                 logger.error(
                     f"Threshold violation detected at {datetime.now()}"
                 )
@@ -218,6 +223,7 @@ def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
                 alarm_log = AlarmLogCreate(
                     level=AlarmLogLevel.FATAL.value,
                     task_id=task.id,
+                    task_log_id=task_log.id,
                     status=AlarmLogStatus.UNPROCESSED.value,
                     location=robot.position,
                     type=sensor_name,

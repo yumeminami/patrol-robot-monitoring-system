@@ -18,6 +18,7 @@ class AlarmLogStatus(Enum):
 class AlarmLogBase(BaseModel):
     level: int
     task_id: Optional[int] = None
+    task_log_id: Optional[int] = None
     type: str
     status: int = AlarmLogStatus.UNPROCESSED.value
     location: int

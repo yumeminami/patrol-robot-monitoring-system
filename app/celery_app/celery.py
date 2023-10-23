@@ -12,7 +12,7 @@ from app.crud.task_logs import task_log as task_log_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.tasks import Task, TaskStatus
-from app.schemas.task_logs import TaskLog, TaskLogStatus
+from app.schemas.task_logs import TaskLogCreate, TaskLog, TaskLogStatus
 from app.services.ros_service import patrol_control
 from app.services.task_service import (
     create_task_xml,
@@ -239,7 +239,7 @@ def start_task(task_id, execution_time):
     task = Task.from_orm(task)
 
     execution_date = f"{datetime.now().strftime('%Y-%m-%d')} {execution_time}"
-    task_log_create = TaskLog(
+    task_log_create = TaskLogCreate(
         task_id=task.id,
         robot_id=task.robot_id,
         execution_date=execution_date,

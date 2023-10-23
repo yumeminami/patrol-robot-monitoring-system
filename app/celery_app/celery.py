@@ -248,7 +248,9 @@ def start_task(task_id, execution_time):
     )
     task_log = task_log_crud.create(db, obj_in=task_log_create)
     task_log = TaskLog.from_orm(task_log)
-    thread = Thread(target=monitor_sensor_data, args=(task, execution_date, task_log))
+    thread = Thread(
+        target=monitor_sensor_data, args=(task, execution_date, task_log)
+    )
     thread.start()
 
     redis_client.hdel(f"task_{task_id}", execution_time)

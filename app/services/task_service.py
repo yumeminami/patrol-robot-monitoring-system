@@ -35,7 +35,6 @@ from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
 from app.schemas.patrol_images import PatrolImageCreate
 from app.schemas.patrol_videos import PatrolVideoCreate
-from app.schemas.task_logs import TaskLogCreate, TaskLogStatus
 from app.schemas.tasks import Task, TaskType, TaskStatus
 from app.schemas.task_logs import TaskLog, TaskLogStatus
 from app.settings import config
@@ -203,6 +202,13 @@ def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
                 sensor.lower_limit > sensor_data[sensor_name]
                 or sensor.upper_limit < sensor_data[sensor_name]
             ):
+                alarm_logs = (
+                    alarm_log_crud.get_alarm_logs_by_task_log_id_and_type(
+                        db, task_log.id, sensor_name
+                    )
+                )
+                if alarm_logs:
+                    continue
                 logger.error(
                     f"Threshold violation detected at {datetime.now()}"
                 )

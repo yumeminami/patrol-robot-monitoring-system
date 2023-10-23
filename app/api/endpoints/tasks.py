@@ -4,7 +4,6 @@ from app.api.api import create_generic_router
 from app.celery_app.celery import push_task_to_celery
 from app.crud.tasks import task as crud
 from app.crud.robots import robot as robot_crud
-from app.crud.gimbalpoints import gimbal_point as gimbal_point_crud
 from app.schemas.tasks import (
     Task,
     TaskCreate,

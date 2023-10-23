@@ -37,6 +37,7 @@ from app.schemas.patrol_images import PatrolImageCreate
 from app.schemas.patrol_videos import PatrolVideoCreate
 from app.schemas.task_logs import TaskLogCreate, TaskLogStatus
 from app.schemas.tasks import Task, TaskType, TaskStatus
+from app.schemas.task_logs import TaskLog, TaskLogStatus
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
 from app.utils.log import logger
@@ -140,7 +141,7 @@ def create_task_xml(task, db):
         return file_name, PatrolControlCommand.NORMAL_TYPE.value
 
 
-def monitor_sensor_data(task: Task, execution_date: str):
+def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
     """
     Continually monitor sensor data throughout the task's runtime.
 
@@ -174,14 +175,11 @@ def monitor_sensor_data(task: Task, execution_date: str):
                     obj_in={"status": TaskStatus.PENDING.value},
                 )
 
-                task_log_create = TaskLogCreate(
-                    task_id=task.id,
-                    robot_id=task.robot_id,
-                    execution_date=execution_date,
-                    type=task.type,
-                    status=TaskLogStatus.FINISHED.value,
+                task_log = task_log_crud.update(
+                    db,
+                    db_obj=task_log,
+                    obj_in={"status": TaskLogStatus.FINISHED.value},
                 )
-                task_log_crud.create(db, obj_in=task_log_create)
                 db.close()
                 break
         except ROSException as e:

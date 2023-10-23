@@ -8,6 +8,7 @@ from pydantic import BaseModel
 class TaskLogStatus(Enum):
     FINISHED = 0
     STOPPED = 1
+    FAILED = 2
 
 
 class TaskLogBase(BaseModel):

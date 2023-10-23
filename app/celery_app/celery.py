@@ -8,9 +8,11 @@ from celery import Celery
 from app.crud.robots import robot as robot_crud
 from app.crud.sensors import sensor as sensor_crud
 from app.crud.tasks import task as task_crud
+from app.crud.task_logs import task_log as task_log_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.tasks import Task, TaskStatus
+from app.schemas.task_logs import TaskLog, TaskLogStatus
 from app.services.ros_service import patrol_control
 from app.services.task_service import (
     create_task_xml,
@@ -237,7 +239,16 @@ def start_task(task_id, execution_time):
     task = Task.from_orm(task)
 
     execution_date = f"{datetime.now().strftime('%Y-%m-%d')} {execution_time}"
-    thread = Thread(target=monitor_sensor_data, args=(task, execution_date))
+    task_log_create = TaskLog(
+        task_id=task.id,
+        robot_id=task.robot_id,
+        execution_date=execution_date,
+        type=task.type,
+        status=TaskLogStatus.STOPPED.value,
+    )
+    task_log = task_log_crud.create(db, obj_in=task_log_create)
+    task_log = TaskLog.from_orm(task_log)
+    thread = Thread(target=monitor_sensor_data, args=(task, execution_date, task_log))
     thread.start()
 
     redis_client.hdel(f"task_{task_id}", execution_time)

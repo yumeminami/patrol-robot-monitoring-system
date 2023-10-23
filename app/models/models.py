@@ -85,6 +85,9 @@ class AlarmLog(BaseModel):
     task_id = Column(
         Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
     )
+    task_log_id = Column(
+        Integer, ForeignKey("task_logs.id", ondelete="CASCADE"), nullable=False
+    )
     type = Column(String(50), index=True)
     time = Column(DateTime, default=func.now())
     status = Column(Integer, default=0)

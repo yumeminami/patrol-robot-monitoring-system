@@ -3,7 +3,6 @@ import json
 import os
 
 import requests
-
 from app.utils.log import logger
 
 IMG_ALGORITHM_CONFIG_PATH = "app/vision_algorithm/img_algorithm_config.json"

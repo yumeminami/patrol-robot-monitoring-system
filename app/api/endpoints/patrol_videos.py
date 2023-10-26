@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from app.api.api import create_generic_router, remove_file
 from app.crud.patrol_videos import patrol_video as crud
 from app.crud.alarm_logs import alarm_log as crud_alarm_log
+from app.crud.task_logs import task_log as task_log_crud
 from app.db.database import SessionLocal
 from app.schemas.patrol_videos import (
     PatrolVideo,
@@ -77,9 +78,13 @@ async def accept_detected_video(
             )
 
         if alarm:
+            task_log = task_log_crud.get_the_latest_task_log(
+                db, patrol_video.task_id
+            )
             alarm_create = AlarmLogCreate(
                 level=AlarmLogLevel.WARNING.value,
                 task_id=patrol_video.task_id,
+                task_log_id=task_log.id,
                 status=AlarmLogStatus.UNPROCESSED.value,
                 location=patrol_video.start_position,
                 type=algorithm,

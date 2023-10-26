@@ -40,6 +40,15 @@ class TaskBase(BaseModel):
     execution_times: List[str] = []
     execution_frequency: str = ""
 
+
+class Task(TaskBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class TaskCreate(TaskBase):
     @root_validator(pre=True)
     def type_validator(cls, values):
         type = values.get("type")
@@ -150,17 +159,6 @@ class TaskBase(BaseModel):
             )
 
         return v
-
-
-class Task(TaskBase):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
-class TaskCreate(TaskBase):
-    pass
 
 
 class TaskUpdate(TaskBase):

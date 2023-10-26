@@ -9,6 +9,8 @@ IMG_ALGORITHM_CONFIG_PATH = "app/vision_algorithm/img_algorithm_config.json"
 VIDEO_ALGORITHM_CONFIG_PATH = (
     "app/vision_algorithm/video_algorithm_config.json"
 )
+IMG_ALGORITHM_DIR_PATH = "app/vision_algorithm/img_algorithm_dict.json"
+VIDEO_ALGORITHM_DIR_PATH = "app/vision_algorithm/video_algorithm_dict.json"
 
 
 class VisionAlgorithm:
@@ -17,6 +19,11 @@ class VisionAlgorithm:
             self.img_algorithm_config = json.load(f)
         with open(VIDEO_ALGORITHM_CONFIG_PATH, "r") as f:
             self.video_algorithm_config = json.load(f)
+        with open(IMG_ALGORITHM_DIR_PATH, "r") as f:
+            self.img_algorithm_dict = json.load(f)
+        with open(VIDEO_ALGORITHM_DIR_PATH, "r") as f:
+            self.video_algorithm_dict = json.load(f)
+
         self.vision_algorithm_api_url = os.environ.get(
             "VISION_ALGORITHM_API_URL", None
         )

@@ -1,0 +1,23 @@
+{
+    "cable": "电缆",
+    "gallery": "管廊",
+    "pipeline": "管道",
+    "vents": "通风堵塞检测",
+    "drain": "排水沟堵塞",
+    "lighting": "照明系统",
+    "fire_extinguisher": "灭火器状态",
+    "dust_damp": "潮湿灰尘",
+    "rust": "锈蚀",
+    "pound": "积水/垃圾/淤泥",
+    "animal": "小动物",
+    "hat_person": "安全帽和行人",
+    "fall": "跌倒",
+    "gas_detector": "气体检测仪",
+    "water_level": "集水池水位",
+    "escape": "逃生口",
+    "ground_wire": "接地线",
+    "drain_pound": "排水沟积水",
+    "reflective_smoke": "反光衣抽烟检测",
+    "safety_signage": "安全出口灯牌",
+    "through_wall": "穿墙套管异常检测"
+}

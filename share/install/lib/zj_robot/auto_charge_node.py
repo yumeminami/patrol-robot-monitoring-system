@@ -105,6 +105,9 @@ class ChargePreparation(smach.State):
             req.patrol_command=5
             resp = client.call(req)
 
+            #重新读取充电桩位置
+
+
             return 'charge_preparation_completed'
         else:
             return 'charge_preparation_standby'
@@ -114,7 +117,15 @@ class SearchDockingPosition(smach.State):
         smach.State.__init__(self, outcomes=['search_completed'])
     def execute(self, userdata):
         global goal_position
-        goal_position=docking_position[0]-100
+        map_data=read_json_file("/home/zj/Project/zj-robot/src/zjrobot/mapdata.json")
+
+        #查找最近充电桩
+        docking_position=[v for k,v in map_data["charging_station"].items()]
+        cur_pos=rospy.get_param("current_position")
+        distance=[abs(charge_station-cur_pos) for charge_station in docking_position]
+        ind=distance.index(min(distance))
+        goal_position=docking_position[ind]-100
+
         return 'search_completed'
 
 

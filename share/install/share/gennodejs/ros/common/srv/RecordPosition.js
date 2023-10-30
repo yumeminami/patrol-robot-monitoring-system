@@ -11,6 +11,7 @@ const _deserializer = _ros_msg_utils.Deserialize;
 const _arrayDeserializer = _deserializer.Array;
 const _finder = _ros_msg_utils.Find;
 const _getByteLength = _ros_msg_utils.getByteLength;
+let std_msgs = _finder('std_msgs');
 
 //-----------------------------------------------------------
 
@@ -21,40 +22,22 @@ class RecordPositionRequest {
   constructor(initObj={}) {
     if (initObj === null) {
       // initObj === null is a special case for deserialization where we don't initialize fields
-      this.robot_state = null;
-      this.time = null;
-      this.position = null;
+      this.data = null;
     }
     else {
-      if (initObj.hasOwnProperty('robot_state')) {
-        this.robot_state = initObj.robot_state
+      if (initObj.hasOwnProperty('data')) {
+        this.data = initObj.data
       }
       else {
-        this.robot_state = [];
-      }
-      if (initObj.hasOwnProperty('time')) {
-        this.time = initObj.time
-      }
-      else {
-        this.time = [];
-      }
-      if (initObj.hasOwnProperty('position')) {
-        this.position = initObj.position
-      }
-      else {
-        this.position = [];
+        this.data = new std_msgs.msg.UInt8MultiArray();
       }
     }
   }
 
   static serialize(obj, buffer, bufferOffset) {
     // Serializes a message object of type RecordPositionRequest
-    // Serialize message field [robot_state]
-    bufferOffset = _arraySerializer.int32(obj.robot_state, buffer, bufferOffset, null);
-    // Serialize message field [time]
-    bufferOffset = _arraySerializer.float32(obj.time, buffer, bufferOffset, null);
-    // Serialize message field [position]
-    bufferOffset = _arraySerializer.float32(obj.position, buffer, bufferOffset, null);
+    // Serialize message field [data]
+    bufferOffset = std_msgs.msg.UInt8MultiArray.serialize(obj.data, buffer, bufferOffset);
     return bufferOffset;
   }
 
@@ -62,21 +45,15 @@ class RecordPositionRequest {
     //deserializes a message object of type RecordPositionRequest
     let len;
     let data = new RecordPositionRequest(null);
-    // Deserialize message field [robot_state]
-    data.robot_state = _arrayDeserializer.int32(buffer, bufferOffset, null)
-    // Deserialize message field [time]
-    data.time = _arrayDeserializer.float32(buffer, bufferOffset, null)
-    // Deserialize message field [position]
-    data.position = _arrayDeserializer.float32(buffer, bufferOffset, null)
+    // Deserialize message field [data]
+    data.data = std_msgs.msg.UInt8MultiArray.deserialize(buffer, bufferOffset);
     return data;
   }
 
   static getMessageSize(object) {
     let length = 0;
-    length += 4 * object.robot_state.length;
-    length += 4 * object.time.length;
-    length += 4 * object.position.length;
-    return length + 12;
+    length += std_msgs.msg.UInt8MultiArray.getMessageSize(object.data);
+    return length;
   }
 
   static datatype() {
@@ -86,16 +63,57 @@ class RecordPositionRequest {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '0944c7b7039144c641c036db46253e7b';
+    return '738c38b6406025140747ced47e1c550e';
   }
 
   static messageDefinition() {
     // Returns full string definition for message
     return `
-    int32[] robot_state
-    float32[] time
-    float32[] position
+    std_msgs/UInt8MultiArray data
     
+    ================================================================================
+    MSG: std_msgs/UInt8MultiArray
+    # Please look at the MultiArrayLayout message definition for
+    # documentation on all multiarrays.
+    
+    MultiArrayLayout  layout        # specification of data layout
+    uint8[]           data          # array of data
+    
+    
+    ================================================================================
+    MSG: std_msgs/MultiArrayLayout
+    # The multiarray declares a generic multi-dimensional array of a
+    # particular data type.  Dimensions are ordered from outer most
+    # to inner most.
+    
+    MultiArrayDimension[] dim # Array of dimension properties
+    uint32 data_offset        # padding elements at front of data
+    
+    # Accessors should ALWAYS be written in terms of dimension stride
+    # and specified outer-most dimension first.
+    # 
+    # multiarray(i,j,k) = data[data_offset + dim_stride[1]*i + dim_stride[2]*j + k]
+    #
+    # A standard, 3-channel 640x480 image with interleaved color channels
+    # would be specified as:
+    #
+    # dim[0].label  = "height"
+    # dim[0].size   = 480
+    # dim[0].stride = 3*640*480 = 921600  (note dim[0] stride is just size of image)
+    # dim[1].label  = "width"
+    # dim[1].size   = 640
+    # dim[1].stride = 3*640 = 1920
+    # dim[2].label  = "channel"
+    # dim[2].size   = 3
+    # dim[2].stride = 3
+    #
+    # multiarray(i,j,k) refers to the ith row, jth column, and kth channel.
+    
+    ================================================================================
+    MSG: std_msgs/MultiArrayDimension
+    string label   # label of given dimension
+    uint32 size    # size of given dimension (in type units)
+    uint32 stride  # stride of given dimension
     `;
   }
 
@@ -105,25 +123,11 @@ class RecordPositionRequest {
       msg = {};
     }
     const resolved = new RecordPositionRequest(null);
-    if (msg.robot_state !== undefined) {
-      resolved.robot_state = msg.robot_state;
+    if (msg.data !== undefined) {
+      resolved.data = std_msgs.msg.UInt8MultiArray.Resolve(msg.data)
     }
     else {
-      resolved.robot_state = []
-    }
-
-    if (msg.time !== undefined) {
-      resolved.time = msg.time;
-    }
-    else {
-      resolved.time = []
-    }
-
-    if (msg.position !== undefined) {
-      resolved.position = msg.position;
-    }
-    else {
-      resolved.position = []
+      resolved.data = new std_msgs.msg.UInt8MultiArray()
     }
 
     return resolved;
@@ -205,6 +209,6 @@ class RecordPositionResponse {
 module.exports = {
   Request: RecordPositionRequest,
   Response: RecordPositionResponse,
-  md5sum() { return '7a611c192c7d0449dba995ec9bb64dc9'; },
+  md5sum() { return '7b0729f31458f38616908a68952d309b'; },
   datatype() { return 'common/RecordPosition'; }
 };

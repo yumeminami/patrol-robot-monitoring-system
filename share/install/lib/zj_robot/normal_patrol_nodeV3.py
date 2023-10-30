@@ -23,8 +23,9 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import xml.dom.minidom
-from motion import move_to_target_position,move
+from motion import move
 import os
+import subprocess
 
 # 定义全局变量
 global xml_paser 
@@ -302,6 +303,7 @@ class Camera(smach.State):
             try:
                 resp=client.call(req)
                 rospy.loginfo("拍照服务调用结果:%d",resp.status_code)
+                print("服务调用成功")
             except rospy.ServiceException:
                 #服务调用失败
                 print("服务调用失败")
@@ -365,6 +367,34 @@ class Transition(smach.State):
         else:
             pass
 
+
+def getCmdOutput(cmd):
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    output_list = []
+    for line in out.splitlines():
+        output_list.append(line.decode('utf-8'))
+    res = ""
+    return output_list
+
+#解决自动充电重复启动的问题
+def restar_auto_charge_node():
+    flag=0
+    rosnode_list=getCmdOutput("rosnode list")
+    for rosnode in rosnode_list:
+        if rosnode.endswith("auto_charge_node"):
+            flag=1
+    if flag==1:
+        print("已有auto_charge_node 无需重启")
+    else:
+        print("需重启auto_charge_node")
+        os.system("roslaunch zj_robot  auto_charge.launch &")
+
+
+
+restar_auto_charge_node()
+
+
 # 定义state patrol_completed
 class PatrolCompleted(smach.State):
     def __init__(self):
@@ -383,7 +413,8 @@ class PatrolCompleted(smach.State):
         clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
 
         rospy.logdebug('Executing state patrol_completed')
-        os.system("roslaunch zj_robot  auto_charge.launch &")#重启自动充电节点
+        restar_auto_charge_node()
+        #重启自动充电节点
         
         return 'patrol_completed'
 

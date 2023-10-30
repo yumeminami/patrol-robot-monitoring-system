@@ -4,6 +4,7 @@ from ._FireDoorControl import *
 from ._FirmwareUpdate import *
 from ._GimbalControl import *
 from ._GimbalMotionControl import *
+from ._Mapping import *
 from ._PanoramicVideoUrl import *
 from ._PatrolControl import *
 from ._PatrolPicture import *

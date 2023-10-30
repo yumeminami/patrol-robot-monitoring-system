@@ -14,89 +14,49 @@
 
 (in-package "ROS")
 
+(if (not (find-package "STD_MSGS"))
+  (ros::roseus-add-msgs "std_msgs"))
 
 
 
 
 (defclass common::RecordPositionRequest
   :super ros::object
-  :slots (_robot_state _time _position ))
+  :slots (_data ))
 
 (defmethod common::RecordPositionRequest
   (:init
    (&key
-    ((:robot_state __robot_state) (make-array 0 :initial-element 0 :element-type :integer))
-    ((:time __time) (make-array 0 :initial-element 0.0 :element-type :float))
-    ((:position __position) (make-array 0 :initial-element 0.0 :element-type :float))
+    ((:data __data) (instance std_msgs::UInt8MultiArray :init))
     )
    (send-super :init)
-   (setq _robot_state __robot_state)
-   (setq _time __time)
-   (setq _position __position)
+   (setq _data __data)
    self)
-  (:robot_state
-   (&optional __robot_state)
-   (if __robot_state (setq _robot_state __robot_state)) _robot_state)
-  (:time
-   (&optional __time)
-   (if __time (setq _time __time)) _time)
-  (:position
-   (&optional __position)
-   (if __position (setq _position __position)) _position)
+  (:data
+   (&rest __data)
+   (if (keywordp (car __data))
+       (send* _data __data)
+     (progn
+       (if __data (setq _data (car __data)))
+       _data)))
   (:serialization-length
    ()
    (+
-    ;; int32[] _robot_state
-    (* 4    (length _robot_state)) 4
-    ;; float32[] _time
-    (* 4    (length _time)) 4
-    ;; float32[] _position
-    (* 4    (length _position)) 4
+    ;; std_msgs/UInt8MultiArray _data
+    (send _data :serialization-length)
     ))
   (:serialize
    (&optional strm)
    (let ((s (if strm strm
               (make-string-output-stream (send self :serialization-length)))))
-     ;; int32[] _robot_state
-     (write-long (length _robot_state) s)
-     (dotimes (i (length _robot_state))
-       (write-long (elt _robot_state i) s)
-       )
-     ;; float32[] _time
-     (write-long (length _time) s)
-     (dotimes (i (length _time))
-       (sys::poke (elt _time i) (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
-       )
-     ;; float32[] _position
-     (write-long (length _position) s)
-     (dotimes (i (length _position))
-       (sys::poke (elt _position i) (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
-       )
+     ;; std_msgs/UInt8MultiArray _data
+       (send _data :serialize s)
      ;;
      (if (null strm) (get-output-stream-string s))))
   (:deserialize
    (buf &optional (ptr- 0))
-   ;; int32[] _robot_state
-   (let (n)
-     (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4)
-     (setq _robot_state (instantiate integer-vector n))
-     (dotimes (i n)
-     (setf (elt _robot_state i) (sys::peek buf ptr- :integer)) (incf ptr- 4)
-     ))
-   ;; float32[] _time
-   (let (n)
-     (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4)
-     (setq _time (instantiate float-vector n))
-     (dotimes (i n)
-     (setf (elt _time i) (sys::peek buf ptr- :float)) (incf ptr- 4)
-     ))
-   ;; float32[] _position
-   (let (n)
-     (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4)
-     (setq _position (instantiate float-vector n))
-     (dotimes (i n)
-     (setf (elt _position i) (sys::peek buf ptr- :float)) (incf ptr- 4)
-     ))
+   ;; std_msgs/UInt8MultiArray _data
+     (send _data :deserialize buf ptr-) (incf ptr- (send _data :serialization-length))
    ;;
    self)
   )
@@ -142,7 +102,7 @@
   :super ros::object
   :slots ())
 
-(setf (get common::RecordPosition :md5sum-) "7a611c192c7d0449dba995ec9bb64dc9")
+(setf (get common::RecordPosition :md5sum-) "7b0729f31458f38616908a68952d309b")
 (setf (get common::RecordPosition :datatype-) "common/RecordPosition")
 (setf (get common::RecordPosition :request) common::RecordPositionRequest)
 (setf (get common::RecordPosition :response) common::RecordPositionResponse)
@@ -150,23 +110,105 @@
 (defmethod common::RecordPositionRequest
   (:response () (instance common::RecordPositionResponse :init)))
 
-(setf (get common::RecordPositionRequest :md5sum-) "7a611c192c7d0449dba995ec9bb64dc9")
+(setf (get common::RecordPositionRequest :md5sum-) "7b0729f31458f38616908a68952d309b")
 (setf (get common::RecordPositionRequest :datatype-) "common/RecordPositionRequest")
 (setf (get common::RecordPositionRequest :definition-)
-      "int32[] robot_state
-float32[] time
-float32[] position
+      "std_msgs/UInt8MultiArray data
+
+================================================================================
+MSG: std_msgs/UInt8MultiArray
+# Please look at the MultiArrayLayout message definition for
+# documentation on all multiarrays.
+
+MultiArrayLayout  layout        # specification of data layout
+uint8[]           data          # array of data
+
+
+================================================================================
+MSG: std_msgs/MultiArrayLayout
+# The multiarray declares a generic multi-dimensional array of a
+# particular data type.  Dimensions are ordered from outer most
+# to inner most.
+
+MultiArrayDimension[] dim # Array of dimension properties
+uint32 data_offset        # padding elements at front of data
+
+# Accessors should ALWAYS be written in terms of dimension stride
+# and specified outer-most dimension first.
+# 
+# multiarray(i,j,k) = data[data_offset + dim_stride[1]*i + dim_stride[2]*j + k]
+#
+# A standard, 3-channel 640x480 image with interleaved color channels
+# would be specified as:
+#
+# dim[0].label  = \"height\"
+# dim[0].size   = 480
+# dim[0].stride = 3*640*480 = 921600  (note dim[0] stride is just size of image)
+# dim[1].label  = \"width\"
+# dim[1].size   = 640
+# dim[1].stride = 3*640 = 1920
+# dim[2].label  = \"channel\"
+# dim[2].size   = 3
+# dim[2].stride = 3
+#
+# multiarray(i,j,k) refers to the ith row, jth column, and kth channel.
+
+================================================================================
+MSG: std_msgs/MultiArrayDimension
+string label   # label of given dimension
+uint32 size    # size of given dimension (in type units)
 ---
 int32 status_code #0失败，1完成
 
 ")
 
-(setf (get common::RecordPositionResponse :md5sum-) "7a611c192c7d0449dba995ec9bb64dc9")
+(setf (get common::RecordPositionResponse :md5sum-) "7b0729f31458f38616908a68952d309b")
 (setf (get common::RecordPositionResponse :datatype-) "common/RecordPositionResponse")
 (setf (get common::RecordPositionResponse :definition-)
-      "int32[] robot_state
-float32[] time
-float32[] position
+      "std_msgs/UInt8MultiArray data
+
+================================================================================
+MSG: std_msgs/UInt8MultiArray
+# Please look at the MultiArrayLayout message definition for
+# documentation on all multiarrays.
+
+MultiArrayLayout  layout        # specification of data layout
+uint8[]           data          # array of data
+
+
+================================================================================
+MSG: std_msgs/MultiArrayLayout
+# The multiarray declares a generic multi-dimensional array of a
+# particular data type.  Dimensions are ordered from outer most
+# to inner most.
+
+MultiArrayDimension[] dim # Array of dimension properties
+uint32 data_offset        # padding elements at front of data
+
+# Accessors should ALWAYS be written in terms of dimension stride
+# and specified outer-most dimension first.
+# 
+# multiarray(i,j,k) = data[data_offset + dim_stride[1]*i + dim_stride[2]*j + k]
+#
+# A standard, 3-channel 640x480 image with interleaved color channels
+# would be specified as:
+#
+# dim[0].label  = \"height\"
+# dim[0].size   = 480
+# dim[0].stride = 3*640*480 = 921600  (note dim[0] stride is just size of image)
+# dim[1].label  = \"width\"
+# dim[1].size   = 640
+# dim[1].stride = 3*640 = 1920
+# dim[2].label  = \"channel\"
+# dim[2].size   = 3
+# dim[2].stride = 3
+#
+# multiarray(i,j,k) refers to the ith row, jth column, and kth channel.
+
+================================================================================
+MSG: std_msgs/MultiArrayDimension
+string label   # label of given dimension
+uint32 size    # size of given dimension (in type units)
 ---
 int32 status_code #0失败，1完成
 
@@ -174,6 +216,6 @@ int32 status_code #0失败，1完成
 
 
 
-(provide :common/RecordPosition "7a611c192c7d0449dba995ec9bb64dc9")
+(provide :common/RecordPosition "7b0729f31458f38616908a68952d309b")
 
 

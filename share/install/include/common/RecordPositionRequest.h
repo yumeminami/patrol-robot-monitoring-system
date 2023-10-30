@@ -15,6 +15,7 @@
 #include <ros/builtin_message_traits.h>
 #include <ros/message_operations.h>
 
+#include <std_msgs/UInt8MultiArray.h>
 
 namespace common
 {
@@ -24,27 +25,17 @@ struct RecordPositionRequest_
   typedef RecordPositionRequest_<ContainerAllocator> Type;
 
   RecordPositionRequest_()
-    : robot_state()
-    , time()
-    , position()  {
+    : data()  {
     }
   RecordPositionRequest_(const ContainerAllocator& _alloc)
-    : robot_state(_alloc)
-    , time(_alloc)
-    , position(_alloc)  {
+    : data(_alloc)  {
   (void)_alloc;
     }
 
 
 
-   typedef std::vector<int32_t, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<int32_t>> _robot_state_type;
-  _robot_state_type robot_state;
-
-   typedef std::vector<float, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<float>> _time_type;
-  _time_type time;
-
-   typedef std::vector<float, typename std::allocator_traits<ContainerAllocator>::template rebind_alloc<float>> _position_type;
-  _position_type position;
+   typedef  ::std_msgs::UInt8MultiArray_<ContainerAllocator>  _data_type;
+  _data_type data;
 
 
 
@@ -75,9 +66,7 @@ return s;
 template<typename ContainerAllocator1, typename ContainerAllocator2>
 bool operator==(const ::common::RecordPositionRequest_<ContainerAllocator1> & lhs, const ::common::RecordPositionRequest_<ContainerAllocator2> & rhs)
 {
-  return lhs.robot_state == rhs.robot_state &&
-    lhs.time == rhs.time &&
-    lhs.position == rhs.position;
+  return lhs.data == rhs.data;
 }
 
 template<typename ContainerAllocator1, typename ContainerAllocator2>
@@ -134,12 +123,12 @@ struct MD5Sum< ::common::RecordPositionRequest_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "0944c7b7039144c641c036db46253e7b";
+    return "738c38b6406025140747ced47e1c550e";
   }
 
   static const char* value(const ::common::RecordPositionRequest_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x0944c7b7039144c6ULL;
-  static const uint64_t static_value2 = 0x41c036db46253e7bULL;
+  static const uint64_t static_value1 = 0x738c38b640602514ULL;
+  static const uint64_t static_value2 = 0x0747ced47e1c550eULL;
 };
 
 template<class ContainerAllocator>
@@ -158,9 +147,51 @@ struct Definition< ::common::RecordPositionRequest_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "int32[] robot_state\n"
-"float32[] time\n"
-"float32[] position\n"
+    return "std_msgs/UInt8MultiArray data\n"
+"\n"
+"================================================================================\n"
+"MSG: std_msgs/UInt8MultiArray\n"
+"# Please look at the MultiArrayLayout message definition for\n"
+"# documentation on all multiarrays.\n"
+"\n"
+"MultiArrayLayout  layout        # specification of data layout\n"
+"uint8[]           data          # array of data\n"
+"\n"
+"\n"
+"================================================================================\n"
+"MSG: std_msgs/MultiArrayLayout\n"
+"# The multiarray declares a generic multi-dimensional array of a\n"
+"# particular data type.  Dimensions are ordered from outer most\n"
+"# to inner most.\n"
+"\n"
+"MultiArrayDimension[] dim # Array of dimension properties\n"
+"uint32 data_offset        # padding elements at front of data\n"
+"\n"
+"# Accessors should ALWAYS be written in terms of dimension stride\n"
+"# and specified outer-most dimension first.\n"
+"# \n"
+"# multiarray(i,j,k) = data[data_offset + dim_stride[1]*i + dim_stride[2]*j + k]\n"
+"#\n"
+"# A standard, 3-channel 640x480 image with interleaved color channels\n"
+"# would be specified as:\n"
+"#\n"
+"# dim[0].label  = \"height\"\n"
+"# dim[0].size   = 480\n"
+"# dim[0].stride = 3*640*480 = 921600  (note dim[0] stride is just size of image)\n"
+"# dim[1].label  = \"width\"\n"
+"# dim[1].size   = 640\n"
+"# dim[1].stride = 3*640 = 1920\n"
+"# dim[2].label  = \"channel\"\n"
+"# dim[2].size   = 3\n"
+"# dim[2].stride = 3\n"
+"#\n"
+"# multiarray(i,j,k) refers to the ith row, jth column, and kth channel.\n"
+"\n"
+"================================================================================\n"
+"MSG: std_msgs/MultiArrayDimension\n"
+"string label   # label of given dimension\n"
+"uint32 size    # size of given dimension (in type units)\n"
+"uint32 stride  # stride of given dimension\n"
 ;
   }
 
@@ -179,9 +210,7 @@ namespace serialization
   {
     template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
     {
-      stream.next(m.robot_state);
-      stream.next(m.time);
-      stream.next(m.position);
+      stream.next(m.data);
     }
 
     ROS_DECLARE_ALLINONE_SERIALIZER
@@ -200,24 +229,9 @@ struct Printer< ::common::RecordPositionRequest_<ContainerAllocator> >
 {
   template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::common::RecordPositionRequest_<ContainerAllocator>& v)
   {
-    s << indent << "robot_state[]" << std::endl;
-    for (size_t i = 0; i < v.robot_state.size(); ++i)
-    {
-      s << indent << "  robot_state[" << i << "]: ";
-      Printer<int32_t>::stream(s, indent + "  ", v.robot_state[i]);
-    }
-    s << indent << "time[]" << std::endl;
-    for (size_t i = 0; i < v.time.size(); ++i)
-    {
-      s << indent << "  time[" << i << "]: ";
-      Printer<float>::stream(s, indent + "  ", v.time[i]);
-    }
-    s << indent << "position[]" << std::endl;
-    for (size_t i = 0; i < v.position.size(); ++i)
-    {
-      s << indent << "  position[" << i << "]: ";
-      Printer<float>::stream(s, indent + "  ", v.position[i]);
-    }
+    s << indent << "data: ";
+    s << std::endl;
+    Printer< ::std_msgs::UInt8MultiArray_<ContainerAllocator> >::stream(s, indent + "  ", v.data);
   }
 };
 

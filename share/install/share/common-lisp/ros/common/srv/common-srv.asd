@@ -18,6 +18,8 @@
     (:file "_package_GimbalControl" :depends-on ("_package"))
     (:file "GimbalMotionControl" :depends-on ("_package_GimbalMotionControl"))
     (:file "_package_GimbalMotionControl" :depends-on ("_package"))
+    (:file "Mapping" :depends-on ("_package_Mapping"))
+    (:file "_package_Mapping" :depends-on ("_package"))
     (:file "PanoramicVideoUrl" :depends-on ("_package_PanoramicVideoUrl"))
     (:file "_package_PanoramicVideoUrl" :depends-on ("_package"))
     (:file "PatrolControl" :depends-on ("_package_PatrolControl"))

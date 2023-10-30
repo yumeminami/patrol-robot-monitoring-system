@@ -19,6 +19,7 @@ let PatrolPicture = require('./PatrolPicture.js')
 let VideoData = require('./VideoData.js')
 let ContinousXmlData = require('./ContinousXmlData.js')
 let GimbalControl = require('./GimbalControl.js')
+let Mapping = require('./Mapping.js')
 let StopControl = require('./StopControl.js')
 let PatrolControl = require('./PatrolControl.js')
 
@@ -41,6 +42,7 @@ module.exports = {
   VideoData: VideoData,
   ContinousXmlData: ContinousXmlData,
   GimbalControl: GimbalControl,
+  Mapping: Mapping,
   StopControl: StopControl,
   PatrolControl: PatrolControl,
 };

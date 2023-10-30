@@ -396,7 +396,7 @@ if __name__ == "__main__":
     server = rospy.Service("patrol_control",PatrolControl,patrol_control_callback)
     os.system("roslaunch zj_robot  normal_patrol.launch &")#正常巡检
     os.system("roslaunch zj_robot  continuous_patrol.launch &")#连续巡检
-    # os.system("roslaunch zj_robot  auto_charge.launch &")#自动充电
+    os.system("roslaunch zj_robot  auto_charge.launch &")#自动充电
 
 
     rospy.set_param("is_robot_normal_patroling",0)#是否巡检中

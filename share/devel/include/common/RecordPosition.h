@@ -40,7 +40,7 @@ template<>
 struct MD5Sum< ::common::RecordPosition > {
   static const char* value()
   {
-    return "7a611c192c7d0449dba995ec9bb64dc9";
+    return "7b0729f31458f38616908a68952d309b";
   }
 
   static const char* value(const ::common::RecordPosition&) { return value(); }

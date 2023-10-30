@@ -20,6 +20,7 @@ from motion import move_to_target_position,move
 
 import xml.dom.minidom
 import os
+import subprocess
 
 
 xml_str="""
@@ -45,6 +46,9 @@ xml_str="""
 """
 
 global patrol_section_index
+
+#是否开启全景相机
+X3=False
 
 PATROL_STANDBY               = 0
 PATROL_REQUEST               = 1
@@ -258,7 +262,8 @@ class Motion_start(smach.State):
         rospy.set_param("continuous_patrol_task_name",xml_paser.get_patrol_task_name())
         target_position=xml_paser.get_patrol_start_position(patrolpoints,patrol_section_index)
         target_velocity=xml_paser.get_patrol_velocity(patrolpoints,patrol_section_index)
-        move_to_target_position(0,target_position,target_velocity)
+        # move_to_target_position(0,target_position,target_velocity)
+        move(target_position,target_velocity)
         return 'motion_start_completed'
 
 
@@ -281,6 +286,26 @@ class Camera_start(smach.State):
         resp=client.call(req)
         rospy.loginfo("相机服务调用结果:%d",resp.status_code)
         time.sleep(5)
+
+        if X3==True:
+            # 全景相机开启
+            client = rospy.ServiceProxy("/zj_robot/x3_camera_control",X3CameraControl)
+            client.wait_for_service(timeout=5)
+            req = X3CameraControlRequest()
+            req.camera_command=1
+            resp = client.call(req)
+            rospy.loginfo("开启是否成功:%d",resp.status_code)
+            time.sleep(2)
+
+
+
+
+
+
+
+
+
+
 
         rospy.set_param("continuous_camera_task",0)
 
@@ -349,6 +374,17 @@ class Camera_end(smach.State):
         except rospy.ServiceException:
             print("视频发送失败")
 
+
+
+        if X3==True:
+            # 全景相机关闭
+            client = rospy.ServiceProxy("/zj_robot/x3_camera_control",X3CameraControl)
+            client.wait_for_service(timeout=5)
+            req = X3CameraControlRequest()
+            req.camera_command=0
+            resp = client.call(req)
+            rospy.loginfo("开启是否成功:%d",resp.status_code)
+
         rospy.set_param("continuous_camera_task",0)
         return 'camera_end_completed'
 
@@ -375,6 +411,35 @@ class Transition(smach.State):
         else:
             pass
 
+
+
+def getCmdOutput(cmd):
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    output_list = []
+    for line in out.splitlines():
+        output_list.append(line.decode('utf-8'))
+    res = ""
+    return output_list
+
+#解决自动充电重复启动的问题
+def restar_auto_charge_node():
+    flag=0
+    rosnode_list=getCmdOutput("rosnode list")
+    for rosnode in rosnode_list:
+        if rosnode.endswith("auto_charge_node"):
+            flag=1
+    if flag==1:
+        print("已有auto_charge_node 无需重启")
+    else:
+        print("需重启auto_charge_node")
+        os.system("roslaunch zj_robot  auto_charge.launch &")
+
+
+
+restar_auto_charge_node()
+
+
 # 定义state patrol_completed
 class PatrolCompleted(smach.State):
     def __init__(self):
@@ -390,7 +455,8 @@ class PatrolCompleted(smach.State):
 
         os.system('mpg123 /home/zj/Project/zj-robot/audio/任务完成.mp3')
         clearparam()#解决巡检完成后回到原点过程中被打断后清除参数的问题
-        os.system("roslaunch zj_robot  auto_charge.launch &")#重启自动充电节点
+        restar_auto_charge_node()
+        #重启自动充电节点
         return 'patrol_completed'
 
 

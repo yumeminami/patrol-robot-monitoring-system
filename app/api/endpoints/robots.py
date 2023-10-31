@@ -185,3 +185,20 @@ def upgrade_robot(
         board_type=board_type,
         upgrade_data=upgrade_data,
     )
+
+
+@router.get("/{id}/3d_model_info")
+def threeD_model_info(
+    id: int,
+    db: Session = Depends(get_db),
+):
+    robot = crud.get(db, id)
+    if robot is None:
+        raise HTTPException(status_code=404, detail="Robot not found")
+    velocity = float(robot.velocity / 500) # would change by different 3d scene
+    position = robot.position / 16 # would change by different 3d scene
+
+    return {
+        "velocity": velocity,
+        "position": position,
+    }

@@ -35,6 +35,7 @@ from app.schemas.gimbalpoints import GimbalPointCreate
 from app.settings import config
 from app.utils.images import ROS_Image_to_cv2
 from app.utils.log import logger
+from app.utils.downloader import download
 
 
 class PositionControlType(Enum):
@@ -455,3 +456,29 @@ def patrol_control(robot_name, **kwargs):
     except Exception as e:
         logger.error(f"Error: {e}")
         return False
+
+
+def handle_panorama_video():
+    """
+    1. Download the panorama video from the server
+    2. Save the video to the local
+    3. Remove the previous video
+    """
+    import datetime
+    import os
+
+    video_url = "http://192.168.3.47:8000/a.mp4"
+    video_filename = f"panorama_video_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.mp4"
+
+    try:
+        download([video_url], os.path.join(config.VIDEO_DIR, video_filename))
+    except Exception as e:
+        print(e)
+
+    for filename in os.listdir(config.VIDEO_DIR):
+        if (
+            filename.startswith("panorama_video")
+            and filename != video_filename
+        ):
+            logger.info(filename)
+            os.remove(os.path.join(config.VIDEO_DIR, filename))

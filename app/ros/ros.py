@@ -1,3 +1,4 @@
+import json
 import logging
 import multiprocessing
 import threading
@@ -14,6 +15,8 @@ from common.srv import (
     PatrolPictureResponse,
     VideoData,
     VideoDataResponse,
+    RecordPosition,
+    RecordPositionResponse,
 )
 
 from app.crud.robots import robot as robot_crud
@@ -21,7 +24,10 @@ from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.robots import Robot
 from app.services.task_service import image_detection, video_detection
+from app.services.ros_service import handle_panorama_video
 from app.utils.log import log_queue, logger
+
+PANORAMA_VIDEO_TIME_DICT_PATH = "app/json_file/panorama_video_time_dict.json"
 
 available_ports = Queue()
 for i in range(45159, 45200):
@@ -39,6 +45,7 @@ topic_list = {
 service_list = {
     "patrol_picture": PatrolPicture,
     "video_data": VideoData,
+    "record_position": RecordPosition,
 }
 
 
@@ -227,6 +234,24 @@ class Node:
 
         response = VideoDataResponse()
         response.status_code = 1
+
+        return response
+
+    def record_position_callback(self, req):
+        """
+        Receive the position to time JSON data from the client
+        """
+        data = json.loads(req.data.data)
+        file_name = PANORAMA_VIDEO_TIME_DICT_PATH
+        with open(file_name, "w") as json_file:
+            json.dump(data, json_file, indent=4)
+
+        logger.info(f"Received position data: {data}")
+        response = RecordPositionResponse()
+        response.status_code = 1
+
+        thread = threading.Thread(target=handle_panorama_video)
+        thread.start()
 
         return response
 

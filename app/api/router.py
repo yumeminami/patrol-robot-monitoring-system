@@ -12,6 +12,7 @@ from .endpoints.task_logs import router as task_logs_router
 from .endpoints.tasks import router as tasks_router
 from .endpoints.vision_algorithms import router as vision_algorithms_router
 from .exporter import router as exporter_router
+from .endpoints.panorama_video import router as panorama_video_router
 
 router = APIRouter()
 
@@ -58,3 +59,7 @@ router.include_router(
 
 # Exporter router
 router.include_router(exporter_router, prefix="/exporter", tags=["exporter"])
+
+router.include_router(
+    panorama_video_router, prefix="/panorama_video", tags=["panorama_video"]
+)

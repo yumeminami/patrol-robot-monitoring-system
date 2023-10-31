@@ -12,11 +12,8 @@ from .endpoints.task_logs import router as task_logs_router
 from .endpoints.tasks import router as tasks_router
 from .endpoints.vision_algorithms import router as vision_algorithms_router
 from .exporter import router as exporter_router
-<<<<<<< HEAD
 from .endpoints.panorama_video import router as panorama_video_router
-=======
 from .zh import router as zh_router
->>>>>>> 5b07111 (feature/implement robots, alarm_logs and tasks API chinese response)
 
 router = APIRouter()
 

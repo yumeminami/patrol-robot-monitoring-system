@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>全景视频</title>
+    <meta name="Description" content="UtoVR全景播放器">
+    <!--引入引导js 动态下载播放器-->
+    <script language="javascript" type="text/javascript" src="./player/UtoVRPlayerGuide.js"></script>
+    <style type="text/css">
+        html body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        #panoDesk {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0px;
+            top: 0px;
+            overflow: hidden;
+        }
+
+        .toolBar {
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            background-color: rgba(125, 125, 125, .5);
+            height: 80px;
+            line-height: 80px;
+            text-align: center;
+        }
+
+        .toolBtn {
+            width: 100px;
+            height: 60px;
+        }
+
+        .toolInput {
+            width: 100px;
+            height: 52px;
+        }
+
+        .message-box {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="panoDesk"></div>
+    <div class="toolBar">
+        <!-- <button class="toolBtn">更新视频</button> -->
+        <input class="toolInput" type="text" id="position" placeholder="输入位置">
+        <button class="toolBtn" onclick="jumpToTime();">跳转</button>
+    </div>
+    <div id="messageBox" class="message-box"></div>
+</body>
+<script language="javascript" type="text/javascript">
+    /*播放器参数配置*/
+    var MyPlayerObj = null;
+    var sceneFilePath = null;
+    // 构建HTTP请求的URL
+    var url = "http://192.168.2.43:8000/api/panorama_video";
+
+    // 发起HTTP请求
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // 从HTTP响应中视频名称
+            var response = JSON.parse(xhr.responseText);
+            sceneFilePath = response.video_name;
+            console.log(response)
+            var params = {
+                container: document.getElementById("panoDesk"),
+                name: "SceneViewer",
+                scenesArr: [
+                    { sceneId: "v1", sceneName: "panorama_video", sceneFilePath: `./videos/${response.video_name}`, sceneType: "Video", initFov: 110 }
+                ],
+                //播放器不支持全景播放回调
+                errorCallBack: function (e) {
+                    console.log("错误状态：" + e);
+                },
+                //浏览器不支持全屏回调
+                fsCallBack: function (status, playObj) {
+                    alert("浏览器不支持全屏！");
+                },
+                initOverCallBack: function () {
+                    MyPlayerObj = this;
+                }
+            };
+            initLoad(params);
+        }
+    };
+    xhr.send()
+
+
+    function jumpToTime() {
+        var positionInput = document.getElementById("position");
+        var position = parseFloat(positionInput.value);
+        console.log(position)
+        if (!isNaN(position)) {
+            // 构建HTTP请求的URL
+            var url = "http://192.168.2.43:8000/api/panorama_video/video_time?position=" + position;
+
+            // 发起HTTP请求
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 从HTTP响应中获取时间
+                    var response = JSON.parse(xhr.responseText);
+                    var time = response.time;
+
+                    MyPlayerObj.api_setVideoCurTime(time);
+                    console.log(time)
+                    messageBox.textContent = "视频已跳转至位置 " + position + " 位置";
+                    messageBox.style.display = "block";
+
+                    setTimeout(function () {
+                        messageBox.style.display = "none";
+                    }, 2000);
+                } else {
+                    messageBox.textContent = "视频跳转失败,请输入有效的位置";
+                    messageBox.style.display = "block";
+
+                    setTimeout(function () {
+                        messageBox.style.display = "none";
+                    }, 2000);
+                }
+            };
+            xhr.send();
+
+            positionInput.value = ''; // 清空输入框
+
+        } else {
+            alert("请输入有效的位置！");
+        }
+    }
+    /*初始化开始*/
+    window.onload = function () {
+    };
+</script>
+
+</html>

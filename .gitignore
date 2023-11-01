@@ -138,3 +138,5 @@ app/static/images/*.png
 
 app/static/videos/*.mp4
 app/static/videos/*.avi
+
+panorama_video_website/UtoVRPlayerSDK_1.0.1194_Web/sample/video/*.mp4

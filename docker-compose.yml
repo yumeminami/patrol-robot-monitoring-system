@@ -22,6 +22,7 @@ services:
       - ./:/app
       - ./app/time_setting/timezone:/etc/timezone:ro
       - ./app/time_setting/localtime:/etc/localtime:ro
+      - video_data:/app/app/static/videos
     depends_on:
       - db
       - redis
@@ -30,6 +31,7 @@ services:
       driver: "json-file"
       options:
           max-size: "1g"
+
     command: python3 app/main.py
   
   celery-worker:
@@ -92,7 +94,23 @@ services:
       - redis_data:/data
     command: redis-server --appendonly no --requirepass "sample_password"
     
+  panorama_video_website:
+    image: nginx:latest
+    container_name: panorama_video_website
+    ports:
+      - "80:80"  
+      - "443:443"
+    depends_on:
+      - app
+    volumes:
+      - ./panorama_video_website/conf.d:/etc/nginx/conf.d
+      - ./panorama_video_website/UtoVRPlayerSDK_1.0.1194_Web:/UtoVRPlayerSDK_1.0.1194_Web
+      - video_data:/UtoVRPlayerSDK_1.0.1194_Web/sample/videos/
+    restart: always
+
+
 
 volumes:
+  video_data: {}
   mysql_data: {}
   redis_data: {}

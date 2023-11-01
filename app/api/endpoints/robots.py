@@ -195,8 +195,10 @@ def threeD_model_info(
     robot = crud.get(db, id)
     if robot is None:
         raise HTTPException(status_code=404, detail="Robot not found")
-    velocity = float(robot.velocity / 500) # would change by different 3d scene
-    position = robot.position / 16 # would change by different 3d scene
+    velocity = float(
+        robot.velocity / 500
+    )  # would change by different 3d scene
+    position = robot.position / 16  # would change by different 3d scene
 
     return {
         "velocity": velocity,

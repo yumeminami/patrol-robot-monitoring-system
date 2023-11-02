@@ -73,7 +73,7 @@ class Node:
         self.subscribers = {}
         handler = logging.handlers.QueueHandler(log_queue)
         logger.addHandler(handler)
-        logger.setLevel(level=logging.DEBUG)
+        logger.setLevel(level=logging.INFO)
 
     def initialize(self):
         self.create_subscribers()

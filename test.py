@@ -18,13 +18,17 @@
 # print(datetime.datetime.now())
 # current_date = datetime.datetime.now().date()
 # print(current_date)
-from cv_bridge import CvBridge
-import cv2
+# from cv_bridge import CvBridge
+# import cv2
 
-img = cv2.imread("hat.jpg")
-bridge = CvBridge()
-img_msg = bridge.cv2_to_imgmsg(img, "bgr8")
-from app.services.task_service import image_detection
+# img = cv2.imread("hat.jpg")
+# bridge = CvBridge()
+# img_msg = bridge.cv2_to_imgmsg(img, "bgr8")
+# from app.services.task_service import image_detection
 
-# image_detection.delay(img_msg, 227, 13)
-image_detection(img_msg, 230, 13)
+# # image_detection.delay(img_msg, 227, 13)
+# image_detection(img_msg, 230, 13)
+
+from app.utils.downloader import download
+
+download(["http://192.168.2.43:8000/static/videos/panorama_video.mp4"],"./a.mp4")

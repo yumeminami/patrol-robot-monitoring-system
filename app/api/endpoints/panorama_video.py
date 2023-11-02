@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.get("/")
 def get_panorama_video():
-    for file_name in os.listdir(config.VIDEO_DIR):
+    for file_name in os.listdir(config.PANORAMA_VIDEO_DIR):
         if file_name.startswith("panorama_video") and file_name.endswith(
             ".mp4"
         ):

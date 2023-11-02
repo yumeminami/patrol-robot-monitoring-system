@@ -22,7 +22,7 @@ services:
       - ./:/app
       - ./app/time_setting/timezone:/etc/timezone:ro
       - ./app/time_setting/localtime:/etc/localtime:ro
-      - video_data:/app/app/static/videos
+      # - video_data:/app/app/static/videos:rw
     depends_on:
       - db
       - redis
@@ -105,7 +105,7 @@ services:
     volumes:
       - ./panorama_video_website/conf.d:/etc/nginx/conf.d
       - ./panorama_video_website/UtoVRPlayerSDK_1.0.1194_Web:/UtoVRPlayerSDK_1.0.1194_Web
-      - video_data:/UtoVRPlayerSDK_1.0.1194_Web/sample/videos/
+      - ./app/static/panorama_video:/UtoVRPlayerSDK_1.0.1194_Web/sample/videos/:rw
     restart: always
 
 

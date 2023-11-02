@@ -471,14 +471,17 @@ def handle_panorama_video():
     video_filename = f"panorama_video_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.mp4"
 
     try:
-        download([video_url], os.path.join(config.VIDEO_DIR, video_filename))
+        download(
+            [video_url],
+            os.path.join(config.PANORAMA_VIDEO_DIR, video_filename),
+        )
     except Exception as e:
         print(e)
 
-    for filename in os.listdir(config.VIDEO_DIR):
+    for filename in os.listdir(config.PANORAMA_VIDEO_DIR):
         if (
             filename.startswith("panorama_video")
             and filename != video_filename
         ):
             logger.info(filename)
-            os.remove(os.path.join(config.VIDEO_DIR, filename))
+            os.remove(os.path.join(config.PANORAMA_VIDEO_DIR, filename))

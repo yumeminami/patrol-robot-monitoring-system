@@ -81,6 +81,7 @@ class PatrolControlCommand(Enum):
     AUTO_TYPE = 3
     RESUM_AUTO = 4
     STOP_AUTO = 5
+    PANORAMA_VIDEO_RECORD = 6
 
 
 def validate_enum_value(value, enum_type):

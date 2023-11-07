@@ -387,7 +387,7 @@ def video_detection(task_id, video_data):
         vision_algorithms.append(vision_algorithm_crud.get(db, id))
 
     video_id = str(uuid.uuid4())
-    video_file_path = f"{config.VIDEO_DIR}/{video_id}.avi"
+    video_file_path = f"{config.VIDEO_DIR}/{video_id}.mp4"
     with open(video_file_path, "wb") as f:
         f.write(video_data)
 
@@ -416,7 +416,7 @@ def video_detection(task_id, video_data):
                 logger.error("Detection error.")
 
             detected_video_file_path = (
-                f"{config.VIDEO_DIR}/{video_id}_{vision_algorithm.name}.avi"
+                f"{config.VIDEO_DIR}/{video_id}_{vision_algorithm.name}.mp4"
             )
             with open(detected_video_file_path, "wb") as f:
                 f.write(deteced_video_data)

@@ -4,8 +4,8 @@ from pydantic import BaseModel
 
 
 class CheckPointBase(BaseModel):
-    name: str
-    robot_id: int
+    name: str = ""
+    robot_id: int = 1
     position: int = 0
     velocity: int = 0
     gimbal_points: List[int] = []

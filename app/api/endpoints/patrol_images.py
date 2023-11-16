@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 from app.api.api import create_generic_router, remove_file
 from app.crud.patrol_images import patrol_image as crud
 from app.schemas.patrol_images import (
@@ -8,7 +9,8 @@ from app.schemas.patrol_images import (
 
 def after_delete(id, patrol_image, db):
     try:
-        remove_file("app/" + patrol_image.image_url)
+        parsed_url = urlparse(patrol_image.image_url)
+        remove_file("app" + parsed_url.path)
     except FileNotFoundError:
         pass
 

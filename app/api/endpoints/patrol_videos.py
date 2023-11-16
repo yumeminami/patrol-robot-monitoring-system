@@ -1,5 +1,6 @@
 import os
 
+from urllib.parse import urlparse
 from fastapi import File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 
@@ -23,7 +24,8 @@ from app.settings import config
 
 def after_delete(id, patrol_video, db):
     try:
-        remove_file("app/" + patrol_video.video_url)
+        parsed_url = urlparse(patrol_video.video_url)
+        remove_file("app" + parsed_url.path)
     except FileNotFoundError:
         pass
 

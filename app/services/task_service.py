@@ -265,12 +265,13 @@ def image_detection(image, task_id, checkpoint_id):
         logger.error("Checkpoint does not exist in the database.")
         return
 
+    localhost = "http://127.0.0.1:8000"
     image_id = str(uuid.uuid4())
     image_cv = ROS_Image_to_cv2(image)
     image_file_path = f"{config.IMAGE_DIR}/{image_id}.jpg"
 
     patrol_image = PatrolImageCreate(
-        image_url=os.path.relpath(image_file_path, "app"),
+        image_url=localhost + os.path.relpath(image_file_path, "app"),
         task_id=task_id,
         uuid=image_id,
         checkpoint_id=checkpoint_id,
@@ -326,7 +327,8 @@ def image_detection(image, task_id, checkpoint_id):
                 alarm_log_crud.create(db, obj_in=alarm_log)
 
             patrol_image_detected = PatrolImageCreate(
-                image_url=os.path.relpath(detected_image_file_path, "app"),
+                image_url=localhost
+                + os.path.relpath(detected_image_file_path, "app"),
                 task_id=task_id,
                 uuid=image_id,
                 checkpoint_id=checkpoint_id,
@@ -352,7 +354,7 @@ def image_detection(image, task_id, checkpoint_id):
     )
     cv2.imwrite(merge_image_file_path, merge_image_cv)
     patrol_image_merge = PatrolImageCreate(
-        image_url=os.path.relpath(merge_image_file_path, "app"),
+        image_url=localhost + os.path.relpath(merge_image_file_path, "app"),
         task_id=task_id,
         uuid=image_id,
         checkpoint_id=checkpoint_id,
@@ -386,13 +388,14 @@ def video_detection(task_id, video_data):
     for id in vision_algorithm_ids:
         vision_algorithms.append(vision_algorithm_crud.get(db, id))
 
+    localhost = "http://127.0.0.1:8000"
     video_id = str(uuid.uuid4())
     video_file_path = f"{config.VIDEO_DIR}/{video_id}.mp4"
     with open(video_file_path, "wb") as f:
         f.write(video_data)
 
     patrol_video_create = PatrolVideoCreate(
-        video_url=os.path.relpath(video_file_path, "app"),
+        video_url=localhost + os.path.relpath(video_file_path, "app"),
         task_id=task_id,
         uuid=video_id,
         start_position=task.start_position,
@@ -422,12 +425,14 @@ def video_detection(task_id, video_data):
                 f.write(deteced_video_data)
 
             patrol_video_detected = PatrolVideoCreate(
-                video_url=os.path.relpath(detected_video_file_path, "app"),
+                video_url=localhost
+                + os.path.relpath(detected_video_file_path, "app"),
                 task_id=task_id,
                 uuid=video_id,
                 start_position=task.start_position,
                 end_position=task.end_position,
                 velocity=task.velocity,
+                alarm=False,
             )
 
             patrol_video_crud.create(db, obj_in=patrol_video_detected)

@@ -307,6 +307,8 @@ def gimbal_control(robot_name, **kwargs):
         request.command = int(kwargs.get("command"))
         request.preset_index = int(kwargs.get("preset_index"))
         validate_enum_value(request.command, GimbalControlCommand)
+        if request.preset_index == 1:
+            return False, "Preset index 1 could not be used"
 
         response = gimbal_control(request)
         if response.status_code == 0:

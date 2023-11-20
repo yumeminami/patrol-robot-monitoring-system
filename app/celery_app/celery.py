@@ -244,7 +244,7 @@ def start_task(task_id, execution_time):
         robot_id=task.robot_id,
         execution_date=execution_date,
         type=task.type,
-        status=TaskLogStatus.STOPPED.value,
+        status=TaskLogStatus.IN_PROGRESS.value,
     )
     task_log = task_log_crud.create(db, obj_in=task_log_create)
     task_log = TaskLog.from_orm(task_log)

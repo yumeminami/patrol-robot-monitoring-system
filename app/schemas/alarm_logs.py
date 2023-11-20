@@ -50,6 +50,7 @@ class AlarmLogUpdate(BaseModel):
 class AlarmLog(AlarmLogBase):
     id: int
     time: datetime
+    created_at: datetime
 
     class Config:
         orm_mode = True

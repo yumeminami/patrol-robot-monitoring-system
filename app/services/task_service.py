@@ -388,7 +388,7 @@ def video_detection(task_id, video_data):
     for id in vision_algorithm_ids:
         vision_algorithms.append(vision_algorithm_crud.get(db, id))
 
-    localhost = "http://127.0.0.1:8000"
+    localhost = "http://127.0.0.1:8000/"
     video_id = str(uuid.uuid4())
     video_file_path = f"{config.VIDEO_DIR}/{video_id}.mp4"
     with open(video_file_path, "wb") as f:

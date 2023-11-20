@@ -321,7 +321,8 @@ def image_detection(image, task_id, checkpoint_id):
                     status=AlarmLogStatus.UNPROCESSED.value,
                     location=checkpoint.position,
                     type=vision_algorithm.name,
-                    img_url=os.path.relpath(detected_image_file_path, "app"),
+                    img_url=localhost
+                    + os.path.relpath(detected_image_file_path, "app"),
                     detail=f"Alarms detected: {detected_alarms}",
                 )
                 alarm_log_crud.create(db, obj_in=alarm_log)

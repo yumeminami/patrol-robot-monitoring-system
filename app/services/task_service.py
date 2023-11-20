@@ -265,7 +265,7 @@ def image_detection(image, task_id, checkpoint_id):
         logger.error("Checkpoint does not exist in the database.")
         return
 
-    localhost = "http://127.0.0.1:8000"
+    localhost = "http://127.0.0.1:8000/"
     image_id = str(uuid.uuid4())
     image_cv = ROS_Image_to_cv2(image)
     image_file_path = f"{config.IMAGE_DIR}/{image_id}.jpg"

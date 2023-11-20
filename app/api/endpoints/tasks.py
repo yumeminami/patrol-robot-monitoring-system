@@ -37,7 +37,7 @@ def after_created(created_task, db):
 def before_update(task_id, update_task, db):
     task_name = update_task.name
     tasks = crud.get_multi_by_name(db=db, name=task_name)
-    if len(tasks):
+    if len(tasks) > 1: 
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Task name already exists",

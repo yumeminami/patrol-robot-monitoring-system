@@ -103,9 +103,11 @@ services:
     depends_on:
       - app
     volumes:
-      - ./panorama_video_website/conf.d:/etc/nginx/conf.d
+      - ./conf.d:/etc/nginx/conf.d
       - ./panorama_video_website/UtoVRPlayerSDK_1.0.1194_Web:/UtoVRPlayerSDK_1.0.1194_Web
       - ./app/static/panorama_video:/UtoVRPlayerSDK_1.0.1194_Web/sample/videos/:rw
+      - ./app/static/videos:/static/videos:rw
+      - ./app/static/images:/static/images:rw
     restart: always
 
 

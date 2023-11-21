@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException
 
 from app.api.api import create_generic_router
+from app.crud.tasks import task as task_crud
 from app.crud.checkpoints import checkpoint as crud
 from app.crud.robots import robot as robot_crud
 from app.db.database import SessionLocal
@@ -25,8 +26,21 @@ def before_created(checkpoint, db):
         raise HTTPException(status_code=404, detail="Robot not found")
 
 
+def before_delete(checkpoint_id, db):
+    tasks = task_crud.get_multi(
+        db=db,
+        checkpoint_ids__any=checkpoint_id,
+    )
+    if tasks:
+        raise HTTPException(
+            status_code=400,
+            detail="Could not delete the checkpoint, there are tasks using it.",
+        )
+
+
 hooks = {
     "before_created": before_created,
+    "before_delete": before_delete,
 }
 
 router = create_generic_router(

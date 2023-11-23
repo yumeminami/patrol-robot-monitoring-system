@@ -17,8 +17,10 @@ RUN echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal main restricted universe 
  && echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal-backports main restricted universe multiverse" >> /etc/apt/sources.list \
  && echo "deb http://mirrors.ustc.edu.cn/ubuntu/ focal-security main restricted universe multiverse" >> /etc/apt/sources.list
 
-# Install python pip
+# Install ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg
 
+# Install python pip
 RUN apt-get update && apt-get install -y python3-pip
 
 # # Install python dependencies

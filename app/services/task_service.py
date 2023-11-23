@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from ast import literal_eval
 from datetime import datetime
 from datetime import timedelta
+import subprocess
 
 import cv2
 import numpy as np
@@ -371,7 +372,11 @@ def video_detection(task_id, video_data):
     """
     1. Save the video to the database.
 
-    2. Call the video detection algorithm.
+    2. Convert the video to avi format.
+
+    3. Call the video detection algorithm.
+
+    4. Convert the detected video to mp4(H264) format.
 
     :param task_id: The task id.
 
@@ -392,8 +397,14 @@ def video_detection(task_id, video_data):
     localhost = "http://127.0.0.1:8000/"
     video_id = str(uuid.uuid4())
     video_file_path = f"{config.VIDEO_DIR}/{video_id}.mp4"
+    video_avi_file_path = f"{config.VIDEO_DIR}/{video_id}.avi"
     with open(video_file_path, "wb") as f:
         f.write(video_data)
+
+    # Convert to avi format
+    command = f"ffmpeg -i {video_file_path} {video_avi_file_path}"
+    subprocess.call(command, shell=True)
+    video_avi_data = open(video_avi_file_path, "rb").read()
 
     patrol_video_create = PatrolVideoCreate(
         video_url=localhost + os.path.relpath(video_file_path, "app"),
@@ -412,18 +423,24 @@ def video_detection(task_id, video_data):
         try:
             deteced_video_data = vs.video_detect(
                 video_id=video_id,
-                video_data=video_data,
+                video_data=video_avi_data,
                 algorithm=vision_algorithm.name,
                 sensitivity=vision_algorithm.sensitivity,
             )
             if deteced_video_data is None:
                 logger.error("Detection error.")
+                continue
 
             detected_video_file_path = (
                 f"{config.VIDEO_DIR}/{video_id}_{vision_algorithm.name}.mp4"
             )
-            with open(detected_video_file_path, "wb") as f:
+            with open("output.mp4", "wb") as f:
                 f.write(deteced_video_data)
+
+            # Convert to h264 format
+            command = f"ffmpeg -i output.mp4 -vcodec h264 {detected_video_file_path}"
+            subprocess.call(command, shell=True)
+            os.remove("output.mp4")
 
             patrol_video_detected = PatrolVideoCreate(
                 video_url=localhost
@@ -440,6 +457,7 @@ def video_detection(task_id, video_data):
         except KeyError as e:
             logger.error(e)
 
+    os.remove(video_avi_file_path)
     db.close()
     return
 

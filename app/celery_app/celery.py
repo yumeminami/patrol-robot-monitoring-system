@@ -214,7 +214,7 @@ def start_task(task_id, execution_time):
         But after the revoke, the celery still execute the task.
         """
         logger.info(f"Task:{task_id} has been stopped manually.")
-        return
+        return f"Task:{task_id} has been stopped manually."
 
     try:
         file_name, patrol_command = create_task_xml(task, db)

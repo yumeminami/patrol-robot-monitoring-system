@@ -207,6 +207,14 @@ def start_task(task_id, execution_time):
     task = task_crud.get(db, task_id)
     robot = robot_crud.get(db, task.robot_id)
     execution_date = f"{datetime.now().strftime('%Y-%m-%d')} {execution_time}"
+    if task.status == TaskStatus.STOPPED.value:
+        """
+        #TODO Fix the bug that the task status is stopped but the task is still running
+        When the task is stopped, the program will revoke all the celery tasks of the task.
+        But after the revoke, the celery still execute the task.
+        """
+        logger.info(f"Task:{task_id} has been stopped manually.")
+        return
 
     try:
         file_name, patrol_command = create_task_xml(task, db)

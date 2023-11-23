@@ -206,6 +206,7 @@ def start_task(task_id, execution_time):
     db = SessionLocal()
     task = task_crud.get(db, task_id)
     robot = robot_crud.get(db, task.robot_id)
+    execution_date = f"{datetime.now().strftime('%Y-%m-%d')} {execution_time}"
 
     try:
         file_name, patrol_command = create_task_xml(task, db)
@@ -226,6 +227,14 @@ def start_task(task_id, execution_time):
             logger.error(
                 f"Robot '{robot.name}' start task id {task.id} failed!"
             )
+            task_log_create = TaskLogCreate(
+                task_id=task.id,
+                robot_id=task.robot_id,
+                execution_date=execution_date,
+                type=task.type,
+                status=TaskLogStatus.FAILED.value,
+            )
+            task_log = task_log_crud.create(db, obj_in=task_log_create)
             return f"Robot '{robot.name}' start task id {task.id} failed!"
     except Exception as e:
         logger.error(f"start task error: {e}")
@@ -238,7 +247,6 @@ def start_task(task_id, execution_time):
     )
     task = Task.from_orm(task)
 
-    execution_date = f"{datetime.now().strftime('%Y-%m-%d')} {execution_time}"
     task_log_create = TaskLogCreate(
         task_id=task.id,
         robot_id=task.robot_id,

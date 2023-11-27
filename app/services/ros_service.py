@@ -307,9 +307,8 @@ def gimbal_control(robot_name, **kwargs):
         request.command = int(kwargs.get("command"))
         request.preset_index = int(kwargs.get("preset_index"))
         validate_enum_value(request.command, GimbalControlCommand)
-        if request.preset_index == 1:
-            return False, "Preset index 1 could not be used"
-        if request.presets_index > 300:
+
+        if request.preset_index > 300:
             return False, "Preset index should be less than 300"
 
         response = gimbal_control(request)
@@ -318,6 +317,8 @@ def gimbal_control(robot_name, **kwargs):
         else:
             db = SessionLocal()
             if request.command == GimbalControlCommand.SET.value:
+                if request.preset_index == 1:
+                    return False, "Preset index 1 could not be used"
                 if (
                     gimbal_point_crud.get_by_preset_index(
                         db=db, preset_index=request.preset_index
@@ -330,6 +331,8 @@ def gimbal_control(robot_name, **kwargs):
                     gimbal_point_crud.create(db=db, obj_in=gimbal_point)
                 result = True
             elif request.command == GimbalControlCommand.CLEAR.value:
+                if request.preset_index == 1:
+                    return False, "Preset index 1 could not be used"
                 gimbal_point = gimbal_point_crud.get_by_preset_index(
                     db=db, preset_index=request.preset_index
                 )

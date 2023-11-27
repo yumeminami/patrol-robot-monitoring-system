@@ -438,7 +438,9 @@ def video_detection(task_id, video_data):
                 f.write(deteced_video_data)
 
             # Convert to h264 format
-            command = f"ffmpeg -i output.mp4 -vcodec h264 {detected_video_file_path}"
+            command = (
+                f"ffmpeg -i output.mp4 -vcodec h264 {detected_video_file_path}"
+            )
             subprocess.call(command, shell=True)
             os.remove("output.mp4")
 

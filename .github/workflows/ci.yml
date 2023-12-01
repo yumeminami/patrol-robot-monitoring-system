@@ -37,4 +37,4 @@ jobs:
    
     - name: Format
       run: |
-        black --line-length=79 app
+        black --line-length=88 app

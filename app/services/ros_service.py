@@ -106,9 +106,7 @@ def velocity_control(robot_name, **kwargs):
     try:
         result = False
         err_msg = ""
-        service_name = "/{robot_name}/velocity_command".format(
-            robot_name=robot_name
-        )
+        service_name = "/{robot_name}/velocity_command".format(robot_name=robot_name)
         rospy.wait_for_service(service_name, timeout=1)
         velocity_control = rospy.ServiceProxy(service_name, VelocityControl)
 
@@ -145,16 +143,12 @@ def position_control(robot_name, **kwargs):
     try:
         result = False
         err_msg = ""
-        service_name = "/{robot_name}/position_command".format(
-            robot_name=robot_name
-        )
+        service_name = "/{robot_name}/position_command".format(robot_name=robot_name)
         rospy.wait_for_service(service_name, timeout=1)
         position_control = rospy.ServiceProxy(service_name, PositionControl)
 
         request = PositionControlRequest()
-        request.position_control_type = int(
-            kwargs.get("position_control_type")
-        )
+        request.position_control_type = int(kwargs.get("position_control_type"))
         validate_enum_value(request.position_control_type, PositionControlType)
         request.target_position_f = float(kwargs.get("target_position_f"))
         request.velocity_f = float(kwargs.get("velocity_f"))
@@ -189,9 +183,7 @@ def stop_control(robot_name, **kwargs):
     try:
         result = False
         err_msg = ""
-        service_name = "/{robot_name}/stop_command".format(
-            robot_name=robot_name
-        )
+        service_name = "/{robot_name}/stop_command".format(robot_name=robot_name)
         rospy.wait_for_service(service_name, timeout=1)
         stop_control = rospy.ServiceProxy(service_name, StopControl)
 
@@ -227,9 +219,7 @@ def take_picture(robot_name):
     """
 
     try:
-        service_name = "/{robot_name}/take_picture".format(
-            robot_name=robot_name
-        )
+        service_name = "/{robot_name}/take_picture".format(robot_name=robot_name)
         rospy.wait_for_service(service_name, timeout=1)
         take_picture = rospy.ServiceProxy(service_name, TakePicture)
 
@@ -262,9 +252,7 @@ def camera_control(robot_name, **kwargs):
     try:
         result = False
         err_msg = ""
-        service_name = "/{robot_name}/camera_control".format(
-            robot_name=robot_name
-        )
+        service_name = "/{robot_name}/camera_control".format(robot_name=robot_name)
         rospy.wait_for_service(service_name, timeout=1)
         camera_control = rospy.ServiceProxy(service_name, CameraControl)
 
@@ -297,9 +285,7 @@ def gimbal_control(robot_name, **kwargs):
     try:
         result = False
         err_msg = ""
-        service_name = "/{robot_name}/gimbal_control".format(
-            robot_name=robot_name
-        )
+        service_name = "/{robot_name}/gimbal_control".format(robot_name=robot_name)
         rospy.wait_for_service(service_name, timeout=1)
         gimbal_control = rospy.ServiceProxy(service_name, GimbalControl)
 
@@ -308,8 +294,10 @@ def gimbal_control(robot_name, **kwargs):
         request.preset_index = int(kwargs.get("preset_index"))
         validate_enum_value(request.command, GimbalControlCommand)
 
-        if request.preset_index > 300:
-            return False, "Preset index should be less than 300"
+        if request.preset_index > 255:
+            return False, "Preset index should be less than 255"
+        elif request.preset_index == 1:
+            return False, "Preset index 1 could not be used"
 
         response = gimbal_control(request)
         if response.status_code == 0:
@@ -317,22 +305,24 @@ def gimbal_control(robot_name, **kwargs):
         else:
             db = SessionLocal()
             if request.command == GimbalControlCommand.SET.value:
-                if request.preset_index == 1:
-                    return False, "Preset index 1 could not be used"
-                if (
-                    gimbal_point_crud.get_by_preset_index(
-                        db=db, preset_index=request.preset_index
-                    )
-                ) is None:
-                    robot = robot_crud.get_by_name(db=db, name=robot_name)
-                    gimbal_point = GimbalPointCreate(
-                        robot_id=robot.id, preset_index=request.preset_index
-                    )
-                    gimbal_point_crud.create(db=db, obj_in=gimbal_point)
+                pan = rospy.get_param(f"/{robot_name}/gimbal_P", default=0)
+                tilt = rospy.get_param(f"/{robot_name}/gimbal_T", default=0)
+                zoom = rospy.get_param(f"/{robot_name}/gimbal_Z", default=0)
+
+                gimbal_point_crud.remove_by_preset_index(
+                    db=db, preset_index=request.preset_index
+                )
+                robot = robot_crud.get_by_name(db=db, name=robot_name)
+                gimbal_point = GimbalPointCreate(
+                    robot_id=robot.id,
+                    preset_index=request.preset_index,
+                    pan=pan,
+                    tilt=tilt,
+                    zoom=zoom,
+                )
+                gimbal_point_crud.create(db=db, obj_in=gimbal_point)
                 result = True
             elif request.command == GimbalControlCommand.CLEAR.value:
-                if request.preset_index == 1:
-                    return False, "Preset index 1 could not be used"
                 gimbal_point = gimbal_point_crud.get_by_preset_index(
                     db=db, preset_index=request.preset_index
                 )
@@ -349,9 +339,7 @@ def gimbal_control(robot_name, **kwargs):
                             checkpoint_ids__any=checkpoint.id,
                         )
                         if tasks is not None:
-                            err_msg = (
-                                "This gimbal point is being used by a task"
-                            )
+                            err_msg = "This gimbal point is being used by a task"
                             return result, err_msg
                 gimbal_point_crud.remove_by_preset_index(
                     db=db, preset_index=request.preset_index
@@ -382,9 +370,7 @@ def gimbal_motion_control(robot_name, **kwargs):
             robot_name=robot_name
         )
         rospy.wait_for_service(service_name, timeout=1)
-        gimbal_motion_control = rospy.ServiceProxy(
-            service_name, GimbalMotionControl
-        )
+        gimbal_motion_control = rospy.ServiceProxy(service_name, GimbalMotionControl)
 
         request = GimbalMotionControlRequest()
         request.command = int(kwargs.get("command"))
@@ -440,9 +426,7 @@ def patrol_control(robot_name, **kwargs):
     :return: result(bool)
     """
     try:
-        service_name = "/{robot_name}/patrol_control".format(
-            robot_name=robot_name
-        )
+        service_name = "/{robot_name}/patrol_control".format(robot_name=robot_name)
         rospy.wait_for_service(service_name, timeout=1)
         patrol_control = rospy.ServiceProxy(service_name, PatrolControl)
 
@@ -476,7 +460,9 @@ def handle_panorama_video():
     import os
 
     video_url = "http://192.168.3.47:8000/a.mp4"
-    video_filename = f"panorama_video_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.mp4"
+    video_filename = (
+        f"panorama_video_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.mp4"
+    )
 
     try:
         download(
@@ -487,9 +473,6 @@ def handle_panorama_video():
         print(e)
 
     for filename in os.listdir(config.PANORAMA_VIDEO_DIR):
-        if (
-            filename.startswith("panorama_video")
-            and filename != video_filename
-        ):
+        if filename.startswith("panorama_video") and filename != video_filename:
             logger.info(filename)
             os.remove(os.path.join(config.PANORAMA_VIDEO_DIR, filename))

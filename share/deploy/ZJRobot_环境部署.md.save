@@ -1,0 +1,28 @@
+# 准备工作
+
+# ubuntu安装 
+# ros安装 ros环境功能包安装
+行为树功能包安装
+
+# 工程代码clone与编译
+clone代码
+git clone git@gitee.com:julischoo/zj-robot.git
+
+修改c_cpp_properties.json文件路径
+
+成功编译（自定义msg头文件问题，行为树问题）
+
+
+# 模块调试
+## 1.串口调试
+
+## 2.云台相机调试
+确定机器与相机在一个网段能够ping 通
+确定云台相机的配置地址：10.92.36.1
+
+修改保存图像路径
+修改位置：gimbal_camera_node.h 第21行
+
+
+
+开机自启动配置

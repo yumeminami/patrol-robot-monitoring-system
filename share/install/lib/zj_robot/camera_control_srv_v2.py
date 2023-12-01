@@ -15,7 +15,7 @@ from datetime import  datetime
 
 camera_cmd = multiprocessing.Manager().Value(ctypes.c_int, 0)
 camera_cmd_2 = multiprocessing.Manager().Value(ctypes.c_int, 0)
-camera_cmd.value=1
+camera_cmd.value=0
 camera_cmd_2.value=0
 
 # # 自定义无缓存读视频类
@@ -81,7 +81,7 @@ def camera_realplay_process_func(camera_cmd,img_pub):
                 print("红外预览")
             #使用自定义类进行预览，减少延迟
             cap = cv2.VideoCapture(url)
-            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            fourcc = cv2.VideoWriter_fourcc(*'H264')
             fps = cap.get(cv2.CAP_PROP_FPS)
             # fps = 10
             x=0.25
@@ -90,7 +90,7 @@ def camera_realplay_process_func(camera_cmd,img_pub):
             print(size)
 
             time_now=str(datetime.now()).replace(" ","")
-            video_name='/home/zj/script/video/video_'+time_now+'.avi'
+            video_name='/home/zj/script/video/video_'+time_now+'.mp4'
             rospy.set_param("video_path",video_name)
             out = cv2.VideoWriter(video_name,fourcc ,fps, size)
             num=0

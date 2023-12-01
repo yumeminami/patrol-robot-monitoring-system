@@ -300,6 +300,8 @@ class Camera(smach.State):
             image = cv2.imread(rospy.get_param("img_path"))
             req.img=bridge.cv2_to_imgmsg(image,"bgr8")
             os.system('mpg123 /home/zj/Project/zj-robot/audio/开始拍照.mp3')
+            imp=rospy.get_param("img_path")
+            os.system(f"rm -rf {imp}")
             try:
                 resp=client.call(req)
                 rospy.loginfo("拍照服务调用结果:%d",resp.status_code)

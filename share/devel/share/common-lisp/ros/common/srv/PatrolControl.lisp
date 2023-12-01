@@ -153,10 +153,10 @@
   "fabfef9b528c8f61881ef7f060cb0b13")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<PatrolControl-response>)))
   "Returns full string definition for message of type '<PatrolControl-response>"
-  (cl:format cl:nil "int32 status_code~%#0失败，1完成~%#2低电量充电中 无法执行任务~%#3已有巡检任务执行中，无法执行任务~%~%~%~%~%~%~%~%"))
+  (cl:format cl:nil "int32 status_code~%#0失败，1完成~%#2低电量充电中 无法执行任务~%#3已有巡检任务执行中，无法执行任务~%#~%~%~%~%~%~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'PatrolControl-response)))
   "Returns full string definition for message of type 'PatrolControl-response"
-  (cl:format cl:nil "int32 status_code~%#0失败，1完成~%#2低电量充电中 无法执行任务~%#3已有巡检任务执行中，无法执行任务~%~%~%~%~%~%~%~%"))
+  (cl:format cl:nil "int32 status_code~%#0失败，1完成~%#2低电量充电中 无法执行任务~%#3已有巡检任务执行中，无法执行任务~%#~%~%~%~%~%~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <PatrolControl-response>))
   (cl:+ 0
      4

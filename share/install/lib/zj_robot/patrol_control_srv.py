@@ -15,6 +15,11 @@ launch_flag=0
 continuous_launch_flag=0
 import os
 
+x3_xml=""
+
+sys.path.append('/home/zj/Project/zj-robot/src/zjrobot/scripts')
+from motion import *
+
 def getCmdOutput(cmd):
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     out, err = p.communicate()
@@ -48,6 +53,7 @@ def restar_auto_charge_node():
 
 def patrol_control_callback(req):
     global ns,launch_flag,continuous_launch_flag
+    global x3_xml
     resp=PatrolControlResponse()
     print("收到数据")
     if req.patrol_command==0:
@@ -77,7 +83,7 @@ def patrol_control_callback(req):
         resp.status_code=1
 
     elif req.patrol_command==1:
-        os.system('mpg123 /home/zj/Project/zj-robot/audio/接收到新的常规巡检任务，开始执行.mp3 &')
+        os.system('mpg123 /home/zj/Project/zj-robot/audio/接收到新的常规巡检任务，开始执行.mp3 ')
         if rospy.get_param("charge_state")==2 or rospy.get_param("charge_state")==1:#充电中
             if rospy.get_param("is_robot_low_power"):
                 #如果是低电量引起，则不执行任务，返回2
@@ -162,7 +168,7 @@ def patrol_control_callback(req):
                 #不执行任务，返回0
                 resp.status_code=3
         else:#机器人不充电中
-            if rospy.get_param("is_robot_normal_patroling")!=1 or rospy.get_param("is_robot_continuous_patroling")!=1:#机器不是执行任务中
+            if rospy.get_param("is_robot_normal_patroling")!=1 and rospy.get_param("is_robot_continuous_patroling")!=1:#机器不是执行任务中
                 #执行任务
                 #===================================
                 #执行任务
@@ -218,7 +224,15 @@ def patrol_control_callback(req):
         rospy.set_param("is_robot_normal_patroling",1)
         resp.status_code=1
 
-    elif req.patrol_command==3:
+    elif req.patrol_command==3 or req.patrol_command==6:#3开启连续巡检 6:使用全景相机
+        if req.patrol_command==3:
+            rospy.set_param("if_use_x3_camera",0)#不使用全景相机
+        else:
+            rospy.set_param("if_use_x3_camera",1)#使用全景相机
+            if rospy.get_param("video_conversion_state")==1:#转换视频中
+                resp.status_code=0
+                return resp
+
         os.system('mpg123 /home/zj/Project/zj-robot/audio/接收到新的连续巡检任务，开始执行.mp3 &')
         if rospy.get_param("charge_state")==2 or rospy.get_param("charge_state")==1:#如果充电中
             if rospy.get_param("is_robot_low_power"):
@@ -273,7 +287,10 @@ def patrol_control_callback(req):
                 server = rospy.ServiceProxy('continuous_xml_data', ContinousXmlData)
                 xml_req = ContinousXmlDataRequest()
                 #msg = UInt8MultiArray(data=list(data))
-                xml_req.data=req.xml_data
+                if rospy.get_param("if_use_x3_camera")==1:
+                    xml_req.data=x3_xml
+                else:
+                    xml_req.data=req.xml_data
                 resp1=server.call(xml_req)
                 print("resp1.status_code")
                 print(resp1.status_code)
@@ -299,7 +316,7 @@ def patrol_control_callback(req):
                 #不执行任务，返回3
                 resp.status_code=3
         else:#机器人不充电中
-            if rospy.get_param("is_robot_normal_patroling")!=1 or rospy.get_param("is_robot_continuous_patroling")!=1:#机器不是执行任务中
+            if rospy.get_param("is_robot_normal_patroling")!=1 and rospy.get_param("is_robot_continuous_patroling")!=1:#机器不是执行任务中
                 #=================开启连续巡检任务
                 print("开启连续巡检模式")
                 if continuous_launch_flag==0:
@@ -315,7 +332,10 @@ def patrol_control_callback(req):
                 server = rospy.ServiceProxy('continuous_xml_data', ContinousXmlData)
                 xml_req = ContinousXmlDataRequest()
                 #msg = UInt8MultiArray(data=list(data))
-                xml_req.data=req.xml_data
+                if rospy.get_param("if_use_x3_camera")==1:
+                    xml_req.data=x3_xml
+                else:
+                    xml_req.data=req.xml_data
                 resp1=server.call(xml_req)
                 print("resp1.status_code")
                 print(resp1.status_code)
@@ -401,6 +421,14 @@ if __name__ == "__main__":
 
     rospy.set_param("is_robot_normal_patroling",0)#是否巡检中
     rospy.set_param("is_robot_continuous_patroling",0)#是否巡检中
+
+    rospy.set_param("if_use_x3_camera",0)#是否使用全景相机
+    #全景相机xml文件准备
+    map_data=read_json_file("/home/zj/Project/zj-robot/src/zjrobot/mapdata.json")
+    x3_xml="""<?xml version='1.0' encoding='utf-8'?>
+<patrolsections Intro="999">
+  <patrolsection index="1" startposition="0" endposition="{0}" velocity="200.0" gimbalpresetpoint="1" />
+</patrolsections>""".format(map_data["end"])
 
     launch_flag=1
     continuous_launch_flag=1

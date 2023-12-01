@@ -30,7 +30,7 @@ def mapping_func():
 
 
     #设置位置为0
-    pub = rospy.Publisher("/zj_robot/setposition_command",setposition_control,queue_size=10)
+    pub = rospy.Publisher("setposition_command",setposition_control,queue_size=10)
     msg = setposition_control()
     print("开始")
     #特殊的发送格式
@@ -42,8 +42,9 @@ def mapping_func():
 
 
 
-    reset_map_srv = rospy.ServiceProxy('/zj_robot/reset_map', ResetMap)
+    reset_map_srv = rospy.ServiceProxy('reset_map', ResetMap)
     resp1 = reset_map_srv("reset")
+    print("reset调用结果：",resp1)
     time.sleep(5)
     pos_srv = rospy.ServiceProxy('position_command', PositionControl)
     resp1 = pos_srv(0,long_path,200)
@@ -67,7 +68,7 @@ def mapping_func():
             pass
         rospy.set_param("mapdata_state",0)
         if rospy.get_param("mapdata_code")==3:
-            print("防火门前")
+            print("防火门前",rospy.get_param("mapdata_position"))
             if len(mapdata["fire_door"][fire_door_ind])==2:
                 fire_door_ind+=1
                 mapdata["fire_door"][fire_door_ind]=[]
@@ -75,7 +76,7 @@ def mapping_func():
             else:
                 mapdata["fire_door"][fire_door_ind].append(rospy.get_param("mapdata_position"))
         if rospy.get_param("mapdata_code")==4:
-            print("防火门后")
+            print("防火门后",rospy.get_param("mapdata_position"))
             if len(mapdata["fire_door"][fire_door_ind])==2:
                 fire_door_ind+=1
                 mapdata["fire_door"][fire_door_ind]=[]
@@ -83,11 +84,11 @@ def mapping_func():
             else:
                 mapdata["fire_door"][fire_door_ind].append(rospy.get_param("mapdata_position"))
         if rospy.get_param("mapdata_code")==5:
-            print("充电桩")
+            print("充电桩",rospy.get_param("mapdata_position"))
             mapdata["charging_station"][charging_station_ind]=rospy.get_param("mapdata_position")
             charging_station_ind+=1
         if rospy.get_param("mapdata_code")==6:
-            print("常规点")
+            print("常规点",rospy.get_param("mapdata_position"))
             mapdata["normal_point"][normal_point_ind]=rospy.get_param("mapdata_position")
             normal_point_ind+=1
 

@@ -74,6 +74,7 @@ def clearparam():
     rospy.set_param("target_velocity",0)
     rospy.set_param("continuous_patrol_end",0)
     rospy.set_param("is_robot_continuous_patroling",0)
+    rospy.set_param("if_use_x3_camera",0)
 
 
 
@@ -174,7 +175,7 @@ class Initial(smach.State):
         smach.State.__init__(self, outcomes=['initial_completed','initial_standby'])
     def execute(self, userdata):
         time.sleep(0.5)
-        global patrol_section_index
+        global patrol_section_index,X3
         try:
             rospy.get_param("continuous_patrol_state")
             rospy.get_param("continuous_patrol_end")
@@ -190,6 +191,10 @@ class Initial(smach.State):
             rospy.set_param("continuous_patrol_state",PATROLING)
             patrol_section_index=0
             rospy.set_param("patrol_section_index",patrol_section_index)
+            if rospy.get_param("if_use_x3_camera")==1:
+                X3=True
+            else:
+                X3=False
             return 'initial_completed'
         elif rospy.get_param("continuous_patrol_state") == PATROLING:
             if rospy.get_param("continuous_patrol_end")==1:#巡检结束回去中
@@ -229,6 +234,7 @@ class Gimbal(smach.State):
         smach.State.__init__(self, outcomes=['gimbal_completed','gimbal_ing','gimbal_error'])
 
     def execute(self, userdata):
+        rospy.set_param("do_not_move_gimbal",1)
         global patrol_section_index
         xml_paser = XMLPaser()
         patrolpoints = xml_paser.openxml(XMLPATH)
@@ -273,36 +279,33 @@ class Camera_start(smach.State):
         smach.State.__init__(self, outcomes=['camera_start_completed'])
 
     def execute(self, userdata):
+
         rospy.set_param("continuous_camera_task",1)
         global patrolpointindex
 
-        xml_paser = XMLPaser()
-        patrolpoints = xml_paser.openxml(XMLPATH)
-        xml_paser.printpatrolpoints(patrolpoints)
-        client = rospy.ServiceProxy("camera_control",CameraControl)
-        req = CameraControlRequest()
-        req.camera_command=5# 2:彩色相机预览+保存
-        os.system('mpg123 /home/zj/Project/zj-robot/audio/开始录制.mp3')
-        resp=client.call(req)
-        rospy.loginfo("相机服务调用结果:%d",resp.status_code)
-        time.sleep(5)
 
         if X3==True:
             # 全景相机开启
-            client = rospy.ServiceProxy("/zj_robot/x3_camera_control",X3CameraControl)
+            print("全景相机开启")
+            client = rospy.ServiceProxy("x3_camera_control",X3CameraControl)
             client.wait_for_service(timeout=5)
             req = X3CameraControlRequest()
             req.camera_command=1
             resp = client.call(req)
             rospy.loginfo("开启是否成功:%d",resp.status_code)
             time.sleep(2)
+        else:
 
-
-
-
-
-
-
+            xml_paser = XMLPaser()
+            patrolpoints = xml_paser.openxml(XMLPATH)
+            xml_paser.printpatrolpoints(patrolpoints)
+            client = rospy.ServiceProxy("camera_control",CameraControl)
+            req = CameraControlRequest()
+            req.camera_command=5# 2:彩色相机预览+保存
+            os.system('mpg123 /home/zj/Project/zj-robot/audio/开始录制.mp3')
+            resp=client.call(req)
+            rospy.loginfo("相机服务调用结果:%d",resp.status_code)
+            time.sleep(5)
 
 
 
@@ -341,51 +344,62 @@ class Camera_end(smach.State):
         time.sleep(4)
         global patrolpointindex
 
-        xml_paser = XMLPaser()
-        patrolpoints = xml_paser.openxml(XMLPATH)
-        xml_paser.printpatrolpoints(patrolpoints)
-
-        client = rospy.ServiceProxy("camera_control",CameraControl)
-        req = CameraControlRequest()
-        req.camera_command=0# 0:停止
-
-        resp=client.call(req)
-        rospy.loginfo("相机服务调用结果:%d",resp.status_code)
-
-        os.system('mpg123 /home/zj/Project/zj-robot/audio/结束录制.mp3')
-
-
-        #发送视频给后台
-        client = rospy.ServiceProxy("video_data",VideoData)
-        req = VideoDataRequest()
-
-        req.patrol_task_name=rospy.get_param("continuous_patrol_task_name")
-        req.patrol_section_index=xml_paser.get_patrol_section_index(patrolpoints,patrol_section_index)
-        video_path =rospy.get_param("video_path")
-
-        with open(video_path, 'rb') as f:
-            video_data = f.read()
-
-        req.video_data.data=list(video_data)
-        try:
-            resp = client.call(req)
-            rospy.loginfo("响应结果:%d",resp.status_code)
-            print("视频发送成功")
-        except rospy.ServiceException:
-            print("视频发送失败")
-
 
 
         if X3==True:
             # 全景相机关闭
-            client = rospy.ServiceProxy("/zj_robot/x3_camera_control",X3CameraControl)
+            print("全景相机关闭")
+            client = rospy.ServiceProxy("x3_camera_control",X3CameraControl)
             client.wait_for_service(timeout=5)
             req = X3CameraControlRequest()
             req.camera_command=0
             resp = client.call(req)
             rospy.loginfo("开启是否成功:%d",resp.status_code)
 
+        else:
+
+            xml_paser = XMLPaser()
+            patrolpoints = xml_paser.openxml(XMLPATH)
+            xml_paser.printpatrolpoints(patrolpoints)
+
+            client = rospy.ServiceProxy("camera_control",CameraControl)
+            req = CameraControlRequest()
+            req.camera_command=0# 0:停止
+
+            resp=client.call(req)
+            rospy.loginfo("相机服务调用结果:%d",resp.status_code)
+
+            os.system('mpg123 /home/zj/Project/zj-robot/audio/结束录制.mp3')
+
+
+            #发送视频给后台
+            client = rospy.ServiceProxy("video_data",VideoData)
+            req = VideoDataRequest()
+
+            req.patrol_task_name=rospy.get_param("continuous_patrol_task_name")
+            req.patrol_section_index=xml_paser.get_patrol_section_index(patrolpoints,patrol_section_index)
+            video_path =rospy.get_param("video_path")
+            #转换
+            os.system(f"ffmpeg -i {video_path} -vcodec h264 /home/zj/script/video/output.mp4 -y")
+
+            with open("/home/zj/script/video/output.mp4", 'rb') as f:
+                video_data = f.read()
+
+            req.video_data.data=list(video_data)
+            try:
+                resp = client.call(req)
+                rospy.loginfo("响应结果:%d",resp.status_code)
+                print("视频发送成功")
+            except rospy.ServiceException:
+                print("视频发送失败")
+
+            print(f"删除视频命令:rm -rf {video_path}")
+            # os.system(f"rm -rf {video_path}")
+
+
         rospy.set_param("continuous_camera_task",0)
+
+        rospy.set_param("do_not_move_gimbal",0)#防止机器人录制时动
         return 'camera_end_completed'
 
 
@@ -523,6 +537,8 @@ def main():
 if __name__ == "__main__":
     rospy.init_node('continuous_patrol_state_machine')
     rospy.set_param("continuous_camera_task",0)
+
+    rospy.set_param("do_not_move_gimbal",0)
 
     xml_paser = XMLPaser()
     patrolpoints = xml_paser.openxml(XMLPATH)

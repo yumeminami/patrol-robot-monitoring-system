@@ -1,5 +1,4 @@
 #! /usr/bin/env python3.8
-
 # 功能需求：
 # 自动充电功能
 
@@ -49,6 +48,7 @@ ACTION_COMPLETED             = 3
 
 # xml 路径
 XMLPATH = "/home/zj/Project/zj-robot/src/zjrobot/test01.xml"
+rospy.set_param("stop_charge_flag",0)
 
 def clearparam(): 
     rospy.set_param("charge_state",0)
@@ -312,12 +312,20 @@ class WaitForCharging(smach.State):
         smach.State.__init__(self, outcomes=['wait_for_charging_completed'])
     def execute(self, userdata):
         print("等待充电")
-        for i in range(60):
-            print("充电秒数:",i)
-            time.sleep(1)
+        i=1
+        while rospy.get_param("battery_level")<90 and rospy.get_param("stop_charge_flag")==0:
             if rospy.is_shutdown():
                 break
-        rospy.set_param("charge_state",CHARGE_STANDBY)
+            i+=1
+            time.sleep(1)
+            if i%30==0:
+                i=0
+                os.system('mpg123 /home/zj/Project/zj-robot/audio/机器人当前电量为.mp3')
+                bl=rospy.get_param("battery_level")
+                play_number(str(bl))
+
+
+
 
         #充电结束按钮
 
@@ -345,7 +353,9 @@ class WaitForCharging(smach.State):
             r=retry_and_report_error(charge_control_func,(0,),1,6,"无法关闭充电","/home/zj/Project/zj-robot/audio/故障警报，无法关闭充电.mp3")
         
         time.sleep(1)#必须加一秒，不然运动会失败
-
+        rospy.set_param("charge_state",CHARGE_STANDBY)
+        time.sleep(2)
+        rospy.set_param("stop_charge_flag",0)
         return "wait_for_charging_completed"
 
 

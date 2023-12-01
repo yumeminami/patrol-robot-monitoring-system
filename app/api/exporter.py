@@ -84,6 +84,4 @@ async def export_alarm_logs():
         )
 
     else:
-        raise HTTPException(
-            status_code=400, detail="Unable to fetch alarm_logs"
-        )
+        raise HTTPException(status_code=400, detail="Unable to fetch alarm_logs")

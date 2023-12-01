@@ -34,9 +34,7 @@ def get_db():
 
 robot_hooks = {}
 
-router = create_generic_router(
-    crud, RobotCreate, RobotUpdate, Robot, hooks=robot_hooks
-)
+router = create_generic_router(crud, RobotCreate, RobotUpdate, Robot, hooks=robot_hooks)
 
 
 def control_robot(
@@ -57,9 +55,7 @@ def control_robot(
 
 
 @router.post("/{id}/velocity_control")
-def velocity_control(
-    id: int, db: Session = Depends(get_db), velocity_f: float = 0.0
-):
+def velocity_control(id: int, db: Session = Depends(get_db), velocity_f: float = 0.0):
     return control_robot(
         id=id, db=db, control_func=velocity_control_ros, velocity_f=velocity_f
     )
@@ -107,9 +103,7 @@ def take_photo(
 
 
 @router.post("/{id}/camera_control")
-def camera_control(
-    id: int, db: Session = Depends(get_db), camera_command: int = 0
-):
+def camera_control(id: int, db: Session = Depends(get_db), camera_command: int = 0):
     return control_robot(
         id=id,
         db=db,
@@ -195,9 +189,7 @@ def threeD_model_info(
     robot = crud.get(db, id)
     if robot is None:
         raise HTTPException(status_code=404, detail="Robot not found")
-    velocity = float(
-        robot.velocity / 500
-    )  # would change by different 3d scene
+    velocity = float(robot.velocity / 500)  # would change by different 3d scene
     position = robot.position / 16  # would change by different 3d scene
 
     return {

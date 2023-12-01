@@ -71,24 +71,16 @@ class TaskCreate(TaskBase):
                     "start_position and end_position could not smaller than 0"
                 )
             if start_position >= end_position:
-                raise ValueError(
-                    "start_position must be smaller than end_position"
-                )
+                raise ValueError("start_position must be smaller than end_position")
             if velocity == 0:
                 raise ValueError("velocity must be provided when type is auto")
             if gimbal_point == 0:
-                raise ValueError(
-                    "gimbal_point must be provided when type is auto"
-                )
+                raise ValueError("gimbal_point must be provided when type is auto")
             if checkpoint_ids:
-                raise ValueError(
-                    "auto type task could not contain checkpoints"
-                )
+                raise ValueError("auto type task could not contain checkpoints")
         elif type == TaskType.MANUAL.value:
             if not checkpoint_ids:
-                raise ValueError(
-                    "checkpoint_ids must be provided when type is manual"
-                )
+                raise ValueError("checkpoint_ids must be provided when type is manual")
 
         return values
 
@@ -131,9 +123,7 @@ class TaskCreate(TaskBase):
                             "execution_time must be a valid time like 24:00"
                         )
                 except Exception:
-                    raise ValueError(
-                        "execution_time must be a valid time like 24:00"
-                    )
+                    raise ValueError("execution_time must be a valid time like 24:00")
         else:
             raise ValueError("execution_time must be provided")
         return v

@@ -60,9 +60,7 @@ def before_update(task_id, update_task, db):
                     if task.type == TaskType.MANUAL.value
                     else PatrolControlCommand.STOP_AUTO.value
                 )
-                patrol_control(
-                    robot_name=robot.name, patrol_command=patrol_command
-                )
+                patrol_control(robot_name=robot.name, patrol_command=patrol_command)
     except Exception as e:
         print(e)
 

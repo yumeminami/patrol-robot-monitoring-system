@@ -32,9 +32,7 @@ def position_to_time(position):
         return None
     else:
         for i in range(len(section_list)):
-            if (section_list[i][0] - position) * (
-                section_list[i][1] - position
-            ) < 0:
+            if (section_list[i][0] - position) * (section_list[i][1] - position) < 0:
                 p = (position - section_list[i][0]) / (
                     section_list[i][1] - section_list[i][0]
                 )

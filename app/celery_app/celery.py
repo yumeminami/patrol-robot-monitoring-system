@@ -71,9 +71,7 @@ def update_robot_data(**kwargs):
     robot = robot_crud.get_by_name(db=db, name=robot_name)
 
     robot_real_time_info["battery"] = robot_real_time_info["battery_level"]
-    robot_real_time_info["battery_status"] = robot_real_time_info[
-        "battery_state"
-    ]
+    robot_real_time_info["battery_status"] = robot_real_time_info["battery_state"]
 
     try:
         robot = robot_crud.update(
@@ -115,9 +113,7 @@ def update_sensor_data(**kwargs):
                 logger.warning(f"Sensor '{sensor.name}' not found in message.")
         logger.info(f"{robot_name} Sensor data updated successfully.")
     except Exception as e:
-        logger.error(
-            f"Error occurred while updating sensor '{sensor.name}': {e}"
-        )
+        logger.error(f"Error occurred while updating sensor '{sensor.name}': {e}")
     finally:
         db.close()
 
@@ -152,9 +148,7 @@ def push_task_to_celery(task):
         )
         now = now.replace(second=0, microsecond=0)
         if execution_time_obj < now:
-            logger.warning(
-                f"Task {task.id} has been expired at {execution_time}"
-            )
+            logger.warning(f"Task {task.id} has been expired at {execution_time}")
             continue
         eta_time = parse_execution_time(execution_time)
         celery_task = start_task.apply_async(
@@ -189,9 +183,7 @@ def regular_query_tasks():
             push_task_to_celery(task)
 
     db.close()
-    return (
-        f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} regular query tasks"
-    )
+    return f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} regular query tasks"
 
 
 @app.task()
@@ -228,13 +220,9 @@ def start_task(task_id, execution_time):
             patrol_command=patrol_command,
             xml_data=xml_data,
         ):
-            logger.error(
-                f"Robot '{robot.name}' start task id {task.id} success!"
-            )
+            logger.error(f"Robot '{robot.name}' start task id {task.id} success!")
         else:
-            logger.error(
-                f"Robot '{robot.name}' start task id {task.id} failed!"
-            )
+            logger.error(f"Robot '{robot.name}' start task id {task.id} failed!")
             task_log_create = TaskLogCreate(
                 task_id=task.id,
                 robot_id=task.robot_id,
@@ -264,9 +252,7 @@ def start_task(task_id, execution_time):
     )
     task_log = task_log_crud.create(db, obj_in=task_log_create)
     task_log = TaskLog.from_orm(task_log)
-    thread = Thread(
-        target=monitor_sensor_data, args=(task, execution_date, task_log)
-    )
+    thread = Thread(target=monitor_sensor_data, args=(task, execution_date, task_log))
     thread.start()
 
     redis_client.hdel(f"task_{task_id}", execution_time)

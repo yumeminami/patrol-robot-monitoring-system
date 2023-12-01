@@ -6,9 +6,7 @@ import requests
 from app.utils.log import logger
 
 IMG_ALGORITHM_CONFIG_PATH = "app/vision_algorithm/img_algorithm_config.json"
-VIDEO_ALGORITHM_CONFIG_PATH = (
-    "app/vision_algorithm/video_algorithm_config.json"
-)
+VIDEO_ALGORITHM_CONFIG_PATH = "app/vision_algorithm/video_algorithm_config.json"
 IMG_ALGORITHM_DIR_PATH = "app/vision_algorithm/img_algorithm_dict.json"
 VIDEO_ALGORITHM_DIR_PATH = "app/vision_algorithm/video_algorithm_dict.json"
 
@@ -24,9 +22,7 @@ class VisionAlgorithm:
         with open(VIDEO_ALGORITHM_DIR_PATH, "r") as f:
             self.video_algorithm_dict = json.load(f)
 
-        self.vision_algorithm_api_url = os.environ.get(
-            "VISION_ALGORITHM_API_URL", None
-        )
+        self.vision_algorithm_api_url = os.environ.get("VISION_ALGORITHM_API_URL", None)
 
     def img_detect(
         self,

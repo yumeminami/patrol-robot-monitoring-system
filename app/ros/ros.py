@@ -156,8 +156,7 @@ class Node:
                 return
 
             info = {
-                field: message.__getattribute__(field)
-                for field in message.__slots__
+                field: message.__getattribute__(field) for field in message.__slots__
             }
 
             redis_client.hset(robot_name, "robot_real_time_info", str(info))
@@ -166,9 +165,7 @@ class Node:
             # logger.info(f"Updated real-time info for robot: {robot_name}")
 
         except Exception as e:
-            logger.error(
-                f"Error occurred while processing real-time info: {e}"
-            )
+            logger.error(f"Error occurred while processing real-time info: {e}")
 
     def sensor_data_callback(self, message, args):
         """Callback function for handling sensor data.
@@ -186,8 +183,7 @@ class Node:
                 return
 
             info = {
-                field: message.__getattribute__(field)
-                for field in message.__slots__
+                field: message.__getattribute__(field) for field in message.__slots__
             }
 
             redis_client.hset(robot_name, "sensor_data", str(info))
@@ -227,9 +223,7 @@ class Node:
         task_id = int(req.patrol_task_name)
         video_data = bytes(req.video_data.data)
 
-        thread = threading.Thread(
-            target=video_detection, args=(task_id, video_data)
-        )
+        thread = threading.Thread(target=video_detection, args=(task_id, video_data))
         thread.start()
 
         response = VideoDataResponse()

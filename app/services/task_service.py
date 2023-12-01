@@ -204,20 +204,14 @@ def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
                 sensor.lower_limit > sensor_data[sensor_name]
                 or sensor.upper_limit < sensor_data[sensor_name]
             ):
-                alarm_logs = (
-                    alarm_log_crud.get_alarm_logs_by_task_log_id_and_type(
-                        db, task_log.id, sensor_name
-                    )
+                alarm_logs = alarm_log_crud.get_alarm_logs_by_task_log_id_and_type(
+                    db, task_log.id, sensor_name
                 )
                 if alarm_logs:
-                    logger.warning(
-                        f"Alarm already exists for sensor {sensor_name}"
-                    )
+                    logger.warning(f"Alarm already exists for sensor {sensor_name}")
                     continue
 
-                logger.error(
-                    f"Threshold violation detected at {datetime.now()}"
-                )
+                logger.error(f"Threshold violation detected at {datetime.now()}")
                 logger.error(
                     f"Sensor: {sensor_name}, Lower Limit: {sensor.lower_limit}, Upper Limit: {sensor.upper_limit}, Current Value: {sensor_data[sensor_name]}"
                 )
@@ -329,8 +323,7 @@ def image_detection(image, task_id, checkpoint_id):
                 alarm_log_crud.create(db, obj_in=alarm_log)
 
             patrol_image_detected = PatrolImageCreate(
-                image_url=localhost
-                + os.path.relpath(detected_image_file_path, "app"),
+                image_url=localhost + os.path.relpath(detected_image_file_path, "app"),
                 task_id=task_id,
                 uuid=image_id,
                 checkpoint_id=checkpoint_id,
@@ -438,15 +431,12 @@ def video_detection(task_id, video_data):
                 f.write(deteced_video_data)
 
             # Convert to h264 format
-            command = (
-                f"ffmpeg -i output.mp4 -vcodec h264 {detected_video_file_path}"
-            )
+            command = f"ffmpeg -i output.mp4 -vcodec h264 {detected_video_file_path}"
             subprocess.call(command, shell=True)
             os.remove("output.mp4")
 
             patrol_video_detected = PatrolVideoCreate(
-                video_url=localhost
-                + os.path.relpath(detected_video_file_path, "app"),
+                video_url=localhost + os.path.relpath(detected_video_file_path, "app"),
                 task_id=task_id,
                 uuid=video_id,
                 start_position=task.start_position,
@@ -494,9 +484,7 @@ def fit_frequency(task):
         if not latest_task_log:
             return True
 
-        logger.warning(
-            f"The task last executed at {latest_task_log.execution_date}"
-        )
+        logger.warning(f"The task last executed at {latest_task_log.execution_date}")
 
         now = datetime.now().date()
         last_execute_date = datetime.strptime(

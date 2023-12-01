@@ -53,9 +53,7 @@ async def accept_detected_video(
     try:
         deteced_video_data = await video_file.read()
 
-        detected_video_file_path = (
-            f"{config.VIDEO_DIR}/{video_id}_{algorithm}.avi"
-        )
+        detected_video_file_path = f"{config.VIDEO_DIR}/{video_id}_{algorithm}.avi"
 
         with open(detected_video_file_path, "wb") as f:
             f.write(deteced_video_data)
@@ -75,14 +73,10 @@ async def accept_detected_video(
 
             crud.create(db, obj_in=patrol_video_detected)
         else:
-            raise HTTPException(
-                status_code=404, detail="original video not found"
-            )
+            raise HTTPException(status_code=404, detail="original video not found")
 
         if alarm:
-            task_log = task_log_crud.get_the_latest_task_log(
-                db, patrol_video.task_id
-            )
+            task_log = task_log_crud.get_the_latest_task_log(db, patrol_video.task_id)
             alarm_create = AlarmLogCreate(
                 level=AlarmLogLevel.WARNING.value,
                 task_id=patrol_video.task_id,

@@ -42,14 +42,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 query = query.filter(getattr(self.model, field_name) > value)
             elif field.endswith("__in"):
                 field_name = field[: -len("__in")]
-                query = query.filter(
-                    getattr(self.model, field_name).in_(value)
-                )
+                query = query.filter(getattr(self.model, field_name).in_(value))
             elif field.endswith("__any"):
                 field_name = field[: -len("__any")]
-                query = query.filter(
-                    getattr(self.model, field_name).contains(value)
-                )
+                query = query.filter(getattr(self.model, field_name).contains(value))
             elif field.endswith("__not"):
                 field_name = field[: -len("__not")]
                 query = query.filter(getattr(self.model, field_name) != value)

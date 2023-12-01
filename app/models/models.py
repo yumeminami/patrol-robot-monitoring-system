@@ -135,6 +135,9 @@ class GimbalPoint(BaseModel):
     __tablename__ = "gimbal_points"
     robot_id = Column(Integer, ForeignKey("robots.id"))
     preset_index = Column(Integer, nullable=False, unique=True)
+    pan = Column(Float, default=0.0)
+    tilt = Column(Float, default=0.0)
+    zoom = Column(Float, default=0.0)
 
 
 class PatrolImage(BaseModel):

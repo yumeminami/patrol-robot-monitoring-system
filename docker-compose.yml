@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   app:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
       target: app
@@ -10,10 +10,10 @@ services:
     restart: always
     container_name: app
     environment:
-      ROS_MASTER_URI: http://ros_core:11311 
+      ROS_MASTER_URI: http://ros_core:11311
       REDIS_PASSWORD: sample_password
       ROS_HOSTNAME: 192.168.2.43
-      PYTHONPATH : /app/share/devel/lib/python3/dist-packages
+      PYTHONPATH: /app/share/devel/lib/python3/dist-packages
       VISION_ALGORITHM_API_URL: http://192.168.2.41:5209
     ports:
       - "8000:8000"
@@ -30,10 +30,10 @@ services:
     logging:
       driver: "json-file"
       options:
-          max-size: "1g"
+        max-size: "1g"
 
     command: python3 app/main.py
-  
+
   celery-worker:
     container_name: celery-worker
     restart: always
@@ -46,8 +46,8 @@ services:
 
     environment:
       REDIS_PASSWORD: sample_password
-      ROS_MASTER_URI: http://ros_core:11311 
-      PYTHONPATH : /app/share/devel/lib/python3/dist-packages
+      ROS_MASTER_URI: http://ros_core:11311
+      PYTHONPATH: /app/share/devel/lib/python3/dist-packages
       VISION_ALGORITHM_API_URL: http://192.168.2.41:5209
     depends_on:
       - db
@@ -55,9 +55,8 @@ services:
     logging:
       driver: "json-file"
       options:
-          max-size: "1g"
+        max-size: "1g"
 
-  
   db:
     image: "mysql:8.0"
     container_name: db
@@ -70,9 +69,10 @@ services:
       - "3306:3306"
     volumes:
       - "mysql_data:/var/lib/mysql"
-    
+      - "./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql"
+
   ros_core:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
       target: ros_core
@@ -82,7 +82,7 @@ services:
     hostname: ros_core
     ports:
       - "11311:11311"
-    depends_on: 
+    depends_on:
       - db
 
   redis:
@@ -93,12 +93,12 @@ services:
     volumes:
       - redis_data:/data
     command: redis-server --appendonly no --requirepass "sample_password"
-    
+
   panorama_video_website:
     image: nginx:latest
     container_name: panorama_video_website
     ports:
-      - "80:80"  
+      - "80:80"
       - "443:443"
     depends_on:
       - app
@@ -109,8 +109,6 @@ services:
       - ./app/static/videos:/static/videos:rw
       - ./app/static/images:/static/images:rw
     restart: always
-
-
 
 volumes:
   video_data: {}

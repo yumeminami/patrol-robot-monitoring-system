@@ -160,14 +160,18 @@ _这个项目是基于ROS（机器人操作系统）开发的。由于ROS官方�
    ```sh
    docker ps
    
-   CONTAINER ID   IMAGE          COMMAND                  CREATED       STATUS       PORTS                               NAMES
-   c0ea67aa47a6   417106dd6a74   "/ros_entrypoint.sh …"   6 hours ago   Up 6 hours   0.0.0.0:8000->8000/tcp              app
-   b048af054ece   53211154db2f   "/ros_entrypoint.sh …"   6 hours ago   Up 6 hours                                       ros_core
-   2ba53f0125c7   417106dd6a74   "/ros_entrypoint.sh …"   6 hours ago   Up 6 hours   8000/tcp                            patrol-robot-monitoring-system-celery-worker-1
-   a249f6aa1715   mysql:8.0      "docker-entrypoint.s…"   6 hours ago   Up 6 hours   0.0.0.0:3306->3306/tcp, 33060/tcp   patrol-robot-monitoring-system-db-1
-   c1532e06141d   redis:latest   "docker-entrypoint.s…"   6 hours ago   Up 6 hours   0.0.0.0:6379->6379/tcp              redis
+   CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS                                                          NAMES
+   7c2ca2fd8071   app:latest                  "/ros_entrypoint.sh …"   7 minutes ago    Up 5 minutes    0.0.0.0:8000->8000/tcp, 0.0.0.0:45150-45200->45150-45200/tcp   app
+   3bee60956053   app:latest                  "/ros_entrypoint.sh …"   7 minutes ago    Up 5 minutes    8000/tcp                                                       celery-worker
+   10138442f708   ros_core:latest             "/ros_entrypoint.sh …"   7 minutes ago    Up 6 minutes    0.0.0.0:11311->11311/tcp                                       ros_core
+   3476189f0163   mysql:8.0                   "docker-entrypoint.s…"   7 minutes ago    Up 6 minutes    0.0.0.0:3306->3306/tcp, 33060/tcp                              db
+   541f457209b1   redis:latest                "docker-entrypoint.s…"   7 minutes ago    Up 6 minutes    0.0.0.0:6379->6379/tcp                                         redis
    ```
- 3. 访问 http://localhost:8000/docs 来浏览APIs。
+3. 初始化数据库
+   ```sh
+    ./init_db.sh
+   ```
+4. 访问 http://localhost:8000/docs 来浏览APIs。
 
 
    

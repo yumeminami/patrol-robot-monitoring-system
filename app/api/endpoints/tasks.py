@@ -72,10 +72,17 @@ def after_update(task_id, updated_task, db):
     push_task_to_celery(updated_task)
 
 
+def after_read(tasks):
+    # reverse the order of tasks
+    tasks = tasks[::-1]
+    return tasks
+
+
 hooks = {
     "before_created": before_created,
     "after_created": after_created,
     "before_update": before_update,
     "after_update": after_update,
+    "after_read": after_read,
 }
 router = create_generic_router(crud, TaskCreate, TaskUpdate, Task, hooks=hooks)

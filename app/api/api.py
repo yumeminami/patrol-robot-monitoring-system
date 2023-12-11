@@ -87,7 +87,7 @@ def create_generic_router(
             return JSONResponse(status_code=404, content="Item not found")
         after_read = hooks.get("after_read")
         if after_read:
-            items = [after_read(item) for item in items]
+            items = after_read(items)
 
         if export:
             # check item type is db model

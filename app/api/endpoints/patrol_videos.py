@@ -22,6 +22,10 @@ from app.schemas.alarm_logs import (
 from app.settings import config
 
 
+def after_read(patrol_videos):
+    return patrol_videos[::-1]
+
+
 def after_delete(id, patrol_video, db):
     try:
         parsed_url = urlparse(patrol_video.video_url)
@@ -32,6 +36,7 @@ def after_delete(id, patrol_video, db):
 
 patrol_videos_hooks = {
     "after_delete": after_delete,
+    "after_read": after_read,
 }
 
 router = create_generic_router(

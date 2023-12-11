@@ -7,6 +7,10 @@ from app.schemas.patrol_images import (
 )
 
 
+def after_read(patrol_images):
+    return patrol_images[::-1]
+
+
 def after_delete(id, patrol_image, db):
     try:
         parsed_url = urlparse(patrol_image.image_url)
@@ -17,6 +21,7 @@ def after_delete(id, patrol_image, db):
 
 patrol_images_hooks = {
     "after_delete": after_delete,
+    "after_read": after_read,
 }
 
 router = create_generic_router(

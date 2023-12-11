@@ -33,6 +33,8 @@ class TaskLogUpdate(BaseModel):
 
 class TaskLog(TaskLogBase):
     id: int
+    patrol_images: list = []
+    patrol_videos: list = []
     created_at: datetime
     updated_at: datetime
 

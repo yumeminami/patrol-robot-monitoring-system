@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
@@ -15,6 +17,9 @@ class CRUDPatrolImage(CRUDBase[PatrolImage, PatrolImageCreate, PatrolImageUpdate
             .filter(PatrolImage.checkpoint_id == checkpoint_id)
             .first()
         )
+
+    def get_by_task_log_id(self, db: Session, *, task_log_id: int) -> List[PatrolImage]:
+        return db.query(self.model).filter(PatrolImage.task_log_id == task_log_id).all()
 
 
 patrol_image = CRUDPatrolImage(PatrolImage)

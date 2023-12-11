@@ -10,7 +10,7 @@ from app.schemas.vision_algorithms import (
 from app.vision_algorithm.vision_algorithm import vision_algorithm as vs
 
 
-def after_read(vision_algorithms):
+def after_reads(vision_algorithms):
     for vision_algorithm in vision_algorithms:
         vision_algorithm = VisionAlgorithm.from_orm(vision_algorithm)
         if vision_algorithm.type == VisionAlgorithmType.VIDEO_DETECTION.value:
@@ -26,7 +26,7 @@ def after_read(vision_algorithms):
         return vision_algorithm
 
 
-hooks = {"after_read": after_read}
+hooks = {"after_reads": after_reads}
 router = create_generic_router(
     crud,
     VisionAlgorithmCreate,

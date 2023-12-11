@@ -3,11 +3,11 @@ from app.crud.alarm_logs import alarm_log as crud
 from app.schemas.alarm_logs import AlarmLog, AlarmLogUpdate
 
 
-def after_read(alarm_logs):
+def after_reads(alarm_logs):
     return alarm_logs[::-1]
 
 
-hooks = {"after_read": after_read}
+hooks = {"after_reads": after_reads}
 
 router = create_generic_router(
     crud=crud,

@@ -85,9 +85,9 @@ def create_generic_router(
             items = crud.get_multi(db=db, skip=skip, limit=limit)
         if items is None:
             return JSONResponse(status_code=404, content="Item not found")
-        after_read = hooks.get("after_read")
-        if after_read:
-            items = after_read(items)
+        after_reads = hooks.get("after_reads")
+        if after_reads:
+            items = after_reads(items)
 
         if export:
             # check item type is db model
@@ -141,7 +141,7 @@ def create_generic_router(
             return JSONResponse(status_code=404, content="Item not found")
         after_read = hooks.get("after_read")
         if after_read:
-            return after_read(db_item)
+            db_item = after_read(db_item)
         return db_item
 
     if create_schema is not None:

@@ -147,6 +147,9 @@ class PatrolImage(BaseModel):
     task_id = Column(
         Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
     )
+    task_log_id = Column(
+        Integer, ForeignKey("task_logs.id", ondelete="CASCADE"), nullable=False
+    )
     checkpoint_id = Column(
         Integer,
         ForeignKey("checkpoints.id", ondelete="CASCADE"),
@@ -161,6 +164,9 @@ class PatrolVideo(BaseModel):
     video_url = Column(String(100), default="")
     task_id = Column(
         Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False
+    )
+    task_log_id = Column(
+        Integer, ForeignKey("task_logs.id", ondelete="CASCADE"), nullable=False
     )
     start_position = Column(Float, default=0)
     end_position = Column(Float, default=0)

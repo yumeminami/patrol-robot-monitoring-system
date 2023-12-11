@@ -268,6 +268,7 @@ def image_detection(image, task_id, checkpoint_id):
     patrol_image = PatrolImageCreate(
         image_url=localhost + os.path.relpath(image_file_path, "app"),
         task_id=task_id,
+        task_log_id=task_log.id,
         uuid=image_id,
         checkpoint_id=checkpoint_id,
         alarm=False,
@@ -325,6 +326,7 @@ def image_detection(image, task_id, checkpoint_id):
             patrol_image_detected = PatrolImageCreate(
                 image_url=localhost + os.path.relpath(detected_image_file_path, "app"),
                 task_id=task_id,
+                task_log_id=task_log.id,
                 uuid=image_id,
                 checkpoint_id=checkpoint_id,
                 alarm=alarm,
@@ -351,6 +353,7 @@ def image_detection(image, task_id, checkpoint_id):
     patrol_image_merge = PatrolImageCreate(
         image_url=localhost + os.path.relpath(merge_image_file_path, "app"),
         task_id=task_id,
+        task_log_id=task_log.id,
         uuid=image_id,
         checkpoint_id=checkpoint_id,
         alarm=False,
@@ -380,6 +383,10 @@ def video_detection(task_id, video_data):
     if task is None:
         logger.error("Task does not exist in the database.")
         return
+    task_log = task_log_crud.get_the_latest_task_log(db, task_id)
+    if task_log is None:
+        logger.error("Task log does not exist in the database.")
+        return
 
     task = Task.from_orm(task)
     vision_algorithm_ids = task.vision_algorithms
@@ -402,6 +409,7 @@ def video_detection(task_id, video_data):
     patrol_video_create = PatrolVideoCreate(
         video_url=localhost + os.path.relpath(video_file_path, "app"),
         task_id=task_id,
+        task_log_id=task_log.id,
         uuid=video_id,
         start_position=task.start_position,
         end_position=task.end_position,
@@ -438,6 +446,7 @@ def video_detection(task_id, video_data):
             patrol_video_detected = PatrolVideoCreate(
                 video_url=localhost + os.path.relpath(detected_video_file_path, "app"),
                 task_id=task_id,
+                task_log_id=task_log.id,
                 uuid=video_id,
                 start_position=task.start_position,
                 end_position=task.end_position,

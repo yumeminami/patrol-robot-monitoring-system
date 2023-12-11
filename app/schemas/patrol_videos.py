@@ -7,6 +7,7 @@ class PatrolVideoBase(BaseModel):
     video_url: str
     uuid: str
     task_id: int
+    task_log_id: int
     start_position: float = 0
     end_position: float = 0
     velocity: float = 0

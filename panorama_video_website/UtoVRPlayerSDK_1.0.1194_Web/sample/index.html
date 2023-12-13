@@ -78,7 +78,7 @@
     var MyPlayerObj = null;
     var sceneFilePath = null;
     // 构建HTTP请求的URL
-    var url = "http://192.168.2.43:8000/api/panorama_video";
+    var url = "http://127.0.0.1:8000/api/panorama_video";
 
     // 发起HTTP请求
     var xhr = new XMLHttpRequest();
@@ -119,7 +119,7 @@
         console.log(position)
         if (!isNaN(position)) {
             // 构建HTTP请求的URL
-            var url = "http://192.168.2.43:8000/api/panorama_video/video_time?position=" + position;
+            var url = "http://127.0.0.1:8000/api/panorama_video/video_time?position=" + position;
 
             // 发起HTTP请求
             var xhr = new XMLHttpRequest();

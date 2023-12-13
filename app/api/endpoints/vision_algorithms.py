@@ -11,6 +11,7 @@ from app.vision_algorithm.vision_algorithm import vision_algorithm as vs
 
 
 def after_reads(vision_algorithms):
+    cn_vision_algorithm = []
     for vision_algorithm in vision_algorithms:
         vision_algorithm = VisionAlgorithm.from_orm(vision_algorithm)
         if vision_algorithm.type == VisionAlgorithmType.VIDEO_DETECTION.value:
@@ -23,7 +24,9 @@ def after_reads(vision_algorithms):
             vision_algorithm_cn_name = None
         if vision_algorithm_cn_name:
             vision_algorithm.name = vision_algorithm_cn_name
-        return vision_algorithm
+
+        cn_vision_algorithm.append(vision_algorithm)
+    return cn_vision_algorithm
 
 
 hooks = {"after_reads": after_reads}

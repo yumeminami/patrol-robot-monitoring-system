@@ -53,12 +53,12 @@ router = create_generic_router(
 
 @router.post("/batch")
 def create_batch(
-    robot_id: int,
     start: int,
     end: int,
     interval: int,
     velocity: float,
     gimbal_points: list = [],
+    robot_id: int = 1,
     db: SessionLocal = Depends(get_db),
 ):
     arr = np.arange(start, end, interval)

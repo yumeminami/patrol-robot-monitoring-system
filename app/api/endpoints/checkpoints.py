@@ -1,3 +1,5 @@
+import numpy as np
+
 from fastapi import Depends, HTTPException
 
 from app.api.api import create_generic_router
@@ -10,6 +12,7 @@ from app.schemas.checkpoints import (
     CheckPointCreate,
     CheckPointUpdate,
 )
+from app.models.models import CheckPoint as CheckPointModel
 
 
 def get_db():
@@ -46,6 +49,40 @@ hooks = {
 router = create_generic_router(
     crud, CheckPointCreate, CheckPointUpdate, CheckPoint, hooks=hooks
 )
+
+
+@router.post("/batch")
+def create_batch(
+    robot_id: int,
+    start: int,
+    end: int,
+    interval: int,
+    velocity: float,
+    gimbal_points: list = [],
+    db: SessionLocal = Depends(get_db),
+):
+    arr = np.arange(start, end, interval)
+    if arr[-1] != end:
+        arr = np.append(arr, end)
+    checkpoints = []
+    from datetime import datetime
+
+    for i in arr:
+        checkpoint = {
+            "name": f"POSITION:{i}mm VELOCITY:{velocity}mm/s",
+            "robot_id": robot_id,
+            "position": i,
+            "velocity": velocity,
+            "gimbal_points": gimbal_points,
+            "created_at": datetime.now(),
+            "updated_at": datetime.now(),
+        }
+        checkpoints.append(checkpoint)
+
+    db.bulk_insert_mappings(CheckPointModel, checkpoints)
+    db.commit()
+
+    return {"message": "success"}
 
 
 @router.post("/robot/{robot_id}")

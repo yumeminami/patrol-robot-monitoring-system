@@ -10,12 +10,18 @@ from app.schemas.patrol_images import PatrolImage
 
 def after_read(task_log):
     task_log = TaskLog.from_orm(task_log)
-    patrol_videos = [PatrolVideo.from_orm(patrol_video).video_url for patrol_video in crud_patrol_video.get_by_task_log_id(
-        db=SessionLocal(), task_log_id=task_log.id
-    )]
-    patrol_images = [PatrolImage.from_orm(patrol_image).image_url for patrol_image in crud_patrol_image.get_by_task_log_id(
-        db=SessionLocal(), task_log_id=task_log.id
-    )]
+    patrol_videos = [
+        PatrolVideo.from_orm(patrol_video).video_url
+        for patrol_video in crud_patrol_video.get_by_task_log_id(
+            db=SessionLocal(), task_log_id=task_log.id
+        )
+    ]
+    patrol_images = [
+        PatrolImage.from_orm(patrol_image).image_url
+        for patrol_image in crud_patrol_image.get_by_task_log_id(
+            db=SessionLocal(), task_log_id=task_log.id
+        )
+    ]
     task_log.patrol_images = patrol_images
     task_log.patrol_videos = patrol_videos
 

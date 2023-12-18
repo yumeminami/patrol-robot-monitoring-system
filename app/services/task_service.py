@@ -260,8 +260,9 @@ def image_detection(image, task_id, checkpoint_id):
         logger.error("Checkpoint does not exist in the database.")
         return
 
+    now = datetime.now()
     localhost = "http://127.0.0.1:8000/"
-    image_id = str(uuid.uuid4())
+    image_id = now.strftime("%Y%m%d%H%M%S")
     image_cv = ROS_Image_to_cv2(image)
     image_file_path = f"{config.IMAGE_DIR}/{image_id}.jpg"
 
@@ -394,8 +395,9 @@ def video_detection(task_id, video_data):
     for id in vision_algorithm_ids:
         vision_algorithms.append(vision_algorithm_crud.get(db, id))
 
+    now = datetime.now()
     localhost = "http://127.0.0.1:8000/"
-    video_id = str(uuid.uuid4())
+    video_id = now.strftime("%Y%m%d%H%M%S")
     video_file_path = f"{config.VIDEO_DIR}/{video_id}.mp4"
     video_avi_file_path = f"{config.VIDEO_DIR}/{video_id}.avi"
     with open(video_file_path, "wb") as f:

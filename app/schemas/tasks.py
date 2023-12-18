@@ -62,14 +62,6 @@ class TaskCreate(TaskBase):
             raise ValueError("type must be auto or manual")
 
         if type == TaskType.AUTO.value:
-            if not start_position or not end_position:
-                raise ValueError(
-                    "start_position and end_position must be provided when type is auto"
-                )
-            if start_position < 0 or end_position < 0:
-                raise ValueError(
-                    "start_position and end_position could not smaller than 0"
-                )
             if start_position >= end_position:
                 raise ValueError("start_position must be smaller than end_position")
             if velocity == 0:

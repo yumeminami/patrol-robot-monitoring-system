@@ -121,6 +121,7 @@ class TaskLog(BaseModel):
     execution_date = Column(JSON, default=[Time])
     type = Column(Integer, default=0)
     status = Column(Integer, default=0)
+    detail = Column(String(100), default="")
 
 
 class VisionAlgorithm(BaseModel):

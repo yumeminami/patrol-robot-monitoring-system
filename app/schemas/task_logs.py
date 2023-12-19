@@ -17,6 +17,7 @@ class TaskLogBase(BaseModel):
     execution_date: Optional[str] = None
     type: int
     status: int = TaskLogStatus.IN_PROGRESS.value
+    detail: Optional[str] = None
 
 
 class TaskLogCreate(TaskLogBase):
@@ -29,6 +30,7 @@ class TaskLogUpdate(BaseModel):
     execution_date: Optional[str] = None
     type: int = 0
     status: int = TaskLogStatus.IN_PROGRESS.value
+    detail: Optional[str] = None
 
 
 class TaskLog(TaskLogBase):

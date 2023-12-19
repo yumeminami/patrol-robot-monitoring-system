@@ -84,6 +84,13 @@ class PatrolControlCommand(Enum):
     PANORAMA_VIDEO_RECORD = 6
 
 
+class PatrolControlResponse(Enum):
+    FAILED = 0
+    SUCCESS = 1
+    LOW_BATTERY = 2
+    INTASK = 3
+
+
 def validate_enum_value(value, enum_type):
     try:
         value = int(value)
@@ -441,13 +448,11 @@ def patrol_control(robot_name, **kwargs):
             request.xml_data = kwargs.get("xml_data")
 
         response = patrol_control(request)
-        if response.status_code == 0:
-            return False
-        return True
+        return response.status_code
 
     except Exception as e:
         logger.error(f"Error: {e}")
-        return False
+        return PatrolControlResponse.FAILED.value
 
 
 def handle_panorama_video():

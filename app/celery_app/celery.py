@@ -13,7 +13,7 @@ from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.tasks import Task, TaskStatus
 from app.schemas.task_logs import TaskLog, TaskLogCreate, TaskLogStatus
-from app.services.ros_service import patrol_control
+from app.services.ros_service import patrol_control, PatrolControlResponse
 from app.services.task_service import (
     create_task_xml,
     monitor_sensor_data,
@@ -215,23 +215,32 @@ def start_task(task_id, execution_time):
             xml_data = f.read()
         os.remove(file_name)
         logger.error(f"Patrol Command: {patrol_command}")
-        if patrol_control(
-            robot_name=robot.name,
-            patrol_command=patrol_command,
-            xml_data=xml_data,
-        ):
+        status_code = patrol_control(
+            robot_name=robot.name, patrol_command=patrol_command, xml_data=xml_data
+        )
+        if status_code == PatrolControlResponse.SUCCESS.value:
             logger.error(f"Robot '{robot.name}' start task id {task.id} success!")
         else:
-            logger.error(f"Robot '{robot.name}' start task id {task.id} failed!")
+            detail = ""
+            if status_code == PatrolControlResponse.FAILED.value:
+                detail = "未知原因"
+            elif status_code == PatrolControlResponse.LOW_BATTERY.value:
+                detail = "电量不足无法开启任务"
+            elif status_code == PatrolControlResponse.INTASK.value:
+                detail = "正任务中无法开启任务"
             task_log_create = TaskLogCreate(
                 task_id=task.id,
                 robot_id=task.robot_id,
                 execution_date=execution_date,
                 type=task.type,
                 status=TaskLogStatus.FAILED.value,
+                detail=detail,
             )
             task_log = task_log_crud.create(db, obj_in=task_log_create)
-            return f"Robot '{robot.name}' start task id {task.id} failed!"
+            logger.error(
+                f"Robot '{robot.name}' start task id {task.id} failed! {detail}"
+            )
+            return f"Robot '{robot.name}' start task id {task.id} failed! {detail}"
     except Exception as e:
         logger.error(f"start task error: {e}")
         return f"start task error: {e}"

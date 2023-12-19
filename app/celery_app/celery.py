@@ -66,6 +66,7 @@ def update_robot_data(**kwargs):
 
     if robot_real_time_info is None:
         logger.error("No robot realtime info found in the cache.")
+        return
 
     db = SessionLocal()
     robot = robot_crud.get_by_name(db=db, name=robot_name)
@@ -96,6 +97,7 @@ def update_sensor_data(**kwargs):
     sensor_data = get_redis_data(robot_name, "sensor_data")
     if sensor_data is None:
         logger.error("No sensor data found in the cache.")
+        return
 
     db = SessionLocal()
     robot = robot_crud.get_by_name(db=db, name=robot_name)

@@ -60,9 +60,11 @@ class VisionAlgorithm:
         try:
             for alarm in alarms:
                 if counts[alarm] > 0:
-                    detected_alarm.append(alarm)
+                    cn_alarm = self.img_algorithm_config[algorithm][alarm]
+                    detected_alarm.append(cn_alarm)
         except Exception as e:
             logger.error(f"vision_algorithm detect error: {e}")
+            detected_alarm = []
         finally:
             return detected_alarm, img
 

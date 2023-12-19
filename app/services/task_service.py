@@ -31,6 +31,7 @@ from app.schemas.alarm_logs import (
     AlarmLogCreate,
     AlarmLogLevel,
     AlarmLogStatus,
+    alarm_log_type_map,
 )
 from app.schemas.checkpoints import CheckPoint
 from app.schemas.gimbalpoints import GimbalPoint
@@ -222,7 +223,7 @@ def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
                     status=AlarmLogStatus.UNPROCESSED.value,
                     location=robot.position,
                     type=sensor_name,
-                    detail=f"Sensor: {sensor_name}, Lower Limit: {sensor.lower_limit}, Upper Limit: {sensor.upper_limit}, Current Value: {sensor_data[sensor_name]}",
+                    detail=f"传感器名称: {alarm_log_type_map[sensor_name]}, 下限: {sensor.lower_limit}, 上限: {sensor.upper_limit}, 当前数值: {sensor_data[sensor_name]}",
                 )
 
                 alarm_log_crud.create(db, obj_in=alarm_log)
@@ -320,7 +321,7 @@ def image_detection(image, task_id, checkpoint_id):
                     type=vs.img_algorithm_dict.get(vision_algorithm.name),
                     img_url=localhost
                     + os.path.relpath(detected_image_file_path, "app"),
-                    detail=f"Alarms detected: {detected_alarms}",
+                    detail=f"检测到异常: {detected_alarms}",
                 )
                 alarm_log_crud.create(db, obj_in=alarm_log)
 

@@ -4,6 +4,17 @@ from typing import Optional
 
 from pydantic import BaseModel, validator
 
+alarm_log_type_map = {
+    "temperature": "温度",
+    "humidity": "湿度",
+    "light": "光照",
+    "PM1_0": "PM1.0",
+    "PM2_5": "PM2.5",
+    "PM10": "PM10",
+    "smoke1": "烟雾1",
+    "smoke2": "烟雾2",
+}
+
 
 class AlarmLogLevel(Enum):
     WARNING = 0  # all sensors alarms level default are warning

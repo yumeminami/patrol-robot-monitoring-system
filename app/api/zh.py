@@ -86,9 +86,7 @@ async def get_robots(token: str = Depends(oauth2_scheme)):
             return translated_data
             return data
         except httpx.HTTPError as e:
-            return JSONResponse(
-                status_code=e.response.status_code, content=str(e)
-            )
+            return JSONResponse(status_code=e.response.status_code, content=str(e))
 
 
 def task_zh_key(key: str) -> str:
@@ -170,9 +168,7 @@ async def get_tasks(token: str = Depends(oauth2_scheme)):
             return translated_data
             return data
         except httpx.HTTPError as e:
-            return JSONResponse(
-                status_code=e.response.status_code, content=str(e)
-            )
+            return JSONResponse(status_code=e.response.status_code, content=str(e))
 
 
 def alarm_zh_key(key: str) -> str:
@@ -284,6 +280,4 @@ async def get_alarm_logs(token: str = Depends(oauth2_scheme)):
             return translated_data
             return data
         except httpx.HTTPError as e:
-            return JSONResponse(
-                status_code=e.response.status_code, content=str(e)
-            )
+            return JSONResponse(status_code=e.response.status_code, content=str(e))

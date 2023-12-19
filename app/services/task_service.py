@@ -273,6 +273,7 @@ def image_detection(image, task_id, checkpoint_id):
         task_log_id=task_log.id,
         uuid=image_id,
         checkpoint_id=checkpoint_id,
+        position=checkpoint.position,
         alarm=False,
     )
     patrol_image_crud.create(db, obj_in=patrol_image)
@@ -285,6 +286,7 @@ def image_detection(image, task_id, checkpoint_id):
         vision_algorithms.append(vision_algorithm_crud.get(db, id))
 
     # Detect
+    exist_alarm = False
     _, img_encoded = cv2.imencode(".jpg", image_cv)
     image_base64 = base64.b64encode(img_encoded).decode()
     for vision_algorithm in vision_algorithms:
@@ -310,6 +312,7 @@ def image_detection(image, task_id, checkpoint_id):
 
             alarm = False
             if len(detected_alarms) > 0:
+                exist_alarm = True
                 alarm = True
                 logger.error(f"Alarms detected: {detected_alarms}")
                 alarm_log = AlarmLogCreate(
@@ -331,6 +334,7 @@ def image_detection(image, task_id, checkpoint_id):
                 task_log_id=task_log.id,
                 uuid=image_id,
                 checkpoint_id=checkpoint_id,
+                position=checkpoint.position,
                 alarm=alarm,
             )
             patrol_image_crud.create(db, obj_in=patrol_image_detected)
@@ -358,7 +362,8 @@ def image_detection(image, task_id, checkpoint_id):
         task_log_id=task_log.id,
         uuid=image_id,
         checkpoint_id=checkpoint_id,
-        alarm=False,
+        position=checkpoint.position,
+        alarm=exist_alarm,
     )
     patrol_image_crud.create(db, obj_in=patrol_image_merge)
 

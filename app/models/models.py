@@ -155,6 +155,7 @@ class PatrolImage(BaseModel):
         ForeignKey("checkpoints.id", ondelete="CASCADE"),
         nullable=False,
     )
+    position = Column(Float, default=0)
     alarm = Column(Boolean, default=False)
 
 

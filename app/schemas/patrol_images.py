@@ -8,6 +8,7 @@ class PatrolImageBase(BaseModel):
     task_id: int
     task_log_id: int
     checkpoint_id: int
+    position: float
     uuid: str
     alarm: bool
 

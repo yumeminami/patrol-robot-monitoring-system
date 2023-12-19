@@ -62,8 +62,6 @@ class TaskCreate(TaskBase):
             raise ValueError("type must be auto or manual")
 
         if type == TaskType.AUTO.value:
-            if start_position >= end_position:
-                raise ValueError("start_position must be smaller than end_position")
             if velocity == 0:
                 raise ValueError("velocity must be provided when type is auto")
             if gimbal_point == 0:

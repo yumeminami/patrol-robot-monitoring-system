@@ -64,7 +64,6 @@ class VisionAlgorithm:
                     detected_alarm.append(cn_alarm)
         except Exception as e:
             logger.error(f"vision_algorithm detect error: {e}")
-            detected_alarm = []
         finally:
             return detected_alarm, img
 

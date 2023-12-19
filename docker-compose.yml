@@ -14,7 +14,7 @@ services:
       REDIS_PASSWORD: sample_password
       ROS_HOSTNAME: 192.168.2.43
       PYTHONPATH: /app/share/devel/lib/python3/dist-packages
-      VISION_ALGORITHM_API_URL: http://192.168.2.41:5209
+      VISION_ALGORITHM_API_URL: http://192.168.2.62:5209
     ports:
       - "8000:8000"
       - "45150-45200:45150-45200"

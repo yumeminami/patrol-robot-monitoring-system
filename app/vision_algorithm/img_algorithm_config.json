@@ -16,7 +16,7 @@
         "dig": "挖掘痕迹",
         "leakage": "正常架构",
         "arch_drop": "架构掉落",
-        "warp_frame": "变形架构",
+        "warp_frames": "变形架构",
         "hole": "有螺栓孔、注浆孔",
         "construction_joint": "施工缝",
         "alarms": [
@@ -25,7 +25,7 @@
             "dig",
             "leakage",
             "arch_drop",
-            "warp_frame",
+            "warp_frames",
             "hole",
             "construction_joint"
         ]
@@ -175,11 +175,11 @@
     },
     "signage":{
         "light": "亮灯",
-        "light_out": "灯灭",
+        "lights_out": "灯灭",
         "damage": "损坏",
         "drop": "掉落",
         "alarms": [
-            "light_out",
+            "lights_out",
             "damage",
             "drop"
         ]

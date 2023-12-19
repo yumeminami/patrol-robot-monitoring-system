@@ -317,7 +317,7 @@ def image_detection(image, task_id, checkpoint_id):
                     task_log_id=task_log.id,
                     status=AlarmLogStatus.UNPROCESSED.value,
                     location=checkpoint.position,
-                    type=vision_algorithm.name,
+                    type=vs.img_algorithm_dict.get(vision_algorithm.name),
                     img_url=localhost
                     + os.path.relpath(detected_image_file_path, "app"),
                     detail=f"Alarms detected: {detected_alarms}",

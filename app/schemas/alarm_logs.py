@@ -6,8 +6,8 @@ from pydantic import BaseModel, validator
 
 
 class AlarmLogLevel(Enum):
-    WARNING = 0
-    FATAL = 1
+    WARNING = 0  # all sensors alarms level default are warning
+    FATAL = 1  # all vision algorithms alarms level default are fatal
 
 
 class AlarmLogStatus(Enum):

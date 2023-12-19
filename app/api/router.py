@@ -13,6 +13,7 @@ from .endpoints.tasks import router as tasks_router
 from .endpoints.vision_algorithms import router as vision_algorithms_router
 from .exporter import router as exporter_router
 from .endpoints.panorama_video import router as panorama_video_router
+from .zh import router as zh_router
 
 router = APIRouter()
 
@@ -55,3 +56,5 @@ router.include_router(exporter_router, prefix="/exporter", tags=["exporter"])
 router.include_router(
     panorama_video_router, prefix="/panorama_video", tags=["panorama_video"]
 )
+# ZH router
+router.include_router(zh_router, prefix="/zh", tags=["zh"])

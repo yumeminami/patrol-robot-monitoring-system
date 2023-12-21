@@ -9,6 +9,7 @@ from pyfiglet import Figlet
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from app.db.database import init_db
 from app.api.deps import router as deps_router
 from app.api.router import router as api_router
 from app.ros.ros import initialize_all_robots_corresponding_nodes
@@ -34,6 +35,7 @@ def create_app():
     return app
 
 
+init_db()
 app = create_app()
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 

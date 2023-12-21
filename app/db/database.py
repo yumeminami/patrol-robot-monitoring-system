@@ -13,3 +13,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 logger.info("Connected to database!")
 
 Base = declarative_base()
+
+
+def init_db():
+    Base.metadata.create_all(bind=engine)

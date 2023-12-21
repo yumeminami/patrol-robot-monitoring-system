@@ -174,6 +174,3 @@ class PatrolVideo(BaseModel):
     end_position = Column(Float, default=0)
     velocity = Column(Float, default=0)
     alarm = Column(Boolean, default=False)
-
-
-Base.metadata.create_all(bind=engine)

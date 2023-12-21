@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.api.deps import router as deps_router
 from app.api.router import router as api_router
 from app.ros.ros import initialize_all_robots_corresponding_nodes
-from app.utils.log import logger
+from app.utils.log import logger, UVICORN_LOGGING_CONFIG
 from app.ws.websocket_manager import router as ws_router
 
 
@@ -43,7 +43,7 @@ logger.info("Server Start...")
 process_list = initialize_all_robots_corresponding_nodes()
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)  # type: ignore
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_config=UVICORN_LOGGING_CONFIG)  # type: ignore
     for process in process_list:
         process.terminate()
     logger.info(f.renderText("\nBye!"))

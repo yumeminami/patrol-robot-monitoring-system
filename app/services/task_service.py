@@ -1,7 +1,6 @@
 import base64
 import os
 import time
-import uuid
 import xml.etree.ElementTree as ET
 from ast import literal_eval
 from datetime import datetime

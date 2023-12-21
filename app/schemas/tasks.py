@@ -52,8 +52,6 @@ class TaskCreate(TaskBase):
     @root_validator(pre=True)
     def type_validator(cls, values):
         type = values.get("type")
-        start_position = values.get("start_position")
-        end_position = values.get("end_position")
         velocity = values.get("velocity")
         gimbal_point = values.get("gimbal_point")
         checkpoint_ids = values.get("checkpoint_ids")

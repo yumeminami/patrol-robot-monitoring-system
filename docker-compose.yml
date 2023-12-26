@@ -38,7 +38,7 @@ services:
     container_name: celery-worker
     restart: always
     image: app:latest
-    command: celery -A app.celery_app.celery worker -B --loglevel=warning
+    command: celery -A app.celery_app.celery worker -B --loglevel=info
     volumes:
       - ./:/app
       - ./app/time_setting/timezone:/etc/timezone:ro

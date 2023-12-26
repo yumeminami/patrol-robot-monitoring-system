@@ -2,6 +2,7 @@ import os
 from ast import literal_eval
 from datetime import datetime
 from threading import Thread
+from urllib.parse import urlparse
 
 from celery import Celery
 
@@ -9,6 +10,7 @@ from app.crud.robots import robot as robot_crud
 from app.crud.sensors import sensor as sensor_crud
 from app.crud.tasks import task as task_crud
 from app.crud.task_logs import task_log as task_log_crud
+from app.crud.patrol_images import patrol_image as patrol_image_crud
 from app.db.database import SessionLocal
 from app.db.redis import redis_client
 from app.schemas.tasks import Task, TaskStatus
@@ -47,6 +49,10 @@ app.conf.beat_schedule = {
         "task": "app.celery_app.celery.regular_query_tasks",
         "schedule": 60.0 * 60 * 6,
     },
+    "remove-expired-images": {
+        "task": "app.celery_app.celery.remove_expired_images",
+        "schedule": 5,
+    },
 }
 
 
@@ -80,7 +86,6 @@ def update_robot_data(**kwargs):
             db_obj=robot,
             obj_in=robot_real_time_info,
         )
-        logger.info(f"Robot '{robot_name}' updated successfully.")
     except Exception as e:
         logger.error(f"Error occurred while updating robot: {e}")
     finally:
@@ -113,9 +118,44 @@ def update_sensor_data(**kwargs):
                 )
             else:
                 logger.warning(f"Sensor '{sensor.name}' not found in message.")
-        logger.info(f"{robot_name} Sensor data updated successfully.")
     except Exception as e:
         logger.error(f"Error occurred while updating sensor '{sensor.name}': {e}")
+    finally:
+        db.close()
+
+
+@app.task()
+def remove_expired_images():
+    """
+    Remove expired images from the system.
+
+    This function retrieves a list of images that were created before a certain number of days ago,
+    and deletes the corresponding image files from the system.
+
+    """
+    db = SessionLocal()
+    day = 5
+    try:
+        imgs = patrol_image_crud.get_before_created_at(db=db, day=day)
+        logger.info(f"-------------------------------------------")
+        logger.info(f"task: remove expired images")
+        logger.info(f"days: {day} day")
+        logger.info(f"total: {len(imgs)} images")
+        if len(imgs) == 0:
+            logger.info(f"no expired images need to be removed! ✅  ")
+            logger.info(f"-------------------------------------------")
+            return
+        for img in imgs:
+            file_path = "app" + urlparse(img.image_url).path
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            patrol_image_crud.remove(db=db, id=img.id)
+        logger.info(f"remove the image files successfully! ✅  ")
+        logger.info(f"remove the image records successfully! ✅ ")
+        logger.info(f"-------------------------------------------")
+
+    except FileNotFoundError:
+        pass
     finally:
         db.close()
 
@@ -157,7 +197,7 @@ def push_task_to_celery(task):
             args=[task.id, execution_time], eta=eta_time
         )
         redis_client.hset(f"task_{task.id}", execution_time, celery_task.id)
-        logger.warning(f"Task {task.id} will start at {execution_time}")
+        logger.info(f"Task {task.id} will start at {execution_time}")
 
 
 @app.task(ignore_result=True)
@@ -216,12 +256,12 @@ def start_task(task_id, execution_time):
         with open(file_name, "r") as f:
             xml_data = f.read()
         os.remove(file_name)
-        logger.error(f"Patrol Command: {patrol_command}")
+        logger.info(f"Patrol Command: {patrol_command}")
         status_code = patrol_control(
             robot_name=robot.name, patrol_command=patrol_command, xml_data=xml_data
         )
         if status_code == PatrolControlResponse.SUCCESS.value:
-            logger.error(f"Robot '{robot.name}' start task id {task.id} success!")
+            logger.info(f"Robot '{robot.name}' start task id {task.id} success!")
         else:
             detail = ""
             if status_code == PatrolControlResponse.FAILED.value:

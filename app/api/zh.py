@@ -36,8 +36,8 @@ def robot_zh_key(key: str) -> str:
 
 def robot_enum_to_literally(enum_key: str, value: int) -> str:
     robot_battery_status_mapping = {
-        0: "未充电",
-        1: "充电中",
+        0: "充电中",
+        1: "未充电",
     }
 
     robot_status_mapping = {

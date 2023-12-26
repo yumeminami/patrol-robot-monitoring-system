@@ -51,7 +51,7 @@ app.conf.beat_schedule = {
     },
     "remove-expired-images": {
         "task": "app.celery_app.celery.remove_expired_images",
-        "schedule": 5,
+        "schedule": 60.0 * 60 * 12,
     },
 }
 

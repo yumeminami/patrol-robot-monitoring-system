@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 
-def parse_execution_time(execution_time):
+def parse_execution_time(execution_time, next_day=False):
     # 支持多种时间格式
     formats = ["%H:%M:%S", "%H:%M"]
     eta_time = None  # 设置默认值
@@ -25,5 +25,8 @@ def parse_execution_time(execution_time):
 
     # 转为UTC时间
     eta_time = eta_time - timedelta(hours=8)
+    
+    if next_day:
+        eta_time = eta_time + timedelta(days=1)
 
     return eta_time

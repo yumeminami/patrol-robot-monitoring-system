@@ -190,8 +190,8 @@ def push_task_to_celery(task):
         )
         now = now.replace(second=0, microsecond=0)
         if execution_time_obj < now:
-            logger.warning(f"Task {task.id} has been expired at {execution_time}")
-            continue
+            logger.warning(f"Task {task.id} has been expired at {execution_time} today")
+            logger.warning(f"Task {task.id} will execute tomorrow at {execution_time}")
         eta_time = parse_execution_time(execution_time)
         celery_task = start_task.apply_async(
             args=[task.id, execution_time], eta=eta_time

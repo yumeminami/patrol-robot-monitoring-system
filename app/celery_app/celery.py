@@ -5,6 +5,7 @@ from threading import Thread
 from urllib.parse import urlparse
 
 from celery import Celery
+from celery.schedules import crontab
 
 from app.crud.robots import robot as robot_crud
 from app.crud.sensors import sensor as sensor_crud
@@ -45,13 +46,13 @@ app.conf.beat_schedule = {
         "schedule": 1.0,
         "kwargs": {"robot_name": "zj_robot"},
     },
-    "regular-query-tasks-every-6-hours": {
+    "regular-query-tasks": {
         "task": "app.celery_app.celery.regular_query_tasks",
-        "schedule": 60.0 * 60 * 6,
+        "schedule": crontab(hour=0, minute=0)
     },
     "remove-expired-images": {
         "task": "app.celery_app.celery.remove_expired_images",
-        "schedule": 60.0 * 60 * 12,
+        "schedule": crontab(hour=0, minute=0)
     },
 }
 
@@ -158,6 +159,8 @@ def remove_expired_images():
         pass
     finally:
         db.close()
+        
+    return f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} remove expired images"
 
 
 def push_task_to_celery(task):
@@ -200,7 +203,7 @@ def push_task_to_celery(task):
         logger.info(f"Task {task.id} will start at {execution_time}")
 
 
-@app.task(ignore_result=True)
+@app.task()
 def regular_query_tasks():
     """
     The celery task is used to tell the system when should the task start but not what the task is.

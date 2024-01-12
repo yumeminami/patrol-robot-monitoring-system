@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from typing import List
 
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import text
 
 
 from app.crud.base import CRUDBase
@@ -29,7 +28,7 @@ class CRUDPatrolImage(CRUDBase[PatrolImage, PatrolImageCreate, PatrolImageUpdate
         return (
             db.query(self.model)
             .filter(PatrolImage.created_at < interval)
-            .filter(PatrolImage.alarm == False)
+            .filter(PatrolImage.alarm is False)
             .all()
         )
 

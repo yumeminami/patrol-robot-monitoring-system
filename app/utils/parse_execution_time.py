@@ -25,7 +25,7 @@ def parse_execution_time(execution_time, next_day=False):
 
     # 转为UTC时间
     eta_time = eta_time - timedelta(hours=8)
-    
+
     if next_day:
         eta_time = eta_time + timedelta(days=1)
 

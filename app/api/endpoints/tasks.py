@@ -52,8 +52,9 @@ def before_update(task_id, update_task, db):
             IN_PROGRESS -> STOPPED: stop the robot
             """
             if (
-                update_task.status == TaskStatus.STOPPED.value
-                and task.status == TaskStatus.IN_PROGRESS.value
+                update_task.status
+                == TaskStatus.STOPPED.value
+                # and task.status == TaskStatus.IN_PROGRESS.value
             ):
                 patrol_command = (
                     PatrolControlCommand.STOP_NORMAL.value

@@ -48,11 +48,11 @@ app.conf.beat_schedule = {
     },
     "regular-query-tasks": {
         "task": "app.celery_app.celery.regular_query_tasks",
-        "schedule": crontab(hour=0, minute=0)
+        "schedule": crontab(hour=0, minute=0),
     },
     "remove-expired-images": {
         "task": "app.celery_app.celery.remove_expired_images",
-        "schedule": crontab(hour=0, minute=0)
+        "schedule": crontab(hour=0, minute=0),
     },
 }
 
@@ -138,28 +138,28 @@ def remove_expired_images():
     day = 5
     try:
         imgs = patrol_image_crud.get_before_created_at(db=db, day=day)
-        logger.info(f"-------------------------------------------")
-        logger.info(f"task: remove expired images")
+        logger.info("-------------------------------------------")
+        logger.info("task: remove expired images")
         logger.info(f"days: {day} day")
         logger.info(f"total: {len(imgs)} images")
         if len(imgs) == 0:
-            logger.info(f"no expired images need to be removed! ✅  ")
-            logger.info(f"-------------------------------------------")
+            logger.info("no expired images need to be removed! ✅  ")
+            logger.info("-------------------------------------------")
             return
         for img in imgs:
             file_path = "app" + urlparse(img.image_url).path
             if os.path.exists(file_path):
                 os.remove(file_path)
             patrol_image_crud.remove(db=db, id=img.id)
-        logger.info(f"remove the image files successfully! ✅  ")
-        logger.info(f"remove the image records successfully! ✅ ")
-        logger.info(f"-------------------------------------------")
+        logger.info("remove the image files successfully! ✅  ")
+        logger.info("remove the image records successfully! ✅ ")
+        logger.info("-------------------------------------------")
 
     except FileNotFoundError:
         pass
     finally:
         db.close()
-        
+
     return f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} remove expired images"
 
 

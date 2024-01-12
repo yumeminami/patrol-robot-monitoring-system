@@ -158,9 +158,14 @@ def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
 
         robot = robot_crud.get(db, task.robot_id)
         try:
-            patrol_state = rospy.get_param(f"/{robot.name}/patrol_state")
+            if task.type == TaskType.AUTO.value:
+                param_name = f"/{robot.name}/is_robot_continuous_patroling"
+            else:
+                param_name = f"/{robot.name}/is_robot_normal_patroling"
+
+            patrol_state = rospy.get_param(param_name)
             logger.warning(f"Patrol state: {patrol_state}")
-            if patrol_state == 0:
+            if patrol_state == 0 or patrol_state == 2:
                 logger.warning(
                     "Patrol completed, terminating sensor data monitoring..."
                 )
@@ -186,7 +191,7 @@ def monitor_sensor_data(task: Task, execution_date: str, task_log: TaskLog):
         except ROSException as e:
             logger.error(e)
         except KeyError:
-            logger.error(f"{robot.name}/patrol_state param does not exist.")
+            logger.error(f"{param_name} param does not exist.")
         except Exception as e:
             logger.error(e)
 

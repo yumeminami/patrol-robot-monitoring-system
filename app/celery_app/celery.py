@@ -48,11 +48,11 @@ app.conf.beat_schedule = {
     },
     "regular-query-tasks": {
         "task": "app.celery_app.celery.regular_query_tasks",
-        "schedule": crontab(hour=0, minute=0),
+        "schedule": crontab(hour=16, minute=0),
     },
     "remove-expired-images": {
         "task": "app.celery_app.celery.remove_expired_images",
-        "schedule": crontab(hour=0, minute=0),
+        "schedule": crontab(hour=16, minute=0),
     },
 }
 
@@ -134,26 +134,27 @@ def remove_expired_images():
     and deletes the corresponding image files from the system.
 
     """
+    logger.error("remove_expired_images")
     db = SessionLocal()
     day = 5
     try:
         imgs = patrol_image_crud.get_before_created_at(db=db, day=day)
-        logger.info("-------------------------------------------")
-        logger.info("task: remove expired images")
-        logger.info(f"days: {day} day")
-        logger.info(f"total: {len(imgs)} images")
+        print("-------------------------------------------")
+        print("task: remove expired images")
+        print(f"days: {day} day")
+        print(f"total: {len(imgs)} images")
         if len(imgs) == 0:
-            logger.info("no expired images need to be removed! ✅  ")
-            logger.info("-------------------------------------------")
+            print("no expired images need to be removed! ✅  ")
+            print("-------------------------------------------")
             return
         for img in imgs:
             file_path = "app" + urlparse(img.image_url).path
             if os.path.exists(file_path):
                 os.remove(file_path)
             patrol_image_crud.remove(db=db, id=img.id)
-        logger.info("remove the image files successfully! ✅  ")
-        logger.info("remove the image records successfully! ✅ ")
-        logger.info("-------------------------------------------")
+        print("remove the image files successfully! ✅  ")
+        print("remove the image records successfully! ✅ ")
+        print("-------------------------------------------")
 
     except FileNotFoundError:
         pass
